@@ -1,19 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { FindOptionsWhere, Repository } from 'typeorm';
 import { User } from './entites/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectModel } from '@nestjs/sequelize';
+import { WhereOptions } from 'sequelize';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-  ) {}
+  constructor(@InjectModel(User) private userRepository: typeof User) {}
 
   fetchAll() {
-    return this.userRepository.find();
+    return this.userRepository.findAll();
   }
 
-  fetchOne(where: FindOptionsWhere<User>) {
+  fetchOne(where: WhereOptions<User>) {
     return this.userRepository.findOne({
       where,
     });

@@ -1,46 +1,31 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
-@Entity({
-  name: 'users',
+@Table({
+  timestamps: true,
 })
-export class User {
-  @PrimaryColumn('uuid')
+export class User extends Model<User> {
+  @Column({
+    primaryKey: true,
+    type: DataType.UUID,
+    defaultValue: DataType.UUID,
+  })
   uuid: string;
 
-  @Column({ length: 50, nullable: false })
+  @Column({ allowNull: false, type: DataType.STRING[50] })
   firstName: string;
 
-  @Column({ length: 50 })
+  @Column({ type: DataType.STRING[50] })
   lastName: string;
 
-  @Column({ length: 50, nullable: false })
+  @Column({ allowNull: false, type: DataType.STRING[50] })
   username: string;
 
-  @Column({ length: 12 })
+  @Column({ type: DataType.STRING[12] })
   mobile: string;
 
-  @Column({ length: 50 })
+  @Column({ type: DataType.STRING[50] })
   email: string;
 
-  @Column({ length: 150, nullable: false })
+  @Column({ allowNull: false, type: DataType.STRING[50] })
   password: string;
-
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
-  public createdAt: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
-  public updatedAt: Date;
 }

@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { SequelizeModule } from '@nestjs/sequelize';
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
+    SequelizeModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => config.get('typeorm'),
+      useFactory: (config: ConfigService) => config.get('sequelize'),
     }),
   ],
 })
