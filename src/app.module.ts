@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
+import { CafeReastaurantModule } from './cafe_reastaurant/cafe_reastaurant.module';
 import typeormConfigs from 'src/database/config';
 
 @Module({
@@ -11,6 +12,7 @@ import typeormConfigs from 'src/database/config';
     DatabaseModule,
     AuthModule,
     UsersModule,
+    CafeReastaurantModule,
   ],
   controllers: [],
 })
