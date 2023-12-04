@@ -35,6 +35,10 @@ module.exports = {
           type: DataTypes.STRING(110),
           allowNull: false,
         },
+        role: {
+          type: DataTypes.ENUM('admin', 'user', 'manager'),
+          defaultValue: 'user',
+        },
 
         createdAt: DataTypes.DATE,
         updatedAt: DataTypes.DATE,
