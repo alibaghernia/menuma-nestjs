@@ -1,9 +1,8 @@
-const dotenvConfig = 'dotenv';
+const { config: dotenvConfig } = require('dotenv');
 
 dotenvConfig({ path: '.env' });
 
 const config = {
-  autoLoadModels: true,
   development: {
     dialect: 'mariadb',
     host: `${process.env.DB_HOST}`,

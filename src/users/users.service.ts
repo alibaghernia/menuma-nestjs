@@ -16,4 +16,12 @@ export class UsersService {
       where,
     });
   }
+
+  findByMobile(mobile: string) {
+    return this.userRepository.findOne({
+      where: {
+        mobile,
+      },
+    });
+  }
 }
