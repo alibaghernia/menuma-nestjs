@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { DatabaseModule } from './database/database.module';
 import { CafeReastaurantModule } from './cafe_reastaurant/cafe_reastaurant.module';
 import { CategoryModule } from './category/category.module';
+import { ProductModule } from './product/product.module';
 import typeormConfigs from 'src/database/config';
 
 @Module({
@@ -15,6 +16,7 @@ import typeormConfigs from 'src/database/config';
     UsersModule,
     CafeReastaurantModule,
     CategoryModule,
+    ProductModule,
   ],
   controllers: [],
 })
