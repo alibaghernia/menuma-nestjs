@@ -6,52 +6,31 @@ const { DataTypes } = require('sequelize');
 module.exports = {
   async up(queryInterface) {
     return queryInterface.createTable(
-      'cafe_reastaurants',
+      'socials',
       {
         uuid: {
+          primaryKey: true,
           type: DataTypes.UUID,
           defaultValue: DataTypes.UUIDV4,
-          primaryKey: true,
         },
-        name: {
-          type: DataTypes.STRING(50),
-          allowNull: false,
-        },
-        slug: {
-          type: DataTypes.STRING(50),
-          allowNull: false,
-        },
-        status: {
+        socialableType: {
           type: DataTypes.STRING,
           allowNull: false,
         },
-        address: {
-          type: DataTypes.STRING(100),
+        socialable_uuid: {
+          type: DataTypes.UUID,
+          allowNull: false,
+          references: null,
         },
-        description: {
-          type: DataTypes.STRING(100),
-        },
-        location_lat: {
-          type: DataTypes.STRING(20),
-        },
-        location_long: {
-          type: DataTypes.STRING(20),
-        },
-        phone_number: {
-          type: DataTypes.STRING(20),
-        },
-        email: {
-          type: DataTypes.STRING(20),
-        },
-        working_hours: {
-          type: DataTypes.JSON,
-        },
-        logo: {
+        type: {
           type: DataTypes.STRING,
+          allowNull: false,
         },
-        banner: {
+        link: {
           type: DataTypes.STRING,
+          allowNull: false,
         },
+
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
       },
@@ -72,6 +51,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.dropTable('cafe_reastaurants');
+    return queryInterface.dropTable('socials');
   },
 };

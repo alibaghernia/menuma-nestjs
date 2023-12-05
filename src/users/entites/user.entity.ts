@@ -1,4 +1,12 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsToMany,
+  Column,
+  DataType,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { CafeReastaurant } from 'src/cafe_reastaurant/entites/cafe_reastaurant.entity';
+import { CafeReastaurantUser } from 'src/cafe_reastaurant/entites/cafe_reastaurant_user.entity';
 
 @Table({
   timestamps: true,
@@ -36,4 +44,14 @@ export class User extends Model<User> {
     defaultValue: 'user',
   })
   role: string;
+
+  @BelongsToMany(() => CafeReastaurant, {
+    through: () => CafeReastaurantUser,
+    as: 'cafe_reastaurants',
+    foreignKey: 'user_uuid',
+    sourceKey: 'uuid',
+    otherKey: 'cafe_reastaurant_uuid',
+    targetKey: 'uuid',
+  })
+  cafeCafeReastaurants: CafeReastaurant[];
 }

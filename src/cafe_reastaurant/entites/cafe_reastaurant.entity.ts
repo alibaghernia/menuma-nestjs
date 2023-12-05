@@ -1,4 +1,14 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import {
+  BelongsToMany,
+  Column,
+  DataType,
+  HasMany,
+  Model,
+  Table,
+} from 'sequelize-typescript';
+import { User } from 'src/users/entites/user.entity';
+import { CafeReastaurantUser } from './cafe_reastaurant_user.entity';
+import { Social } from 'src/database/entities/social.entity';
 
 @Table({
   underscored: true,
@@ -33,18 +43,6 @@ export class CafeReastaurant extends Model<CafeReastaurant> {
   @Column({ type: DataType.STRING(20) })
   location_long: string;
 
-  @Column({ type: DataType.STRING(100) })
-  instagram: string;
-
-  @Column({ type: DataType.STRING(100) })
-  telegram: string;
-
-  @Column({ type: DataType.STRING(100) })
-  twitter_x: string;
-
-  @Column({ type: DataType.STRING(100) })
-  whatsapp: string;
-
   @Column({ type: DataType.STRING(20) })
   phone_number: string;
 
@@ -59,4 +57,24 @@ export class CafeReastaurant extends Model<CafeReastaurant> {
 
   @Column({ type: DataType.STRING })
   banner: string;
+
+  @BelongsToMany(() => User, {
+    through: () => CafeReastaurantUser,
+    as: 'users',
+    otherKey: 'user_uuid',
+    sourceKey: 'uuid',
+    foreignKey: 'cafe_reastaurant_uuid',
+    targetKey: 'uuid',
+  })
+  users: User[];
+
+  @HasMany(() => Social, {
+    as: 'socials',
+    foreignKey: 'socialable_uuid',
+    sourceKey: 'uuid',
+    scope: {
+      socialableType: 'cafe_reastaurant',
+    },
+  })
+  socials: Social[];
 }
