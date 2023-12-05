@@ -25,7 +25,7 @@ export class CafeReastaurant extends Model<CafeReastaurant> {
   @Column({ allowNull: false, type: DataType.STRING(50) })
   name: string;
 
-  @Column({ allowNull: false, type: DataType.STRING(50) })
+  @Column({ allowNull: false, type: DataType.STRING(50), unique: true })
   slug: string;
 
   @Column({ allowNull: false, type: DataType.BOOLEAN })
@@ -50,7 +50,7 @@ export class CafeReastaurant extends Model<CafeReastaurant> {
   email: string;
 
   @Column({ type: DataType.JSON })
-  working_hours: any[];
+  working_hours: object[];
 
   @Column({ type: DataType.STRING })
   logo: string;
@@ -73,7 +73,7 @@ export class CafeReastaurant extends Model<CafeReastaurant> {
     foreignKey: 'socialable_uuid',
     sourceKey: 'uuid',
     scope: {
-      socialableType: 'cafe_reastaurant',
+      socialable_type: 'cafe_reastaurant',
     },
   })
   socials: Social[];

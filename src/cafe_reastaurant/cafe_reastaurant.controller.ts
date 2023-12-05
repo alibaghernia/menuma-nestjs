@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
+  Param,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -12,12 +14,21 @@ import { SessionGuard } from 'src/auth/guards';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/misc/role.enum';
 import { RolesGuard } from 'src/auth/guards/role.guard';
-import { CafeReastaurant } from './entites/cafe_reastaurant.entity';
 
 @Controller('cafe-reastaurant')
 @UseGuards(RolesGuard)
 export class CafeReastaurantController {
   constructor(private cafeReastaurantService: CafeReastaurantService) {}
+
+  @Get()
+  getAll() {
+    return this.cafeReastaurantService.findAll();
+  }
+
+  @Get(':slug')
+  getBySlug(@Param('slug') slug: string) {
+    return this.cafeReastaurantService.findBySlug(slug);
+  }
 
   @Post('/create')
   @UseGuards(SessionGuard)
@@ -25,7 +36,7 @@ export class CafeReastaurantController {
   async create(@Body() body: CreateCafeReastaurantDTO) {
     try {
       const cafeReastaurant = await this.cafeReastaurantService.create(
-        body as unknown as CafeReastaurant,
+        body as unknown as Required<CreateCafeReastaurantDTO>,
       );
       return {
         ok: true,

@@ -13,7 +13,7 @@ export class Social extends Model<Social> {
   uuid: string;
 
   @Column({ type: DataType.STRING })
-  socialableType: string;
+  socialable_type: string;
 
   @Column({ type: DataType.UUID })
   socialable_uuid: string;

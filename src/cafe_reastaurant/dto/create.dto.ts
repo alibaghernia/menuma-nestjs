@@ -66,7 +66,7 @@ export class CreateCafeReastaurantDTO {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => isString)
-  readonly working_hours?: string;
+  readonly working_hours?: object[];
 
   @IsOptional()
   @IsString()

@@ -13,7 +13,7 @@ module.exports = {
           type: DataTypes.UUID,
           defaultValue: DataTypes.UUIDV4,
         },
-        socialableType: {
+        socialable_type: {
           type: DataTypes.STRING,
           allowNull: false,
         },

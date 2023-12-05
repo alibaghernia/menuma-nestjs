@@ -20,6 +20,7 @@ module.exports = {
         slug: {
           type: DataTypes.STRING(50),
           allowNull: false,
+          unique: true,
         },
         status: {
           type: DataTypes.STRING,
