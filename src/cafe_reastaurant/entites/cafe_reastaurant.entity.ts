@@ -9,10 +9,13 @@ import {
 import { User } from 'src/users/entites/user.entity';
 import { CafeReastaurantUser } from './cafe_reastaurant_user.entity';
 import { Social } from 'src/database/entities/social.entity';
+import { CafeReastaurantCategory } from './cafe_reastaurant_category.entity';
+import { Category } from 'src/category/entities/category.entity';
 
 @Table({
   underscored: true,
   timestamps: true,
+  tableName: 'cafe_reastaurants',
 })
 export class CafeReastaurant extends Model<CafeReastaurant> {
   @Column({
@@ -77,4 +80,14 @@ export class CafeReastaurant extends Model<CafeReastaurant> {
     },
   })
   socials: Social[];
+
+  @BelongsToMany(() => Category, {
+    through: () => CafeReastaurantCategory,
+    as: 'categories',
+    foreignKey: 'cafe_reastaurant_uuid',
+    sourceKey: 'uuid',
+    otherKey: 'category_uuid',
+    targetKey: 'uuid',
+  })
+  categories: Category[];
 }
