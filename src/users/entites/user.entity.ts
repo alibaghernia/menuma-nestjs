@@ -47,11 +47,11 @@ export class User extends Model<User> {
 
   @BelongsToMany(() => CafeReastaurant, {
     through: () => CafeReastaurantUser,
-    as: 'cafe_reastaurants',
+    as: 'cafeReastaurants',
     foreignKey: 'user_uuid',
     sourceKey: 'uuid',
     otherKey: 'cafe_reastaurant_uuid',
     targetKey: 'uuid',
   })
-  cafeCafeReastaurants: CafeReastaurant[];
+  cafeReastaurants: CafeReastaurant[];
 }

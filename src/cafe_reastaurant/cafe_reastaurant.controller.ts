@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CafeReastaurantService } from './cafe_reastaurant.service';
@@ -92,18 +93,23 @@ export class CafeReastaurantController {
   }
 
   @Post(':id/add_user/:user_id')
-  async addUser(@Param('id') id: string, @Param('user_id') user_id: string) {
+  async addUser(
+    @Param('id') id: string,
+    @Param('user_id') user_id: string,
+    @Query('role') role: any,
+  ) {
     try {
-      await this.cafeReastaurantService.addUser(id, user_id);
+      await this.cafeReastaurantService.addUser(id, user_id, role);
       return {
         ok: true,
         message: 'cafe-reastaurant updated successfully!',
       };
     } catch (error) {
-      throw new HttpException(
-        'An error occurred while updating cafe-reastaurant!',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw error;
+      // throw new HttpException(
+      //   'An error occurred while updating cafe-reastaurant!',
+      //   HttpStatus.INTERNAL_SERVER_ERROR,
+      // );
     }
   }
 }

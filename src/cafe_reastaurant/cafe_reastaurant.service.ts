@@ -1,4 +1,10 @@
-import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CafeReastaurant } from './entites/cafe_reastaurant.entity';
 import { HasManyAddAssociationsMixinOptions, WhereOptions } from 'sequelize';
@@ -7,6 +13,9 @@ import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
 import { UpdateCafeReastaurantDTO } from './dto/update.dto';
 import { Op } from 'sequelize';
+import { REQUEST } from '@nestjs/core';
+import { Request } from 'express';
+import { User } from 'src/users/entites/user.entity';
 
 @Injectable()
 export class CafeReastaurantService {
@@ -14,9 +23,12 @@ export class CafeReastaurantService {
   constructor(
     @InjectModel(CafeReastaurant)
     private cafeReastaurantRepository: typeof CafeReastaurant,
+    @InjectModel(User)
+    private userRepository: typeof User,
     @InjectModel(Social)
     private socialRepository: typeof Social,
     private sequelize: Sequelize,
+    @Inject(REQUEST) private request: Request,
   ) {}
 
   findAll() {
@@ -123,14 +135,33 @@ export class CafeReastaurantService {
   ) {
     const transaction = await this.sequelize.transaction();
     try {
-      const cafe_reastaurant = await this.cafeReastaurantRepository.findOne({
-        where: {
-          uuid: cafe_reastaurant_uuid,
-        },
+      const user = await this.userRepository.findOne({
+        where: { uuid: this.request.user.uuid },
+        include: [
+          {
+            model: CafeReastaurant,
+            through: {
+              where: {
+                role: 'manager',
+              },
+            },
+            where: {
+              uuid: cafe_reastaurant_uuid,
+            },
+          },
+        ],
       });
+      if (!user)
+        throw new HttpException(
+          "You don't have permission to perform this action!",
+          HttpStatus.FORBIDDEN,
+        );
+      const cafe_reastaurant = await user.cafeReastaurants?.find(
+        (item) => item.uuid == cafe_reastaurant_uuid,
+      );
       if (!cafe_reastaurant)
         throw new HttpException(
-          'Cafe reastaurant not found!',
+          "Cafe reastaurant not found or you dont' have enough permission!",
           HttpStatus.NOT_FOUND,
         );
       await cafe_reastaurant.addUser(user_uuid, {
