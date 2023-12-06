@@ -4,6 +4,7 @@ import { config as dotenvConfig } from 'dotenv';
 import { CafeReastaurantUser } from 'src/cafe_reastaurant/entites/cafe_reastaurant_user.entity';
 import { Social } from './entities/social.entity';
 import { CafeReastaurantCategory } from 'src/cafe_reastaurant/entites/cafe_reastaurant_category.entity';
+import { CategoryProduct } from 'src/product/entities/category_product.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -14,7 +15,12 @@ const config: SequelizeModuleOptions = {
   username: `${process.env.DB_USERNAME}`,
   password: `${process.env.DB_PASSWORD}`,
   database: `${process.env.DB_DATABASE}`,
-  models: [CafeReastaurantUser, CafeReastaurantCategory, Social],
+  models: [
+    CafeReastaurantUser,
+    CafeReastaurantCategory,
+    CategoryProduct,
+    Social,
+  ],
 };
 
 export default registerAs('sequelize', () => config);

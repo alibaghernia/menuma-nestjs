@@ -11,6 +11,7 @@ import { CafeReastaurantUser } from './cafe_reastaurant_user.entity';
 import { Social } from 'src/database/entities/social.entity';
 import { CafeReastaurantCategory } from './cafe_reastaurant_category.entity';
 import { Category } from 'src/category/entities/category.entity';
+import { Product } from 'src/product/entities/product.entity';
 
 @Table({
   underscored: true,
@@ -90,4 +91,11 @@ export class CafeReastaurant extends Model<CafeReastaurant> {
     targetKey: 'uuid',
   })
   categories: Category[];
+
+  @HasMany(() => Product, {
+    as: 'products',
+    foreignKey: 'cafe_reastaurant_uuid',
+    sourceKey: 'uuid',
+  })
+  products: Product[];
 }
