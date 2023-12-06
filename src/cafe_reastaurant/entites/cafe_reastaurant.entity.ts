@@ -12,11 +12,13 @@ import { Social } from 'src/database/entities/social.entity';
 import { CafeReastaurantCategory } from './cafe_reastaurant_category.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { HasManyAddAssociationMixin } from 'sequelize';
 
 @Table({
   underscored: true,
   timestamps: true,
   tableName: 'cafe_reastaurants',
+  paranoid: true,
 })
 export class CafeReastaurant extends Model<CafeReastaurant> {
   @Column({
@@ -98,4 +100,6 @@ export class CafeReastaurant extends Model<CafeReastaurant> {
     sourceKey: 'uuid',
   })
   products: Product[];
+
+  addUser: HasManyAddAssociationMixin<User, User['uuid']>;
 }

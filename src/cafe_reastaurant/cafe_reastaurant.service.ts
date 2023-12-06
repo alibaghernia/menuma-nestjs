@@ -1,10 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CafeReastaurant } from './entites/cafe_reastaurant.entity';
-import { WhereOptions } from 'sequelize';
+import { HasManyAddAssociationsMixinOptions, WhereOptions } from 'sequelize';
 import { CreateCafeReastaurantDTO } from './dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
+import { UpdateCafeReastaurantDTO } from './dto/update.dto';
+import { Op } from 'sequelize';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class CafeReastaurantService {
@@ -14,6 +17,7 @@ export class CafeReastaurantService {
     @InjectModel(Social)
     private socialRepository: typeof Social,
     private sequelize: Sequelize,
+    private userService: UsersService,
   ) {}
 
   findAll() {
@@ -29,10 +33,13 @@ export class CafeReastaurantService {
     });
   }
 
-  findBySlug(slug: string) {
+  findBySlugOrId(slugOrId: string) {
     return this.cafeReastaurantRepository.findOne({
       where: {
-        slug,
+        [Op.or]: {
+          slug: slugOrId,
+          uuid: slugOrId,
+        },
       },
       include: [
         {
@@ -87,6 +94,53 @@ export class CafeReastaurantService {
       return newCafeRes;
     } catch (error) {
       await transaction.rollback();
+      throw error;
+    }
+  }
+
+  remove(cafe_reastaurant_uuid: string) {
+    return this.cafeReastaurantRepository.destroy({
+      where: {
+        uuid: cafe_reastaurant_uuid,
+      },
+    });
+  }
+  update(
+    cafe_reastaurant_uuid: string,
+    cafe_reastaurant: UpdateCafeReastaurantDTO,
+  ) {
+    return this.cafeReastaurantRepository.update(cafe_reastaurant, {
+      where: {
+        uuid: cafe_reastaurant_uuid,
+      },
+    });
+  }
+
+  async addUser(
+    cafe_reastaurant_uuid: string,
+    user_uuid: string,
+    role?: 'manager' | 'employee',
+  ) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      const cafe_reastaurant = await this.cafeReastaurantRepository.findOne({
+        where: {
+          uuid: cafe_reastaurant_uuid,
+        },
+      });
+      if (!cafe_reastaurant)
+        throw new HttpException(
+          'Cafe reastaurant not found!',
+          HttpStatus.NOT_FOUND,
+        );
+      await cafe_reastaurant.addUser(user_uuid, {
+        through: { role },
+      } as HasManyAddAssociationsMixinOptions);
+    } catch (error) {
+      console.log({
+        error,
+      });
+      transaction.rollback();
       throw error;
     }
   }

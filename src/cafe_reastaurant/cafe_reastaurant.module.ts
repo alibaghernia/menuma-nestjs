@@ -4,9 +4,10 @@ import { CafeReastaurantController } from './cafe_reastaurant.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { CafeReastaurant } from './entites/cafe_reastaurant.entity';
 import { Social } from 'src/database/entities/social.entity';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [SequelizeModule.forFeature([CafeReastaurant, Social])],
+  imports: [SequelizeModule.forFeature([CafeReastaurant, Social]), UsersModule],
   providers: [CafeReastaurantService],
   controllers: [CafeReastaurantController],
 })

@@ -7,6 +7,8 @@ import { CafeReastaurantModule } from './cafe_reastaurant/cafe_reastaurant.modul
 import { CategoryModule } from './category/category.module';
 import { ProductModule } from './product/product.module';
 import typeormConfigs from 'src/database/config';
+import { RolesGuard } from './auth/guards/role.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -19,5 +21,11 @@ import typeormConfigs from 'src/database/config';
     ProductModule,
   ],
   controllers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

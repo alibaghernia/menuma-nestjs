@@ -25,4 +25,11 @@ export class CafeReastaurantUser extends Model<CafeReastaurantUser> {
 
   @ForeignKey(() => User)
   user_uuid: string;
+
+  @Column({
+    type: DataType.ENUM('manager', 'employee'),
+    defaultValue: 'employee',
+    allowNull: false,
+  })
+  role: string;
 }

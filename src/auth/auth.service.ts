@@ -18,7 +18,7 @@ export class AuthService {
       throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
 
     return {
-      id: user.id,
+      uuid: user.uuid,
       email: user.email,
       fname: user.firstName,
       role: user.role,
