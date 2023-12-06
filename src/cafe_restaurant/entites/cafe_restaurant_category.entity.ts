@@ -5,14 +5,14 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { CafeReastaurant } from './cafe_reastaurant.entity';
+import { CafeRestaurant } from './cafe_restaurant.entity';
 import { Category } from 'src/category/entities/category.entity';
 
 @Table({
-  tableName: 'cafe_reastaurant-category',
+  tableName: 'cafe_restaurant-category',
   timestamps: false,
 })
-export class CafeReastaurantCategory extends Model<CafeReastaurantCategory> {
+export class CafeRestaurantCategory extends Model<CafeRestaurantCategory> {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -20,11 +20,11 @@ export class CafeReastaurantCategory extends Model<CafeReastaurantCategory> {
   })
   uuid: string;
 
-  @ForeignKey(() => CafeReastaurant)
+  @ForeignKey(() => CafeRestaurant)
   @Column({
     type: DataType.UUID,
   })
-  cafe_reastaurant_uuid: string;
+  cafe_restaurant_uuid: string;
 
   @ForeignKey(() => Category)
   @Column({

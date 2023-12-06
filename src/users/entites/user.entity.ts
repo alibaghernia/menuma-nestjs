@@ -5,8 +5,8 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { CafeReastaurant } from 'src/cafe_reastaurant/entites/cafe_reastaurant.entity';
-import { CafeReastaurantUser } from 'src/cafe_reastaurant/entites/cafe_reastaurant_user.entity';
+import { CafeRestaurant } from 'src/cafe_restaurant/entites/cafe_restaurant.entity';
+import { CafeRestaurantUser } from 'src/cafe_restaurant/entites/cafe_restaurant_user.entity';
 
 @Table({
   timestamps: true,
@@ -45,13 +45,13 @@ export class User extends Model<User> {
   })
   role: string;
 
-  @BelongsToMany(() => CafeReastaurant, {
-    through: () => CafeReastaurantUser,
-    as: 'cafeReastaurants',
+  @BelongsToMany(() => CafeRestaurant, {
+    through: () => CafeRestaurantUser,
+    as: 'cafeRestaurants',
     foreignKey: 'user_uuid',
     sourceKey: 'uuid',
-    otherKey: 'cafe_reastaurant_uuid',
+    otherKey: 'cafe_restaurant_uuid',
     targetKey: 'uuid',
   })
-  cafeReastaurants: CafeReastaurant[];
+  cafeRestaurants: CafeRestaurant[];
 }

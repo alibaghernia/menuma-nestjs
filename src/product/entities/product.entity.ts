@@ -7,7 +7,7 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { CafeReastaurant } from 'src/cafe_reastaurant/entites/cafe_reastaurant.entity';
+import { CafeRestaurant } from 'src/cafe_restaurant/entites/cafe_restaurant.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { CategoryProduct } from './category_product.entity';
 
@@ -53,19 +53,19 @@ export class Product extends Model<Product> {
   })
   prices: Price[];
 
-  @ForeignKey(() => CafeReastaurant)
+  @ForeignKey(() => CafeRestaurant)
   @Column({
     type: DataType.UUID,
     allowNull: false,
   })
-  cafe_reastaurant_uuid: string;
+  cafe_restaurant_uuid: string;
 
-  @BelongsTo(() => CafeReastaurant, {
-    as: 'cafeReastaurant',
-    foreignKey: 'cafe_reastaurant_uuid',
+  @BelongsTo(() => CafeRestaurant, {
+    as: 'cafeRestaurant',
+    foreignKey: 'cafe_restaurant_uuid',
     targetKey: 'uuid',
   })
-  cafeReastaurant: CafeReastaurant;
+  cafeRestaurant: CafeRestaurant;
 
   @BelongsToMany(() => Category, {
     through: () => CategoryProduct,

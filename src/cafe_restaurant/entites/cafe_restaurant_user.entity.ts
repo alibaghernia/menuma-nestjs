@@ -5,14 +5,14 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { CafeReastaurant } from './cafe_reastaurant.entity';
+import { CafeRestaurant } from './cafe_restaurant.entity';
 import { User } from 'src/users/entites/user.entity';
 
 @Table({
-  tableName: 'cafe_reastaurant-user',
+  tableName: 'cafe_restaurant-user',
   timestamps: false,
 })
-export class CafeReastaurantUser extends Model<CafeReastaurantUser> {
+export class CafeRestaurantUser extends Model<CafeRestaurantUser> {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -20,8 +20,8 @@ export class CafeReastaurantUser extends Model<CafeReastaurantUser> {
   })
   uuid: string;
 
-  @ForeignKey(() => CafeReastaurant)
-  cafe_reastaurant_uuid: string;
+  @ForeignKey(() => CafeRestaurant)
+  cafe_restaurant_uuid: string;
 
   @ForeignKey(() => User)
   user_uuid: string;

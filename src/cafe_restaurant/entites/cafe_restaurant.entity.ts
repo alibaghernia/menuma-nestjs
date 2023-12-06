@@ -7,9 +7,9 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { User } from 'src/users/entites/user.entity';
-import { CafeReastaurantUser } from './cafe_reastaurant_user.entity';
+import { CafeRestaurantUser } from './cafe_restaurant_user.entity';
 import { Social } from 'src/database/entities/social.entity';
-import { CafeReastaurantCategory } from './cafe_reastaurant_category.entity';
+import { CafeRestaurantCategory } from './cafe_restaurant_category.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Product } from 'src/product/entities/product.entity';
 import { HasManyAddAssociationMixin } from 'sequelize';
@@ -17,10 +17,10 @@ import { HasManyAddAssociationMixin } from 'sequelize';
 @Table({
   underscored: true,
   timestamps: true,
-  tableName: 'cafe_reastaurants',
+  tableName: 'cafe_restaurants',
   paranoid: true,
 })
-export class CafeReastaurant extends Model<CafeReastaurant> {
+export class CafeRestaurant extends Model<CafeRestaurant> {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -65,11 +65,11 @@ export class CafeReastaurant extends Model<CafeReastaurant> {
   banner: string;
 
   @BelongsToMany(() => User, {
-    through: () => CafeReastaurantUser,
+    through: () => CafeRestaurantUser,
     as: 'users',
     otherKey: 'user_uuid',
     sourceKey: 'uuid',
-    foreignKey: 'cafe_reastaurant_uuid',
+    foreignKey: 'cafe_restaurant_uuid',
     targetKey: 'uuid',
   })
   users: User[];
@@ -79,15 +79,15 @@ export class CafeReastaurant extends Model<CafeReastaurant> {
     foreignKey: 'socialable_uuid',
     sourceKey: 'uuid',
     scope: {
-      socialable_type: 'cafe_reastaurant',
+      socialable_type: 'cafe_restaurant',
     },
   })
   socials: Social[];
 
   @BelongsToMany(() => Category, {
-    through: () => CafeReastaurantCategory,
+    through: () => CafeRestaurantCategory,
     as: 'categories',
-    foreignKey: 'cafe_reastaurant_uuid',
+    foreignKey: 'cafe_restaurant_uuid',
     sourceKey: 'uuid',
     otherKey: 'category_uuid',
     targetKey: 'uuid',
@@ -96,7 +96,7 @@ export class CafeReastaurant extends Model<CafeReastaurant> {
 
   @HasMany(() => Product, {
     as: 'products',
-    foreignKey: 'cafe_reastaurant_uuid',
+    foreignKey: 'cafe_restaurant_uuid',
     sourceKey: 'uuid',
   })
   products: Product[];

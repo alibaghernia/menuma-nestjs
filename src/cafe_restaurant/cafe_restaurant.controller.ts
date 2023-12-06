@@ -11,45 +11,45 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CafeReastaurantService } from './cafe_reastaurant.service';
-import { CreateCafeReastaurantDTO } from './dto';
+import { CafeRestaurantService } from './cafe_restaurant.service';
+import { CreateCafeRestaurantDTO } from './dto';
 import { SessionGuard } from 'src/auth/guards';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/misc/role.enum';
-import { UpdateCafeReastaurantDTO } from './dto/update.dto';
+import { UpdateCafeRestaurantDTO } from './dto/update.dto';
 
-@Controller('cafe-reastaurant')
-export class CafeReastaurantController {
-  constructor(private cafeReastaurantService: CafeReastaurantService) {}
+@Controller('cafe-restaurant')
+export class CafeRestaurantController {
+  constructor(private cafeRestaurantService: CafeRestaurantService) {}
 
   @Get()
   getAll() {
-    return this.cafeReastaurantService.findAll();
+    return this.cafeRestaurantService.findAll();
   }
 
   @Get(':slugOrId')
   getBySlug(@Param('slugOrId') slugOrId: string) {
-    return this.cafeReastaurantService.findBySlugOrId(slugOrId);
+    return this.cafeRestaurantService.findBySlugOrId(slugOrId);
   }
 
   @UseGuards(SessionGuard)
   @Post('/create')
   @Roles(Role.Admin)
-  async create(@Body() body: CreateCafeReastaurantDTO) {
+  async create(@Body() body: CreateCafeRestaurantDTO) {
     try {
-      const cafeReastaurant = await this.cafeReastaurantService.create(
-        body as unknown as Required<CreateCafeReastaurantDTO>,
+      const cafeRestaurant = await this.cafeRestaurantService.create(
+        body as unknown as Required<CreateCafeRestaurantDTO>,
       );
       return {
         ok: true,
-        message: `${cafeReastaurant.name} crearted successfully!`,
+        message: `${cafeRestaurant.name} crearted successfully!`,
       };
     } catch (error) {
       console.log({
         error,
       });
       throw new HttpException(
-        'Cafe Reastaurant creation error!',
+        'Cafe Restaurant creation error!',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
@@ -60,14 +60,14 @@ export class CafeReastaurantController {
   @Roles(Role.Admin)
   async remove(@Param('id') id: string) {
     try {
-      await this.cafeReastaurantService.remove(id);
+      await this.cafeRestaurantService.remove(id);
       return {
         ok: true,
-        message: 'Cafe reastaurant deleted successfully!',
+        message: 'Cafe restaurant deleted successfully!',
       };
     } catch (error) {
       throw new HttpException(
-        'An error occurred while deleting cafe-reastaurant',
+        'An error occurred while deleting cafe-restaurant',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -76,17 +76,17 @@ export class CafeReastaurantController {
   @Put(':id')
   async update(
     @Param('id') id: string,
-    @Body() payload: UpdateCafeReastaurantDTO,
+    @Body() payload: UpdateCafeRestaurantDTO,
   ) {
     try {
-      await this.cafeReastaurantService.update(id, payload);
+      await this.cafeRestaurantService.update(id, payload);
       return {
         ok: true,
-        message: 'cafe-reastaurant updated successfully!',
+        message: 'cafe-restaurant updated successfully!',
       };
     } catch (error) {
       throw new HttpException(
-        'An error occurred while updating cafe-reastaurant!',
+        'An error occurred while updating cafe-restaurant!',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -99,15 +99,15 @@ export class CafeReastaurantController {
     @Query('role') role: any,
   ) {
     try {
-      await this.cafeReastaurantService.addUser(id, user_id, role);
+      await this.cafeRestaurantService.addUser(id, user_id, role);
       return {
         ok: true,
-        message: 'cafe-reastaurant updated successfully!',
+        message: 'cafe-restaurant updated successfully!',
       };
     } catch (error) {
       throw error;
       // throw new HttpException(
-      //   'An error occurred while updating cafe-reastaurant!',
+      //   'An error occurred while updating cafe-restaurant!',
       //   HttpStatus.INTERNAL_SERVER_ERROR,
       // );
     }

@@ -27,10 +27,10 @@ module.exports = {
           type: DataTypes.JSON,
           allowNull: false,
         },
-        cafe_reastaurant_uuid: {
+        cafe_restaurant_uuid: {
           type: DataTypes.UUID,
           references: {
-            model: 'cafe_reastaurants',
+            model: 'cafe_restaurants',
             key: 'uuid',
           },
         },
