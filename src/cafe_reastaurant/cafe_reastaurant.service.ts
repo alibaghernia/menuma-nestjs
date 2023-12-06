@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CafeReastaurant } from './entites/cafe_reastaurant.entity';
 import { HasManyAddAssociationsMixinOptions, WhereOptions } from 'sequelize';
@@ -7,20 +7,20 @@ import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
 import { UpdateCafeReastaurantDTO } from './dto/update.dto';
 import { Op } from 'sequelize';
-import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class CafeReastaurantService {
+  private logger = new Logger(CafeReastaurantService.name);
   constructor(
     @InjectModel(CafeReastaurant)
     private cafeReastaurantRepository: typeof CafeReastaurant,
     @InjectModel(Social)
     private socialRepository: typeof Social,
     private sequelize: Sequelize,
-    private userService: UsersService,
   ) {}
 
   findAll() {
+    this.logger.log('fetch all cafe-reastaurants');
     return this.cafeReastaurantRepository.findAll({
       include: [
         {
