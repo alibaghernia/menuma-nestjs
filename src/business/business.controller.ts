@@ -18,7 +18,7 @@ import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/misc/role.enum';
 import { UpdateBusinessDTO } from './dto/update.dto';
 
-@Controller('cafe-restaurant')
+@Controller('business')
 export class BusinessController {
   constructor(private businessService: BusinessService) {}
 
@@ -67,7 +67,7 @@ export class BusinessController {
       };
     } catch (error) {
       throw new HttpException(
-        'An error occurred while deleting cafe-restaurant',
+        'An error occurred while deleting business',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -79,11 +79,11 @@ export class BusinessController {
       await this.businessService.update(id, payload);
       return {
         ok: true,
-        message: 'cafe-restaurant updated successfully!',
+        message: 'business updated successfully!',
       };
     } catch (error) {
       throw new HttpException(
-        'An error occurred while updating cafe-restaurant!',
+        'An error occurred while updating business!',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
@@ -99,12 +99,12 @@ export class BusinessController {
       await this.businessService.addUser(id, user_id, role);
       return {
         ok: true,
-        message: 'cafe-restaurant updated successfully!',
+        message: 'business updated successfully!',
       };
     } catch (error) {
       throw error;
       // throw new HttpException(
-      //   'An error occurred while updating cafe-restaurant!',
+      //   'An error occurred while updating business!',
       //   HttpStatus.INTERNAL_SERVER_ERROR,
       // );
     }

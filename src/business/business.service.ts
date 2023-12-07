@@ -32,7 +32,7 @@ export class BusinessService {
   ) {}
 
   findAll() {
-    this.logger.log('fetch all cafe-restaurants');
+    this.logger.log('fetch all businesses');
     return this.businessRepository.findAll({
       include: [
         {
