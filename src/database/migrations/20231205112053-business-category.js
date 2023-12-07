@@ -5,23 +5,23 @@ const { DataTypes } = require('sequelize');
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    return queryInterface.createTable('cafe_restaurant-user', {
+    return queryInterface.createTable('business-category', {
       uuid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      cafe_restaurant_uuid: {
+      business_uuid: {
         type: DataTypes.UUID,
         references: {
-          model: 'cafe_restaurants',
+          model: 'businesses',
           key: 'uuid',
         },
       },
-      user_uuid: {
+      category_uuid: {
         type: DataTypes.UUID,
         references: {
-          model: 'users',
+          model: 'categories',
           key: 'uuid',
         },
       },
@@ -35,6 +35,6 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    return queryInterface.dropTable('cafe_restaurant-user');
+    return queryInterface.dropTable('business-category');
   },
 };

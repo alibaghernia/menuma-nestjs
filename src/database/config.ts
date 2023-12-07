@@ -1,13 +1,13 @@
 import { registerAs } from '@nestjs/config';
 import { SequelizeModuleOptions } from '@nestjs/sequelize';
 import { config as dotenvConfig } from 'dotenv';
-import { CafeRestaurantUser } from 'src/cafe_restaurant/entites/cafe_restaurant_user.entity';
+import { BusinessUser } from 'src/business/entites/business_user.entity';
 import { Social } from './entities/social.entity';
-import { CafeRestaurantCategory } from 'src/cafe_restaurant/entites/cafe_restaurant_category.entity';
+import { BusinessCategory } from 'src/business/entites/business_category.entity';
 import { CategoryProduct } from 'src/product/entities/category_product.entity';
 import { User } from 'src/users/entites/user.entity';
 import { Category } from 'src/category/entities/category.entity';
-import { CafeRestaurant } from 'src/cafe_restaurant/entites/cafe_restaurant.entity';
+import { Business } from 'src/business/entites/business.entity';
 import { Product } from 'src/product/entities/product.entity';
 
 dotenvConfig({ path: '.env' });
@@ -23,10 +23,10 @@ const config: SequelizeModuleOptions = {
   models: [
     User,
     Category,
-    CafeRestaurant,
+    Business,
     Product,
-    CafeRestaurantUser,
-    CafeRestaurantCategory,
+    BusinessUser,
+    BusinessCategory,
     CategoryProduct,
     Social,
   ],

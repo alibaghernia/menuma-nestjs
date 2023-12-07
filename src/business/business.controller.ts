@@ -11,38 +11,38 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CafeRestaurantService } from './cafe_restaurant.service';
-import { CreateCafeRestaurantDTO } from './dto';
+import { BusinessService } from './business.service';
+import { CreateBusinessDTO } from './dto';
 import { SessionGuard } from 'src/auth/guards';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/misc/role.enum';
-import { UpdateCafeRestaurantDTO } from './dto/update.dto';
+import { UpdateBusinessDTO } from './dto/update.dto';
 
 @Controller('cafe-restaurant')
-export class CafeRestaurantController {
-  constructor(private cafeRestaurantService: CafeRestaurantService) {}
+export class BusinessController {
+  constructor(private businessService: BusinessService) {}
 
   @Get()
   getAll() {
-    return this.cafeRestaurantService.findAll();
+    return this.businessService.findAll();
   }
 
   @Get(':slugOrId')
   getBySlug(@Param('slugOrId') slugOrId: string) {
-    return this.cafeRestaurantService.findBySlugOrId(slugOrId);
+    return this.businessService.findBySlugOrId(slugOrId);
   }
 
   @UseGuards(SessionGuard)
   @Post('/create')
   @Roles(Role.Admin)
-  async create(@Body() body: CreateCafeRestaurantDTO) {
+  async create(@Body() body: CreateBusinessDTO) {
     try {
-      const cafeRestaurant = await this.cafeRestaurantService.create(
-        body as unknown as Required<CreateCafeRestaurantDTO>,
+      const business = await this.businessService.create(
+        body as unknown as Required<CreateBusinessDTO>,
       );
       return {
         ok: true,
-        message: `${cafeRestaurant.name} crearted successfully!`,
+        message: `${business.name} crearted successfully!`,
       };
     } catch (error) {
       console.log({
@@ -60,7 +60,7 @@ export class CafeRestaurantController {
   @Roles(Role.Admin)
   async remove(@Param('id') id: string) {
     try {
-      await this.cafeRestaurantService.remove(id);
+      await this.businessService.remove(id);
       return {
         ok: true,
         message: 'Cafe restaurant deleted successfully!',
@@ -74,12 +74,9 @@ export class CafeRestaurantController {
   }
 
   @Put(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() payload: UpdateCafeRestaurantDTO,
-  ) {
+  async update(@Param('id') id: string, @Body() payload: UpdateBusinessDTO) {
     try {
-      await this.cafeRestaurantService.update(id, payload);
+      await this.businessService.update(id, payload);
       return {
         ok: true,
         message: 'cafe-restaurant updated successfully!',
@@ -99,7 +96,7 @@ export class CafeRestaurantController {
     @Query('role') role: any,
   ) {
     try {
-      await this.cafeRestaurantService.addUser(id, user_id, role);
+      await this.businessService.addUser(id, user_id, role);
       return {
         ok: true,
         message: 'cafe-restaurant updated successfully!',

@@ -6,8 +6,8 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { CafeRestaurant } from 'src/cafe_restaurant/entites/cafe_restaurant.entity';
-import { CafeRestaurantUser } from 'src/cafe_restaurant/entites/cafe_restaurant_user.entity';
+import { Business } from 'src/business/entites/business.entity';
+import { BusinessUser } from 'src/business/entites/business_user.entity';
 
 @Table({
   timestamps: true,
@@ -46,18 +46,15 @@ export class User extends Model<User> {
   })
   role: string;
 
-  @BelongsToMany(() => CafeRestaurant, {
-    through: () => CafeRestaurantUser,
-    as: 'cafeRestaurants',
+  @BelongsToMany(() => Business, {
+    through: () => BusinessUser,
+    as: 'businesses',
     foreignKey: 'user_uuid',
     sourceKey: 'uuid',
-    otherKey: 'cafe_restaurant_uuid',
+    otherKey: 'business_uuid',
     targetKey: 'uuid',
   })
-  cafeRestaurants: CafeRestaurant[];
+  businesses: Business[];
 
-  hasCafeRestaurant: BelongsToManyHasAssociationMixin<
-    CafeRestaurant,
-    CafeRestaurant['uuid']
-  >;
+  hasBusiness: BelongsToManyHasAssociationMixin<Business, Business['uuid']>;
 }

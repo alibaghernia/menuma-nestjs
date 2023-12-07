@@ -7,7 +7,7 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { CafeRestaurant } from 'src/cafe_restaurant/entites/cafe_restaurant.entity';
+import { Business } from 'src/business/entites/business.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { CategoryProduct } from './category_product.entity';
 import { BelongsToSetAssociationMixin } from 'sequelize';
@@ -54,19 +54,19 @@ export class Product extends Model<Product> {
   })
   prices: ProductPrice[];
 
-  @ForeignKey(() => CafeRestaurant)
+  @ForeignKey(() => Business)
   @Column({
     type: DataType.UUID,
     allowNull: false,
   })
-  cafe_restaurant_uuid: string;
+  business_uuid: string;
 
-  @BelongsTo(() => CafeRestaurant, {
-    as: 'cafeRestaurant',
-    foreignKey: 'cafe_restaurant_uuid',
+  @BelongsTo(() => Business, {
+    as: 'business',
+    foreignKey: 'business_uuid',
     targetKey: 'uuid',
   })
-  cafeRestaurant: CafeRestaurant;
+  business: Business;
 
   @BelongsToMany(() => Category, {
     through: () => CategoryProduct,
@@ -77,8 +77,5 @@ export class Product extends Model<Product> {
   })
   categories: Category[];
 
-  setCafeRestaurant: BelongsToSetAssociationMixin<
-    CafeRestaurant,
-    CafeRestaurant['uuid']
-  >;
+  setBusiness: BelongsToSetAssociationMixin<Business, Business['uuid']>;
 }

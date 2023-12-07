@@ -9,7 +9,7 @@ import {
   isString,
 } from 'class-validator';
 
-export class UpdateCafeRestaurantDTO {
+export class UpdateBusinessDTO {
   @IsNotEmpty()
   @IsString()
   readonly name: string;

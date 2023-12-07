@@ -32,7 +32,7 @@ export class CreateProductDTO {
 
   @IsUUID()
   @IsNotEmpty()
-  cafe_restaurant_uuid: string;
+  business_uuid: string;
 
   @IsArray()
   @ValidateNested({ each: true })

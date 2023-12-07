@@ -8,8 +8,8 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { CafeRestaurant } from 'src/cafe_restaurant/entites/cafe_restaurant.entity';
-import { CafeRestaurantCategory } from 'src/cafe_restaurant/entites/cafe_restaurant_category.entity';
+import { Business } from 'src/business/entites/business.entity';
+import { BusinessCategory } from 'src/business/entites/business_category.entity';
 import { CategoryProduct } from 'src/product/entities/category_product.entity';
 import { Product } from 'src/product/entities/product.entity';
 
@@ -56,15 +56,15 @@ export class Category extends Model<Category> {
   })
   parent: Category;
 
-  @BelongsToMany(() => CafeRestaurant, {
-    through: () => CafeRestaurantCategory,
-    as: 'cafeRestaurants',
+  @BelongsToMany(() => Business, {
+    through: () => BusinessCategory,
+    as: 'businesses',
     foreignKey: 'category_uuid',
     sourceKey: 'uuid',
-    otherKey: 'cafe_restaurant_uuid',
+    otherKey: 'business_uuid',
     targetKey: 'uuid',
   })
-  cafeRestaurants: CafeRestaurant[];
+  businesses: Business[];
 
   @BelongsToMany(() => Product, {
     through: () => CategoryProduct,

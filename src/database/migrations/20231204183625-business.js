@@ -6,7 +6,7 @@ const { DataTypes } = require('sequelize');
 module.exports = {
   async up(queryInterface) {
     return queryInterface.createTable(
-      'cafe_restaurants',
+      'businesses',
       {
         uuid: {
           type: DataTypes.UUID,
@@ -74,6 +74,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.dropTable('cafe_restaurants');
+    return queryInterface.dropTable('businesses');
   },
 };

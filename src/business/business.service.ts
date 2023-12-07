@@ -6,23 +6,23 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { CafeRestaurant } from './entites/cafe_restaurant.entity';
+import { Business } from './entites/business.entity';
 import { HasManyAddAssociationsMixinOptions, WhereOptions } from 'sequelize';
-import { CreateCafeRestaurantDTO } from './dto';
+import { CreateBusinessDTO } from './dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
-import { UpdateCafeRestaurantDTO } from './dto/update.dto';
+import { UpdateBusinessDTO } from './dto/update.dto';
 import { Op } from 'sequelize';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { User } from 'src/users/entites/user.entity';
 
 @Injectable()
-export class CafeRestaurantService {
-  private logger = new Logger(CafeRestaurantService.name);
+export class BusinessService {
+  private logger = new Logger(BusinessService.name);
   constructor(
-    @InjectModel(CafeRestaurant)
-    private cafeRestaurantRepository: typeof CafeRestaurant,
+    @InjectModel(Business)
+    private businessRepository: typeof Business,
     @InjectModel(User)
     private userRepository: typeof User,
     @InjectModel(Social)
@@ -33,7 +33,7 @@ export class CafeRestaurantService {
 
   findAll() {
     this.logger.log('fetch all cafe-restaurants');
-    return this.cafeRestaurantRepository.findAll({
+    return this.businessRepository.findAll({
       include: [
         {
           model: Social,
@@ -46,7 +46,7 @@ export class CafeRestaurantService {
   }
 
   findBySlugOrId(slugOrId: string) {
-    return this.cafeRestaurantRepository.findOne({
+    return this.businessRepository.findOne({
       where: {
         [Op.or]: {
           slug: slugOrId,
@@ -64,13 +64,13 @@ export class CafeRestaurantService {
     });
   }
 
-  findOne(where: WhereOptions<CafeRestaurant>) {
-    return this.cafeRestaurantRepository.findOne({
+  findOne(where: WhereOptions<Business>) {
+    return this.businessRepository.findOne({
       where,
     });
   }
 
-  async create(payload: Required<CreateCafeRestaurantDTO>) {
+  async create(payload: Required<CreateBusinessDTO>) {
     const transaction = await this.sequelize.transaction();
     try {
       const {
@@ -80,11 +80,11 @@ export class CafeRestaurantService {
         twitter_x,
         status,
         manager,
-        ...cafeRestaurant
+        ...business
       } = payload;
 
-      const newCafeRes = await this.cafeRestaurantRepository.create({
-        ...cafeRestaurant,
+      const newCafeRes = await this.businessRepository.create({
+        ...business,
         status: status ? status : true,
       });
 
@@ -96,7 +96,7 @@ export class CafeRestaurantService {
       })
         .filter(([, v]) => !!v)
         .map(([k, v]) => ({
-          socialable_type: 'cafe_restaurant',
+          socialable_type: 'business',
           socialable_uuid: newCafeRes.uuid,
           type: k,
           link: v,
@@ -115,45 +115,42 @@ export class CafeRestaurantService {
     }
   }
 
-  remove(cafe_restaurant_uuid: string) {
-    return this.cafeRestaurantRepository.destroy({
+  remove(business_uuid: string) {
+    return this.businessRepository.destroy({
       where: {
-        uuid: cafe_restaurant_uuid,
+        uuid: business_uuid,
       },
     });
   }
-  update(
-    cafe_restaurant_uuid: string,
-    cafe_restaurant: UpdateCafeRestaurantDTO,
-  ) {
-    return this.cafeRestaurantRepository.update(cafe_restaurant, {
+  update(business_uuid: string, business: UpdateBusinessDTO) {
+    return this.businessRepository.update(business, {
       where: {
-        uuid: cafe_restaurant_uuid,
+        uuid: business_uuid,
       },
     });
   }
 
   async addUser(
-    cafe_restaurant_uuid: string,
+    business_uuid: string,
     user_uuid: string,
     role?: 'manager' | 'employee',
   ) {
     const transaction = await this.sequelize.transaction();
     try {
-      let cafe_restaurant: CafeRestaurant;
+      let business: Business;
       if (this.request.user.role != 'admin') {
         const user = await this.userRepository.findOne({
           where: { uuid: this.request.user.uuid },
           include: [
             {
-              model: CafeRestaurant,
+              model: Business,
               through: {
                 where: {
                   role: 'manager',
                 },
               },
               where: {
-                uuid: cafe_restaurant_uuid,
+                uuid: business_uuid,
               },
             },
           ],
@@ -163,22 +160,22 @@ export class CafeRestaurantService {
             "You don't have permission to perform this action!",
             HttpStatus.FORBIDDEN,
           );
-        cafe_restaurant = await user.cafeRestaurants?.find(
-          (item) => item.uuid == cafe_restaurant_uuid,
+        business = await user.businesses?.find(
+          (item) => item.uuid == business_uuid,
         );
       } else {
-        cafe_restaurant = await this.cafeRestaurantRepository.findOne({
+        business = await this.businessRepository.findOne({
           where: {
-            uuid: cafe_restaurant_uuid,
+            uuid: business_uuid,
           },
         });
       }
-      if (!cafe_restaurant)
+      if (!business)
         throw new HttpException(
           "Cafe restaurant not found or you dont' have enough permission!",
           HttpStatus.NOT_FOUND,
         );
-      await cafe_restaurant.addUser(user_uuid, {
+      await business.addUser(user_uuid, {
         through: { role },
       } as HasManyAddAssociationsMixinOptions);
     } catch (error) {

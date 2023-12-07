@@ -5,7 +5,7 @@ import { CreateProductDTO } from './dto/create.dto';
 import { REQUEST } from '@nestjs/core';
 import { User } from 'src/users/entites/user.entity';
 import { Request } from 'express';
-import { CafeRestaurant } from 'src/cafe_restaurant/entites/cafe_restaurant.entity';
+import { Business } from 'src/business/entites/business.entity';
 import { BelongsToManyHasAssociationMixinOptions } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
@@ -27,9 +27,9 @@ export class ProductService {
         },
         include: [
           {
-            model: CafeRestaurant,
+            model: Business,
             where: {
-              uuid: payload.cafe_restaurant_uuid,
+              uuid: payload.business_uuid,
             },
           },
         ],
@@ -39,16 +39,13 @@ export class ProductService {
           'Cafe Restaurant not found!',
           HttpStatus.NOT_FOUND,
         );
-      const hasPermission = await user.hasCafeRestaurant(
-        payload.cafe_restaurant_uuid,
-        {
-          through: {
-            where: {
-              role: 'manager',
-            },
+      const hasPermission = await user.hasBusiness(payload.business_uuid, {
+        through: {
+          where: {
+            role: 'manager',
           },
-        } as BelongsToManyHasAssociationMixinOptions,
-      );
+        },
+      } as BelongsToManyHasAssociationMixinOptions);
       if (!hasPermission)
         throw new HttpException(
           "You don't have enough permission to perform this action",

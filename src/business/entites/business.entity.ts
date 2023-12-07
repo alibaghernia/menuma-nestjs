@@ -7,9 +7,9 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { User } from 'src/users/entites/user.entity';
-import { CafeRestaurantUser } from './cafe_restaurant_user.entity';
+import { BusinessUser } from './business_user.entity';
 import { Social } from 'src/database/entities/social.entity';
-import { CafeRestaurantCategory } from './cafe_restaurant_category.entity';
+import { BusinessCategory } from './business_category.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Product } from 'src/product/entities/product.entity';
 import {
@@ -23,10 +23,10 @@ import {
 @Table({
   underscored: true,
   timestamps: true,
-  tableName: 'cafe_restaurants',
+  tableName: 'businesses',
   paranoid: true,
 })
-export class CafeRestaurant extends Model<CafeRestaurant> {
+export class Business extends Model<Business> {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -71,11 +71,11 @@ export class CafeRestaurant extends Model<CafeRestaurant> {
   banner: string;
 
   @BelongsToMany(() => User, {
-    through: () => CafeRestaurantUser,
+    through: () => BusinessUser,
     as: 'users',
     otherKey: 'user_uuid',
     sourceKey: 'uuid',
-    foreignKey: 'cafe_restaurant_uuid',
+    foreignKey: 'business_uuid',
     targetKey: 'uuid',
   })
   users: User[];
@@ -85,15 +85,15 @@ export class CafeRestaurant extends Model<CafeRestaurant> {
     foreignKey: 'socialable_uuid',
     sourceKey: 'uuid',
     scope: {
-      socialable_type: 'cafe_restaurant',
+      socialable_type: 'business',
     },
   })
   socials: Social[];
 
   @BelongsToMany(() => Category, {
-    through: () => CafeRestaurantCategory,
+    through: () => BusinessCategory,
     as: 'categories',
-    foreignKey: 'cafe_restaurant_uuid',
+    foreignKey: 'business_uuid',
     sourceKey: 'uuid',
     otherKey: 'category_uuid',
     targetKey: 'uuid',
@@ -102,7 +102,7 @@ export class CafeRestaurant extends Model<CafeRestaurant> {
 
   @HasMany(() => Product, {
     as: 'products',
-    foreignKey: 'cafe_restaurant_uuid',
+    foreignKey: 'business_uuid',
     sourceKey: 'uuid',
   })
   products: Product[];
