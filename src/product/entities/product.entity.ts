@@ -10,12 +10,13 @@ import {
 import { CafeRestaurant } from 'src/cafe_restaurant/entites/cafe_restaurant.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { CategoryProduct } from './category_product.entity';
+import { BelongsToSetAssociationMixin } from 'sequelize';
 
-type Metadata = {
+export type ProductMetadata = {
   title: string;
   value: string;
 };
-type Price = {
+export type ProductPrice = {
   title: string;
   amount: number;
 };
@@ -46,12 +47,12 @@ export class Product extends Model<Product> {
   @Column({
     type: DataType.JSON,
   })
-  metadata: Metadata[];
+  metadata: ProductMetadata[];
 
   @Column({
     type: DataType.JSON,
   })
-  prices: Price[];
+  prices: ProductPrice[];
 
   @ForeignKey(() => CafeRestaurant)
   @Column({
@@ -75,4 +76,9 @@ export class Product extends Model<Product> {
     targetKey: 'uuid',
   })
   categories: Category[];
+
+  setCafeRestaurant: BelongsToSetAssociationMixin<
+    CafeRestaurant,
+    CafeRestaurant['uuid']
+  >;
 }

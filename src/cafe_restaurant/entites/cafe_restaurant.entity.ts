@@ -12,7 +12,13 @@ import { Social } from 'src/database/entities/social.entity';
 import { CafeRestaurantCategory } from './cafe_restaurant_category.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Product } from 'src/product/entities/product.entity';
-import { HasManyAddAssociationMixin } from 'sequelize';
+import {
+  HasManyAddAssociationMixin,
+  HasManyRemoveAssociationMixin,
+  HasManyCountAssociationsMixin,
+  HasManyCreateAssociationMixin,
+  HasManyHasAssociationMixin,
+} from 'sequelize';
 
 @Table({
   underscored: true,
@@ -101,5 +107,15 @@ export class CafeRestaurant extends Model<CafeRestaurant> {
   })
   products: Product[];
 
+  count: HasManyCountAssociationsMixin;
+
   addUser: HasManyAddAssociationMixin<User, User['uuid']>;
+  removeUser: HasManyRemoveAssociationMixin<User, User['uuid']>;
+  hasUser: HasManyHasAssociationMixin<User, User['uuid']>;
+  createUser: HasManyCreateAssociationMixin<User>;
+
+  addProduct: HasManyAddAssociationMixin<Product, Product['uuid']>;
+  removeProduct: HasManyRemoveAssociationMixin<Product, Product['uuid']>;
+  hasProduct: HasManyHasAssociationMixin<Product, Product['uuid']>;
+  createProduct: HasManyCreateAssociationMixin<Product>;
 }

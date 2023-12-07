@@ -1,3 +1,4 @@
+import { BelongsToManyHasAssociationMixin } from 'sequelize';
 import {
   BelongsToMany,
   Column,
@@ -54,4 +55,9 @@ export class User extends Model<User> {
     targetKey: 'uuid',
   })
   cafeRestaurants: CafeRestaurant[];
+
+  hasCafeRestaurant: BelongsToManyHasAssociationMixin<
+    CafeRestaurant,
+    CafeRestaurant['uuid']
+  >;
 }
