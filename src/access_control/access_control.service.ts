@@ -5,8 +5,8 @@ import { Permission } from './entities/permission.entity';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { Sequelize } from 'sequelize-typescript';
-import { User } from 'src/users/entites/user.entity';
-import { Business } from 'src/business/entites/business.entity';
+import { BusinessUser } from 'src/business/entites/business_user.entity';
+import * as _ from 'lodash';
 
 @Injectable()
 export class AccessControlService {
@@ -14,7 +14,7 @@ export class AccessControlService {
     private sequelize: Sequelize,
     @InjectModel(Role) private roleRepo: typeof Role,
     @InjectModel(Permission) private permissionRepo: typeof Permission,
-    @InjectModel(User) private userRepo: typeof User,
+    @InjectModel(BusinessUser) private businessUserRepo: typeof BusinessUser,
     @Inject(REQUEST) private request: Request,
   ) {}
 
@@ -25,33 +25,38 @@ export class AccessControlService {
     business_uuid: string,
     user_uuid: string,
   ) {
-    const user = await this.userRepo.findOne({
+    const businessUser = await this.businessUserRepo.findOne({
       where: {
-        uuid: user_uuid,
+        user_uuid,
+        business_uuid,
       },
-      include: [
-        {
-          model: Business,
-          where: {
-            uuid: business_uuid,
-          },
-        },
-      ],
+      include: [{ model: Role, include: [Permission] }, Permission],
     });
 
-    if (!user)
+    if (!businessUser)
       throw new HttpException(
         "You don't have permission to this business",
         HttpStatus.FORBIDDEN,
       );
-    console.log({
-      check: user.getBusinesses,
-    });
-    const business = await user.getBusinesses({
-      where: { uuid: business_uuid },
-    });
-    console.log({
-      business,
-    });
+
+    const permissions = businessUser.permissions;
+    const rolePermissions = businessUser.roles
+      .map((item) => item.permissions)
+      .flat();
+    const allPermissions = _.uniqBy(
+      permissions.concat(rolePermissions),
+      (item) => item.action,
+    );
+    const hasPermission = allPermissions.some(
+      (item) =>
+        item.title == perDetail.title || item.action == perDetail.action,
+    );
+    if (!hasPermission)
+      throw new HttpException(
+        `You don't have enough permissions to perform ${
+          perDetail.action ? `${perDetail.action} action` : perDetail.title
+        }`,
+        HttpStatus.FORBIDDEN,
+      );
   }
 }

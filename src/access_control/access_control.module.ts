@@ -7,14 +7,14 @@ import { Permission } from './entities/permission.entity';
 import { RolePermission } from './entities/role_permission.entity';
 import { BusinessUserRole } from './entities/business-user_role.entity';
 import { BusinessUserPermission } from './entities/business-user_permission.entity';
-import { User } from 'src/users/entites/user.entity';
+import { BusinessUser } from 'src/business/entites/business_user.entity';
 
 @Module({
   imports: [
     SequelizeModule.forFeature([
       Role,
-      User,
       Permission,
+      BusinessUser,
       RolePermission,
       BusinessUserRole,
       BusinessUserPermission,

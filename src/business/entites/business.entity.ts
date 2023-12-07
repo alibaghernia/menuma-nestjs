@@ -19,6 +19,7 @@ import {
   HasManyCreateAssociationMixin,
   HasManyHasAssociationMixin,
 } from 'sequelize';
+import { Role } from 'src/access_control/entities/role.entity';
 
 @Table({
   underscored: true,
@@ -107,6 +108,20 @@ export class Business extends Model<Business> {
   })
   products: Product[];
 
+  @HasMany(() => BusinessUser, {
+    as: 'businessUsers',
+    foreignKey: 'business_uuid',
+    sourceKey: 'uuid',
+  })
+  businessUsers: BusinessUser[];
+
+  @HasMany(() => Role, {
+    as: 'roles',
+    foreignKey: 'business_uuid',
+    sourceKey: 'uuid',
+  })
+  roles: string;
+
   count: HasManyCountAssociationsMixin;
 
   addUser: HasManyAddAssociationMixin<User, User['uuid']>;
@@ -118,4 +133,5 @@ export class Business extends Model<Business> {
   removeProduct: HasManyRemoveAssociationMixin<Product, Product['uuid']>;
   hasProduct: HasManyHasAssociationMixin<Product, Product['uuid']>;
   createProduct: HasManyCreateAssociationMixin<Product>;
+  BusinessUser: BusinessUser;
 }

@@ -41,6 +41,9 @@ dependencies:
   express-session:
     specifier: ^1.17.3
     version: 1.17.3
+  lodash:
+    specifier: ^4.17.21
+    version: 4.17.21
   mariadb:
     specifier: ^3.2.2
     version: 3.2.2
@@ -97,6 +100,9 @@ devDependencies:
   '@types/jest':
     specifier: ^29.5.2
     version: 29.5.10
+  '@types/lodash':
+    specifier: ^4.14.202
+    version: 4.14.202
   '@types/node':
     specifier: ^20.3.1
     version: 20.10.2

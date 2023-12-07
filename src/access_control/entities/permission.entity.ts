@@ -1,12 +1,14 @@
 import {
-  BelongsTo,
+  BelongsToMany,
   Column,
   DataType,
-  ForeignKey,
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Business } from 'src/business/entites/business.entity';
+import { Role } from './role.entity';
+import { RolePermission } from './role_permission.entity';
+import { BusinessUser } from 'src/business/entites/business_user.entity';
+import { BusinessUserPermission } from './business-user_permission.entity';
 
 @Table({
   tableName: 'permissions',
@@ -21,12 +23,6 @@ export class Permission extends Model<Permission> {
   })
   uuid: string;
 
-  @ForeignKey(() => Business)
-  @Column({
-    type: DataType.UUID,
-  })
-  business_uuid: string;
-
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -39,10 +35,23 @@ export class Permission extends Model<Permission> {
   })
   action: string;
 
-  @BelongsTo(() => Business, {
-    as: 'business',
-    foreignKey: 'business_uuid',
+  @BelongsToMany(() => Role, {
+    through: () => RolePermission,
+    as: 'roles',
+    foreignKey: 'permission_uuid',
+    sourceKey: 'uuid',
+    otherKey: 'role_uuid',
     targetKey: 'uuid',
   })
-  business: Business;
+  roles: Role[];
+
+  @BelongsToMany(() => BusinessUser, {
+    through: () => BusinessUserPermission,
+    as: 'businessUsers',
+    foreignKey: 'permission_uuid',
+    sourceKey: 'uuid',
+    otherKey: 'business_user_uuid',
+    targetKey: 'uuid',
+  })
+  businessUsers: BusinessUser[];
 }

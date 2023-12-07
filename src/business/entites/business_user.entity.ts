@@ -1,5 +1,6 @@
 import {
   BelongsTo,
+  BelongsToMany,
   Column,
   DataType,
   ForeignKey,
@@ -11,6 +12,8 @@ import { Business } from './business.entity';
 import { User } from 'src/users/entites/user.entity';
 import { BusinessUserRole } from 'src/access_control/entities/business-user_role.entity';
 import { BusinessUserPermission } from 'src/access_control/entities/business-user_permission.entity';
+import { Role } from 'src/access_control/entities/role.entity';
+import { Permission } from 'src/access_control/entities/permission.entity';
 
 @Table({
   tableName: 'business-user',
@@ -56,12 +59,32 @@ export class BusinessUser extends Model<BusinessUser> {
     foreignKey: 'business_user_uuid',
     sourceKey: 'uuid',
   })
-  businessRoles: BusinessUserRole;
+  businessRoles: BusinessUserRole[];
 
   @HasMany(() => BusinessUserPermission, {
     as: 'businessPermissions',
     foreignKey: 'business_user_uuid',
     sourceKey: 'uuid',
   })
-  businessPermissions: BusinessUserPermission;
+  businessPermissions: BusinessUserPermission[];
+
+  @BelongsToMany(() => Role, {
+    through: () => BusinessUserRole,
+    as: 'roles',
+    foreignKey: 'business_user_uuid',
+    sourceKey: 'uuid',
+    otherKey: 'role_uuid',
+    targetKey: 'uuid',
+  })
+  roles: Role[];
+
+  @BelongsToMany(() => Permission, {
+    through: () => BusinessUserPermission,
+    as: 'permissions',
+    foreignKey: 'business_user_uuid',
+    sourceKey: 'uuid',
+    otherKey: 'permission_uuid',
+    targetKey: 'uuid',
+  })
+  permissions: Permission[];
 }
