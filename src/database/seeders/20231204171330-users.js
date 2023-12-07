@@ -11,6 +11,7 @@ module.exports = {
         password:
           '$2a$10$lIahHU2he8fQd3XrQ3TGwOdvLHU6LEXDE5NV.XuM9kOJWvfgughnW', //adminpass,
         mobile: '09000000000',
+        role: 'admin',
         created_at: new Date(),
         updated_at: new Date(),
       },
