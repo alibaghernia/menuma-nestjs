@@ -9,6 +9,7 @@ import { ProductModule } from './product/product.module';
 import typeormConfigs from 'src/database/config';
 import { RolesGuard } from './auth/guards/role.guard';
 import { APP_GUARD } from '@nestjs/core';
+import { AccessControlModule } from './access_control/access_control.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { APP_GUARD } from '@nestjs/core';
     BusinessModule,
     CategoryModule,
     ProductModule,
+    AccessControlModule,
   ],
   controllers: [],
   providers: [
