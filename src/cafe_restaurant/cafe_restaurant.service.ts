@@ -135,30 +135,39 @@ export class CafeRestaurantService {
   ) {
     const transaction = await this.sequelize.transaction();
     try {
-      const user = await this.userRepository.findOne({
-        where: { uuid: this.request.user.uuid },
-        include: [
-          {
-            model: CafeRestaurant,
-            through: {
+      let cafe_restaurant: CafeRestaurant;
+      if (this.request.user.role != 'admin') {
+        const user = await this.userRepository.findOne({
+          where: { uuid: this.request.user.uuid },
+          include: [
+            {
+              model: CafeRestaurant,
+              through: {
+                where: {
+                  role: 'manager',
+                },
+              },
               where: {
-                role: 'manager',
+                uuid: cafe_restaurant_uuid,
               },
             },
-            where: {
-              uuid: cafe_restaurant_uuid,
-            },
-          },
-        ],
-      });
-      if (!user)
-        throw new HttpException(
-          "You don't have permission to perform this action!",
-          HttpStatus.FORBIDDEN,
+          ],
+        });
+        if (!user)
+          throw new HttpException(
+            "You don't have permission to perform this action!",
+            HttpStatus.FORBIDDEN,
+          );
+        cafe_restaurant = await user.cafeRestaurants?.find(
+          (item) => item.uuid == cafe_restaurant_uuid,
         );
-      const cafe_restaurant = await user.cafeRestaurants?.find(
-        (item) => item.uuid == cafe_restaurant_uuid,
-      );
+      } else {
+        cafe_restaurant = await this.cafeRestaurantRepository.findOne({
+          where: {
+            uuid: cafe_restaurant_uuid,
+          },
+        });
+      }
       if (!cafe_restaurant)
         throw new HttpException(
           "Cafe restaurant not found or you dont' have enough permission!",
