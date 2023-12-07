@@ -24,4 +24,12 @@ export class UsersService {
       },
     });
   }
+
+  getAllManagers() {
+    return this.userRepository.findOne({
+      where: {
+        role: 'manager',
+      },
+    });
+  }
 }

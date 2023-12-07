@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
   ValidateNested,
   isString,
 } from 'class-validator';
@@ -75,4 +76,8 @@ export class CreateCafeRestaurantDTO {
   @IsOptional()
   @IsString()
   readonly banner?: string;
+
+  @IsOptional()
+  @IsUUID()
+  readonly manager: string;
 }

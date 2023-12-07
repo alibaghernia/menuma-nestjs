@@ -79,6 +79,7 @@ export class CafeRestaurantService {
         telegram,
         twitter_x,
         status,
+        manager,
         ...cafeRestaurant
       } = payload;
 
@@ -101,6 +102,10 @@ export class CafeRestaurantService {
           link: v,
         }));
       await this.socialRepository.bulkCreate(socials);
+      if (manager)
+        await newCafeRes.addUser(manager, {
+          through: { role: 'manager' },
+        } as HasManyAddAssociationsMixinOptions);
       await transaction.commit();
 
       return newCafeRes;
