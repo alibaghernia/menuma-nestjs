@@ -6,33 +6,38 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Business } from './business.entity';
-import { User } from 'src/users/entites/user.entity';
+import { Business } from 'src/business/entites/business.entity';
 
 @Table({
-  tableName: 'business-user',
+  tableName: 'permissions',
   timestamps: false,
+  paranoid: true,
 })
-export class BusinessUser extends Model<BusinessUser> {
+export class Permission extends Model<Permission> {
   @Column({
-    primaryKey: true,
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
+    primaryKey: true,
   })
   uuid: string;
 
   @ForeignKey(() => Business)
+  @Column({
+    type: DataType.UUID,
+  })
   business_uuid: string;
 
-  @ForeignKey(() => User)
-  user_uuid: string;
-
   @Column({
-    type: DataType.ENUM('manager', 'employee'),
-    defaultValue: 'employee',
+    type: DataType.STRING,
     allowNull: false,
   })
-  role: string;
+  title: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  action: string;
 
   @BelongsTo(() => Business, {
     as: 'business',
@@ -40,11 +45,4 @@ export class BusinessUser extends Model<BusinessUser> {
     targetKey: 'uuid',
   })
   business: Business;
-
-  @BelongsTo(() => User, {
-    as: 'user',
-    foreignKey: 'user_uuid',
-    targetKey: 'uuid',
-  })
-  user: User;
 }
