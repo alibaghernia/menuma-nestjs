@@ -1,11 +1,13 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { SessionGuard } from 'src/auth/guards';
 import { ProductService } from '../product.service';
 import { CreateProductDTO } from '../dto/create.dto';
 import { AccessControlService } from 'src/access_control/access_control.service';
-import { Request } from 'express';
+import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
+import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
 @Controller('product')
 @UseGuards(SessionGuard)
+@UseGuards(CheckPermissionsGuard)
 export class ProductProtectedController {
   constructor(
     private productService: ProductService,
@@ -13,15 +15,10 @@ export class ProductProtectedController {
   ) {}
 
   @Post('create')
-  async create(@Body() payload: CreateProductDTO, @Req() req: Request) {
+  @CheckPermissions(['create-product'], true)
+  async create(@Body() payload: CreateProductDTO) {
     try {
-      await this.accessControllService.checkUserPermission(
-        { action: 'create-product' },
-        payload.business_uuid,
-        req.user.uuid,
-      );
-
-      await this.productService.create(payload);
+      return payload;
     } catch (error) {
       throw error;
     }
