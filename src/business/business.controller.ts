@@ -49,7 +49,7 @@ export class BusinessController {
         error,
       });
       throw new HttpException(
-        'Cafe Restaurant creation error!',
+        'Business creation error!',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
@@ -63,7 +63,7 @@ export class BusinessController {
       await this.businessService.remove(id);
       return {
         ok: true,
-        message: 'Cafe restaurant deleted successfully!',
+        message: 'Business deleted successfully!',
       };
     } catch (error) {
       throw new HttpException(

@@ -35,10 +35,7 @@ export class ProductService {
         ],
       });
       if (!user)
-        throw new HttpException(
-          'Cafe Restaurant not found!',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
       const hasPermission = await user.hasBusiness(payload.business_uuid, {
         through: {
           where: {

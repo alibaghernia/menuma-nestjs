@@ -1,4 +1,7 @@
-import { BelongsToManyHasAssociationMixin } from 'sequelize';
+import {
+  BelongsToManyGetAssociationsMixin,
+  BelongsToManyHasAssociationMixin,
+} from 'sequelize';
 import {
   BelongsToMany,
   Column,
@@ -57,4 +60,5 @@ export class User extends Model<User> {
   businesses: Business[];
 
   hasBusiness: BelongsToManyHasAssociationMixin<Business, Business['uuid']>;
+  getBusinesses: BelongsToManyGetAssociationsMixin<Business>;
 }

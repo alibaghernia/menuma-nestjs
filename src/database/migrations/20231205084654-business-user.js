@@ -25,6 +25,10 @@ module.exports = {
           key: 'uuid',
         },
       },
+      role: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
     });
   },
 

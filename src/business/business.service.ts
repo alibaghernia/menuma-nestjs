@@ -172,7 +172,7 @@ export class BusinessService {
       }
       if (!business)
         throw new HttpException(
-          "Cafe restaurant not found or you dont' have enough permission!",
+          "Business not found or you dont' have enough permission!",
           HttpStatus.NOT_FOUND,
         );
       await business.addUser(user_uuid, {
