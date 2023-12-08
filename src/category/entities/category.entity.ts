@@ -68,7 +68,7 @@ export class Category extends Model<Category> {
 
   @BelongsToMany(() => Product, {
     through: () => CategoryProduct,
-    foreignKey: 'category_id',
+    foreignKey: 'category_uuid',
     sourceKey: 'uuid',
     otherKey: 'product_uuid',
     targetKey: 'uuid',

@@ -30,14 +30,15 @@ export class CreateProductDTO {
   @Type(() => Price)
   prices: ProductPrice[];
 
-  @IsUUID()
-  @IsNotEmpty()
-  business_uuid: string;
-
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => Category)
   categories: Category[];
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => Tag)
+  tags: Tag[];
 }
 
 class Metadata {
@@ -58,12 +59,13 @@ class Price {
   amount: number;
 }
 
+class Tag {
+  @IsString()
+  value: string;
+}
+
 class Category {
   @ValidateIf((e) => !e.title)
   @IsUUID()
   readonly uuid: string;
-
-  @ValidateIf((e) => !e.uuid)
-  @IsString()
-  readonly title: string;
 }

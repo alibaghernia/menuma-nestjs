@@ -4,13 +4,19 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
 import { Business } from 'src/business/entites/business.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { CategoryProduct } from './category_product.entity';
-import { BelongsToSetAssociationMixin } from 'sequelize';
+import {
+  BelongsToSetAssociationMixin,
+  HasManyCreateAssociationMixin,
+} from 'sequelize';
+import { Tag } from 'src/database/entities/tag.entity';
+import { BelongsToManySetAssociationsMixin } from 'sequelize';
 
 export type ProductMetadata = {
   title: string;
@@ -24,6 +30,7 @@ export type ProductPrice = {
 @Table({
   tableName: 'products',
   timestamps: true,
+  underscored: true,
 })
 export class Product extends Model<Product> {
   @Column({
@@ -61,6 +68,16 @@ export class Product extends Model<Product> {
   })
   business_uuid: string;
 
+  @HasMany(() => Tag, {
+    as: 'tags',
+    foreignKey: 'tagable_uuid',
+    sourceKey: 'uuid',
+    scope: {
+      tagable_type: 'product',
+    },
+  })
+  tags: Tag[];
+
   @BelongsTo(() => Business, {
     as: 'business',
     foreignKey: 'business_uuid',
@@ -72,10 +89,13 @@ export class Product extends Model<Product> {
     through: () => CategoryProduct,
     foreignKey: 'product_uuid',
     sourceKey: 'uuid',
-    otherKey: 'category_id',
+    otherKey: 'category_uuid',
     targetKey: 'uuid',
   })
   categories: Category[];
 
   setBusiness: BelongsToSetAssociationMixin<Business, Business['uuid']>;
+  setCategories: BelongsToManySetAssociationsMixin<Category, Category['uuid']>;
+  setTags: BelongsToManySetAssociationsMixin<Tag, Tag['uuid']>;
+  createTag: HasManyCreateAssociationMixin<Tag>;
 }

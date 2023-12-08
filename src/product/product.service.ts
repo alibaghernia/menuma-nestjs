@@ -1,13 +1,12 @@
-import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Product } from './entities/product.entity';
 import { CreateProductDTO } from './dto/create.dto';
 import { REQUEST } from '@nestjs/core';
 import { User } from 'src/users/entites/user.entity';
 import { Request } from 'express';
-import { Business } from 'src/business/entites/business.entity';
-import { BelongsToManyHasAssociationMixinOptions } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
+import { Tag } from 'src/database/entities/tag.entity';
 
 @Injectable()
 export class ProductService {
@@ -15,39 +14,25 @@ export class ProductService {
     private sequelize: Sequelize,
     @InjectModel(Product) private productRepository: typeof Product,
     @InjectModel(User) private userRepository: typeof User,
+    @InjectModel(Tag) private tagRepository: typeof Tag,
     @Inject(REQUEST) private request: Request,
   ) {}
 
-  async create(payload: CreateProductDTO) {
+  async create(business_uuid: string, payload: CreateProductDTO) {
     const transaction = await this.sequelize.transaction();
     try {
-      const user = await this.userRepository.findOne({
-        where: {
-          uuid: this.request.user.uuid,
-        },
-        include: [
-          {
-            model: Business,
-            where: {
-              uuid: payload.business_uuid,
-            },
-          },
-        ],
+      const { categories, tags, ...prodPayload } = payload;
+      const product = await this.productRepository.create({
+        ...prodPayload,
+        business_uuid,
       });
-      if (!user)
-        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-      const hasPermission = await user.hasBusiness(payload.business_uuid, {
-        through: {
-          where: {
-            role: 'manager',
-          },
-        },
-      } as BelongsToManyHasAssociationMixinOptions);
-      if (!hasPermission)
-        throw new HttpException(
-          "You don't have enough permission to perform this action",
-          HttpStatus.FORBIDDEN,
-        );
+
+      for (const tag of tags) {
+        await product.createTag({
+          value: tag.value,
+        });
+      }
+      await product.setCategories(categories.map((cat) => cat.uuid));
 
       await transaction.commit();
     } catch (error) {

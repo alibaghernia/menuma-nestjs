@@ -6,9 +6,13 @@ import { Product } from './entities/product.entity';
 import { User } from 'src/users/entites/user.entity';
 import { ProductProtectedController } from './controllers/product.protected.controller';
 import { AccessControlModule } from 'src/access_control/access_control.module';
+import { Tag } from 'src/database/entities/tag.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Product, User]), AccessControlModule],
+  imports: [
+    SequelizeModule.forFeature([Product, User, Tag]),
+    AccessControlModule,
+  ],
   providers: [ProductService],
   controllers: [ProductController, ProductProtectedController],
 })
