@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
-import { ProductService } from '../product.service';
+import { ProductPanelService } from '../services/product.panel.service';
 
 @Controller('product')
 export class ProductController {
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductPanelService) {}
 }

@@ -68,6 +68,11 @@ export const business_permissions = {
   },
 };
 export const product_permissions = {
+  readProducts: {
+    uuid: 'f7c3fd2b-515d-4e9f-b400-89b1db8cd1e8',
+    title: 'Read products',
+    action: 'read-products',
+  },
   createProduct: {
     uuid: 'fe81d8f7-9b4c-45de-b489-e0a515a6a801',
     title: 'Create new product',

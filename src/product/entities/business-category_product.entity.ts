@@ -10,7 +10,7 @@ import { BusinessCategory } from 'src/business/entites/business_category.entity'
 import { Product } from './product.entity';
 
 @Table({
-  tableName: 'business-category_product',
+  tableName: 'business_category-product',
   underscored: true,
   timestamps: false,
 })

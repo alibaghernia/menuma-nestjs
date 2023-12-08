@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ProductService } from './product.service';
+import { ProductPanelService } from './services/product.panel.service';
 import { ProductController } from './controllers/product.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Product } from './entities/product.entity';
 import { User } from 'src/users/entites/user.entity';
-import { ProductProtectedController } from './controllers/product.protected.controller';
+import { ProductPanelController } from './controllers/product.panel.controller';
 import { AccessControlModule } from 'src/access_control/access_control.module';
 import { Tag } from 'src/database/entities/tag.entity';
 
@@ -13,7 +13,7 @@ import { Tag } from 'src/database/entities/tag.entity';
     SequelizeModule.forFeature([Product, User, Tag]),
     AccessControlModule,
   ],
-  providers: [ProductService],
-  controllers: [ProductController, ProductProtectedController],
+  providers: [ProductPanelService],
+  controllers: [ProductController, ProductPanelController],
 })
 export class ProductModule {}

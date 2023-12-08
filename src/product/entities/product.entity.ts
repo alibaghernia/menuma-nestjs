@@ -11,12 +11,17 @@ import {
 import { Business } from 'src/business/entites/business.entity';
 import {
   BelongsToSetAssociationMixin,
+  HasManyAddAssociationMixin,
   HasManyCreateAssociationMixin,
+  HasManyHasAssociationMixin,
+  HasManyRemoveAssociationMixin,
+  HasManyRemoveAssociationsMixin,
 } from 'sequelize';
 import { Tag } from 'src/database/entities/tag.entity';
 import { BelongsToManySetAssociationsMixin } from 'sequelize';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
 import { BusinessCategoryProduct } from './business-category_product.entity';
+import { HasManyAddAssociationsMixin } from 'sequelize';
 
 export type ProductMetadata = {
   title: string;
@@ -87,19 +92,23 @@ export class Product extends Model<Product> {
 
   @BelongsToMany(() => BusinessCategory, {
     through: () => BusinessCategoryProduct,
-    as: 'businessCategory',
+    as: 'businessCategories',
     foreignKey: 'product_uuid',
     sourceKey: 'uuid',
     otherKey: 'business_category_uuid',
     targetKey: 'uuid',
   })
-  businessCategory: BusinessCategory[];
+  businessCategories: BusinessCategory[];
 
   setBusiness: BelongsToSetAssociationMixin<Business, Business['uuid']>;
   setBusinessCategories: BelongsToManySetAssociationsMixin<
     BusinessCategory,
     BusinessCategory['uuid']
   >;
-  setTags: BelongsToManySetAssociationsMixin<Tag, Tag['uuid']>;
   createTag: HasManyCreateAssociationMixin<Tag>;
+  addTags: HasManyAddAssociationsMixin<Tag, Tag['uuid']>;
+  addTag: HasManyAddAssociationMixin<Tag, Tag['uuid']>;
+  hasTag: HasManyHasAssociationMixin<Tag, Tag['uuid']>;
+  removeTag: HasManyRemoveAssociationMixin<Tag, Tag['uuid']>;
+  removeTags: HasManyRemoveAssociationsMixin<Tag, Tag['uuid']>;
 }

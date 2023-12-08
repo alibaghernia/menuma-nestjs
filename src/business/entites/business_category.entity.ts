@@ -41,7 +41,7 @@ export class BusinessCategory extends Model<BusinessCategory> {
   category_uuid: string;
 
   @BelongsTo(() => Category, {
-    as: 'cateogry',
+    as: 'category',
     foreignKey: 'category_uuid',
     targetKey: 'uuid',
   })
