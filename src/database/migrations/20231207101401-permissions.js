@@ -11,13 +11,6 @@ module.exports = {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      business_uuid: {
-        type: DataTypes.UUID,
-        references: {
-          model: 'businesses',
-          key: 'uuid',
-        },
-      },
       title: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -32,6 +25,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.dropTable('roles');
+    return queryInterface.dropTable('permissions');
   },
 };

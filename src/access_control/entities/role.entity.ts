@@ -42,6 +42,7 @@ export class Role extends Model<Role> {
     as: 'business',
     foreignKey: 'business_uuid',
     targetKey: 'uuid',
+    constraints: false,
   })
   businesses: Business[];
 
