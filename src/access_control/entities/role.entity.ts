@@ -15,7 +15,9 @@ import { BusinessUserRole } from './business-user_role.entity';
 import {
   HasManyAddAssociationMixin,
   HasManyAddAssociationsMixin,
+  HasManyRemoveAssociationMixin,
 } from 'sequelize';
+import { HasManyRemoveAssociationsMixin } from 'sequelize';
 
 @Table({
   tableName: 'roles',
@@ -71,5 +73,13 @@ export class Role extends Model<Role> {
   businessUsers: BusinessUser[];
 
   addPermission: HasManyAddAssociationMixin<Permission, Permission['uuid']>;
+  removePermission: HasManyRemoveAssociationMixin<
+    Permission,
+    Permission['uuid']
+  >;
   addPermissions: HasManyAddAssociationsMixin<Permission, Permission['uuid']>;
+  removePermissions: HasManyRemoveAssociationsMixin<
+    Permission,
+    Permission['uuid']
+  >;
 }

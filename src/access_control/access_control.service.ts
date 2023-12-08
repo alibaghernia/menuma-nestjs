@@ -136,6 +136,9 @@ export class AccessControlService {
       include: [
         {
           model: Permission,
+          through: {
+            attributes: [],
+          },
         },
       ],
       attributes: {
@@ -152,6 +155,9 @@ export class AccessControlService {
       include: [
         {
           model: Permission,
+          through: {
+            attributes: [],
+          },
         },
       ],
       attributes: {
@@ -201,6 +207,45 @@ export class AccessControlService {
 
       if (payload.permission_uuid) role.addPermission(payload.permission_uuid);
       else role.addPermissions(payload.permissions_uuid);
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+  async unassingPermissionToBusinessRole(
+    business_uuid: string,
+    role_uuid: string,
+    payload: AssignPermissionToBusinessRoleDTO,
+  ) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      const role = await this.roleRepo.findOne({
+        where: {
+          uuid: role_uuid,
+          business_uuid,
+        },
+      });
+      if (!role)
+        throw new HttpException('Role not found!', HttpStatus.NOT_FOUND);
+
+      const administratorPermissionsIds = administratorAccessPermissions.map(
+        (item) => item.uuid,
+      );
+      if (
+        administratorPermissionsIds.some(
+          (item) => item == payload.permission_uuid,
+        )
+      )
+        throw new HttpException(
+          "You don't have permission to do this action!",
+          HttpStatus.FORBIDDEN,
+        );
+
+      if (payload.permission_uuid)
+        role.removePermission(payload.permission_uuid);
+      else role.removePermissions(payload.permissions_uuid);
 
       await transaction.commit();
     } catch (error) {

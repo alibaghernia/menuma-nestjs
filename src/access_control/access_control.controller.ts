@@ -199,4 +199,28 @@ export class AccessControlController {
       throw error;
     }
   }
+
+  @Post(':business_uuid/roles/:role_uuid/unassign-permission')
+  @CheckPermissions([access_control.updateBusinessRole.action])
+  async unassingPermissionToBusinessRole(
+    @Param('business_uuid') business_uuid: string,
+    @Param('role_uuid') role_uuid: string,
+    @Body() payload: AssignPermissionToBusinessRoleDTO,
+  ) {
+    this.logger.log('assign permission to business role');
+    try {
+      await this.accessConttolService.unassingPermissionToBusinessRole(
+        business_uuid,
+        role_uuid,
+        payload,
+      );
+      return {
+        ok: true,
+        message: 'Unassign permission to business role successfully!',
+      };
+    } catch (error) {
+      this.logger.error('error unassign permission to business role');
+      throw error;
+    }
+  }
 }

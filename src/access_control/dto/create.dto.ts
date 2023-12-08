@@ -20,7 +20,7 @@ export class AssignPermissionToBusinessRoleDTO {
   @IsNotEmpty()
   permission_uuid?: string;
 
-  @ValidateIf((e) => !e.permissions_uuid)
+  @ValidateIf((e) => e.permissions_uuid)
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => IsString)
