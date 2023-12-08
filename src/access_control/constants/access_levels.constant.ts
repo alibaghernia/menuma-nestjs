@@ -1,4 +1,9 @@
 export const access_control = {
+  seeAllPermissions: {
+    uuid: 'f5351386-3d31-42fa-862e-5f1f7494452d',
+    title: 'See All Permissions',
+    action: 'see-all-permissions',
+  },
   seeAllRoles: {
     uuid: '286433b1-b2da-4e2f-86d4-6ec31a3ea99e',
     title: 'See All Roles',
@@ -13,6 +18,11 @@ export const access_control = {
     uuid: 'c4f90d3e-7570-41c0-abe5-471a8be9dd52',
     title: 'Update System Role',
     action: 'update-system-role',
+  },
+  createBusinessRole: {
+    uuid: '9651b985-6066-4acc-810b-f965789523da',
+    title: 'Update Business Role',
+    action: 'create-business-role',
   },
   updateBusinessRole: {
     uuid: '991163a9-c930-4e54-8e38-49b6884d93aa',
@@ -91,3 +101,11 @@ export const category_permissions = {
     action: 'delete-category',
   },
 };
+
+export const administratorAccessPermissions = [
+  access_control.seeAllRoles,
+  access_control.updateSystemRole,
+  business_permissions.createBusiness,
+  business_permissions.removeBusiness,
+  business_permissions.seeAllBusiness,
+];

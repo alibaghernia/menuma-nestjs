@@ -12,6 +12,10 @@ import { Permission } from './permission.entity';
 import { RolePermission } from './role_permission.entity';
 import { BusinessUser } from 'src/business/entites/business_user.entity';
 import { BusinessUserRole } from './business-user_role.entity';
+import {
+  HasManyAddAssociationMixin,
+  HasManyAddAssociationsMixin,
+} from 'sequelize';
 
 @Table({
   tableName: 'roles',
@@ -65,4 +69,7 @@ export class Role extends Model<Role> {
     targetKey: 'uuid',
   })
   businessUsers: BusinessUser[];
+
+  addPermission: HasManyAddAssociationMixin<Permission, Permission['uuid']>;
+  addPermissions: HasManyAddAssociationsMixin<Permission, Permission['uuid']>;
 }

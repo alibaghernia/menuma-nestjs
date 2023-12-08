@@ -34,7 +34,13 @@ async function bootstrap() {
   );
   app.use(passport.initialize());
   app.use(passport.session());
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: true,
+    }),
+  );
 
   const host = configService.get<string>('SERVER_HOST', '127.0.0.1');
   const port = configService.get<number>('SERVER_PORT', 3000);

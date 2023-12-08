@@ -7,6 +7,12 @@ import { Request } from 'express';
 import { Sequelize } from 'sequelize-typescript';
 import { BusinessUser } from 'src/business/entites/business_user.entity';
 import * as _ from 'lodash';
+import {
+  AssignPermissionToBusinessRoleDTO,
+  CreateBusinessRoleDTO,
+} from './dto/create.dto';
+import { administratorAccessPermissions } from './constants';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class AccessControlService {
@@ -56,5 +62,150 @@ export class AccessControlService {
         }`,
         HttpStatus.FORBIDDEN,
       );
+  }
+
+  async getPermissions() {
+    return this.permissionRepo.findAll({
+      where: {
+        [Op.not]: {
+          [Op.or]: administratorAccessPermissions.map((item) => ({
+            uuid: item.uuid,
+          })),
+        },
+      },
+    });
+  }
+  async getSystemRoles() {
+    return this.roleRepo.findAll({
+      where: {
+        business_uuid: '',
+      },
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+    });
+  }
+  async getSystemRole(role_uuid: string) {
+    return this.roleRepo.findOne({
+      where: {
+        uuid: role_uuid,
+        business_uuid: '',
+      },
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+    });
+  }
+  async getSystemRolePermissions(role_uuid: string) {
+    const role = await this.roleRepo.findOne({
+      where: {
+        uuid: role_uuid,
+        business_uuid: '',
+      },
+      include: [
+        {
+          model: Permission,
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+    });
+    if (!role) throw new HttpException('Role not found!', HttpStatus.NOT_FOUND);
+
+    return role.permissions || [];
+  }
+  async getBusinessRoles(business_uuid: string) {
+    return this.roleRepo.findAll({
+      where: {
+        business_uuid,
+      },
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+    });
+  }
+  async getBusinessRolesWithPermissions(business_uuid: string) {
+    return this.roleRepo.findAll({
+      where: {
+        business_uuid,
+      },
+      include: [
+        {
+          model: Permission,
+        },
+      ],
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+    });
+  }
+  async getBusinessRolePermissions(business_uuid: string, role_uuid: string) {
+    const role = await this.roleRepo.findOne({
+      where: {
+        business_uuid,
+        uuid: role_uuid,
+      },
+      include: [
+        {
+          model: Permission,
+        },
+      ],
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+    });
+    return role?.permissions || [];
+  }
+
+  async createBusinessRole(
+    business_uuid: string,
+    payload: CreateBusinessRoleDTO,
+  ) {
+    return this.roleRepo.create({
+      business_uuid,
+      title: payload.title,
+    });
+  }
+  async assingPermissionToBusinessRole(
+    business_uuid: string,
+    role_uuid: string,
+    payload: AssignPermissionToBusinessRoleDTO,
+  ) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      const role = await this.roleRepo.findOne({
+        where: {
+          uuid: role_uuid,
+          business_uuid,
+        },
+      });
+      if (!role)
+        throw new HttpException('Role not found!', HttpStatus.NOT_FOUND);
+
+      const administratorPermissionsIds = administratorAccessPermissions.map(
+        (item) => item.uuid,
+      );
+      if (
+        administratorPermissionsIds.some(
+          (item) => item == payload.permission_uuid,
+        )
+      )
+        throw new HttpException(
+          "You don't have permission to do this action!",
+          HttpStatus.FORBIDDEN,
+        );
+
+      if (payload.permission_uuid) role.addPermission(payload.permission_uuid);
+      else role.addPermissions(payload.permissions_uuid);
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   }
 }

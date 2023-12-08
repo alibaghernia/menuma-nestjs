@@ -12,7 +12,6 @@ export class CheckPermissionsGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log('CheckPermissionsGuard');
     const { permissions, id_field, from_body } =
       this.reflector.getAllAndOverride<{
         permissions: string[];
@@ -22,7 +21,7 @@ export class CheckPermissionsGuard implements CanActivate {
 
     if (!permissions) return true;
     const request = context.switchToHttp().getRequest<Request>();
-    if (request.user.role == 'admin') return true; // if user is admin prevnt checking permissions
+    if (request.user.role == 'admin') return true; // if user is admin prevent checking permissions
     const user_uuid = request.user.uuid;
     let business_uuid;
     if (!from_body) {
