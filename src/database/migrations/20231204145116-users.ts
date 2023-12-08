@@ -1,34 +1,41 @@
-'use strict';
-
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
     return queryInterface.createTable(
-      'socials',
+      'users',
       {
         uuid: {
           primaryKey: true,
           type: DataTypes.UUID,
           defaultValue: DataTypes.UUIDV4,
         },
-        socialable_type: {
-          type: DataTypes.STRING,
+        first_name: {
+          type: DataTypes.STRING(50),
           allowNull: false,
         },
-        socialable_uuid: {
-          type: DataTypes.UUID,
-          allowNull: false,
-          references: null,
+        last_name: {
+          type: DataTypes.STRING(50),
         },
-        type: {
-          type: DataTypes.STRING,
+        username: {
+          type: DataTypes.STRING(50),
           allowNull: false,
         },
-        link: {
-          type: DataTypes.STRING,
+        mobile: {
+          type: DataTypes.STRING(13),
           allowNull: false,
+        },
+        email: {
+          type: DataTypes.STRING(50),
+        },
+        password: {
+          type: DataTypes.STRING(110),
+          allowNull: false,
+        },
+        role: {
+          type: DataTypes.ENUM('admin', 'user', 'manager'),
+          defaultValue: 'user',
         },
 
         created_at: DataTypes.DATE,
@@ -51,6 +58,12 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.dropTable('socials');
+    /**
+     * Add reverting commands here.
+     *
+     * Example:
+     * await queryInterface.dropTable('users');
+     */
+    return queryInterface.dropTable('users');
   },
 };

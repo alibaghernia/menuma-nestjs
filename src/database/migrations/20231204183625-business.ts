@@ -1,47 +1,59 @@
-'use strict';
-
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
     return queryInterface.createTable(
-      'users',
+      'businesses',
       {
         uuid: {
-          primaryKey: true,
           type: DataTypes.UUID,
           defaultValue: DataTypes.UUIDV4,
+          primaryKey: true,
         },
-        first_name: {
+        name: {
           type: DataTypes.STRING(50),
           allowNull: false,
         },
-        last_name: {
-          type: DataTypes.STRING(50),
-        },
-        username: {
+        slug: {
           type: DataTypes.STRING(50),
           allowNull: false,
+          unique: true,
         },
-        mobile: {
-          type: DataTypes.STRING(13),
+        status: {
+          type: DataTypes.STRING,
           allowNull: false,
+        },
+        address: {
+          type: DataTypes.STRING(100),
+        },
+        description: {
+          type: DataTypes.STRING(100),
+        },
+        location_lat: {
+          type: DataTypes.STRING(20),
+        },
+        location_long: {
+          type: DataTypes.STRING(20),
+        },
+        phone_number: {
+          type: DataTypes.STRING(20),
         },
         email: {
-          type: DataTypes.STRING(50),
+          type: DataTypes.STRING(20),
         },
-        password: {
-          type: DataTypes.STRING(110),
-          allowNull: false,
+        working_hours: {
+          type: DataTypes.JSON,
         },
-        role: {
-          type: DataTypes.ENUM('admin', 'user', 'manager'),
-          defaultValue: 'user',
+        logo: {
+          type: DataTypes.STRING,
         },
-
+        banner: {
+          type: DataTypes.STRING,
+        },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
+        deleted_at: DataTypes.DATE,
       },
       {
         hooks: {
@@ -60,12 +72,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
-    return queryInterface.dropTable('users');
+    return queryInterface.dropTable('businesses');
   },
 };

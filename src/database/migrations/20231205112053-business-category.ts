@@ -1,27 +1,25 @@
-'use strict';
-
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    return queryInterface.createTable('role-permission', {
+    return queryInterface.createTable('business-category', {
       uuid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      role_uuid: {
+      business_uuid: {
         type: DataTypes.UUID,
         references: {
-          model: 'roles',
+          model: 'businesses',
           key: 'uuid',
         },
       },
-      permission_uuid: {
+      category_uuid: {
         type: DataTypes.UUID,
         references: {
-          model: 'permissions',
+          model: 'categories',
           key: 'uuid',
         },
       },
@@ -29,6 +27,12 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.dropTable('role-permission');
+    /**
+     * Add reverting commands here.
+     *
+     * Example:
+     * await queryInterface.dropTable('users');
+     */
+    return queryInterface.dropTable('business-category');
   },
 };

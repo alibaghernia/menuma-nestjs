@@ -1,33 +1,32 @@
-'use strict';
-
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    return queryInterface.createTable('roles', {
+    return queryInterface.createTable('category-product', {
       uuid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      business_uuid: {
+      category_uuid: {
         type: DataTypes.UUID,
         references: {
-          model: 'businesses',
+          model: 'categories',
           key: 'uuid',
         },
       },
-      title: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      product_uuid: {
+        type: DataTypes.UUID,
+        references: {
+          model: 'products',
+          key: 'uuid',
+        },
       },
-
-      deleted_at: DataTypes.DATE,
     });
   },
 
   async down(queryInterface) {
-    return queryInterface.dropTable('roles');
+    return queryInterface.dropTable('category-product');
   },
 };

@@ -1,61 +1,39 @@
-'use strict';
-
-const { DataTypes } = require('sequelize');
+import { DataTypes } from 'sequelize';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
     return queryInterface.createTable(
-      'businesses',
+      'products',
       {
         uuid: {
           type: DataTypes.UUID,
           defaultValue: DataTypes.UUIDV4,
           primaryKey: true,
         },
-        name: {
-          type: DataTypes.STRING(50),
-          allowNull: false,
-        },
-        slug: {
-          type: DataTypes.STRING(50),
-          allowNull: false,
-          unique: true,
-        },
-        status: {
+        title: {
           type: DataTypes.STRING,
           allowNull: false,
-        },
-        address: {
-          type: DataTypes.STRING(100),
         },
         description: {
-          type: DataTypes.STRING(100),
+          type: DataTypes.STRING,
         },
-        location_lat: {
-          type: DataTypes.STRING(20),
-        },
-        location_long: {
-          type: DataTypes.STRING(20),
-        },
-        phone_number: {
-          type: DataTypes.STRING(20),
-        },
-        email: {
-          type: DataTypes.STRING(20),
-        },
-        working_hours: {
+        metadata: {
           type: DataTypes.JSON,
         },
-        logo: {
-          type: DataTypes.STRING,
+        prices: {
+          type: DataTypes.JSON,
+          allowNull: false,
         },
-        banner: {
-          type: DataTypes.STRING,
+        business_uuid: {
+          type: DataTypes.UUID,
+          references: {
+            model: 'businesses',
+            key: 'uuid',
+          },
         },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
-        deleted_at: DataTypes.DATE,
       },
       {
         hooks: {
@@ -74,6 +52,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.dropTable('businesses');
+    return queryInterface.dropTable('products');
   },
 };
