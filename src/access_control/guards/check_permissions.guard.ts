@@ -17,7 +17,7 @@ export class CheckPermissionsGuard implements CanActivate {
         permissions: string[];
         from_body?: boolean;
         id_field: string;
-      }>(CHECK_PERMISSIONS, [context.getHandler(), context.getClass()]);
+      }>(CHECK_PERMISSIONS, [context.getHandler(), context.getClass()]) || {};
 
     if (!permissions) return true;
     const request = context.switchToHttp().getRequest<Request>();

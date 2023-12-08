@@ -3,16 +3,16 @@ import { DataTypes } from 'sequelize';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    return queryInterface.createTable('category-product', {
+    return queryInterface.createTable('business_category-product', {
       uuid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      category_uuid: {
+      business_category_uuid: {
         type: DataTypes.UUID,
         references: {
-          model: 'categories',
+          model: 'business-category',
           key: 'uuid',
         },
       },
@@ -27,6 +27,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.dropTable('category-product');
+    return queryInterface.dropTable('business_category-product');
   },
 };

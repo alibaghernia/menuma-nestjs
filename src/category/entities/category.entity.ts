@@ -10,8 +10,6 @@ import {
 } from 'sequelize-typescript';
 import { Business } from 'src/business/entites/business.entity';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
-import { CategoryProduct } from 'src/product/entities/category_product.entity';
-import { Product } from 'src/product/entities/product.entity';
 
 @Table({
   tableName: 'categories',
@@ -65,13 +63,4 @@ export class Category extends Model<Category> {
     targetKey: 'uuid',
   })
   businesses: Business[];
-
-  @BelongsToMany(() => Product, {
-    through: () => CategoryProduct,
-    foreignKey: 'category_uuid',
-    sourceKey: 'uuid',
-    otherKey: 'product_uuid',
-    targetKey: 'uuid',
-  })
-  products: Product[];
 }

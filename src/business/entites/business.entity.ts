@@ -18,6 +18,9 @@ import {
   HasManyCountAssociationsMixin,
   HasManyCreateAssociationMixin,
   HasManyHasAssociationMixin,
+  BelongsToManyCreateAssociationMixin,
+  BelongsToManyAddAssociationMixin,
+  BelongsToManyHasAssociationMixin,
 } from 'sequelize';
 import { Role } from 'src/access_control/entities/role.entity';
 
@@ -133,5 +136,9 @@ export class Business extends Model<Business> {
   removeProduct: HasManyRemoveAssociationMixin<Product, Product['uuid']>;
   hasProduct: HasManyHasAssociationMixin<Product, Product['uuid']>;
   createProduct: HasManyCreateAssociationMixin<Product>;
+
+  createCategory: BelongsToManyCreateAssociationMixin<Category>;
+  addCategory: BelongsToManyAddAssociationMixin<Category, Category['uuid']>;
+  hasCategory: BelongsToManyHasAssociationMixin<Category, Category['uuid']>;
   BusinessUser: BusinessUser;
 }

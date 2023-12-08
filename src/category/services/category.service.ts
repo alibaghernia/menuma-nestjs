@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Category } from './entities/category.entity';
-import { CreateCategoryDTO } from './dto';
+import { Category } from '../entities/category.entity';
+import { CreateCategoryDTO } from '../dto';
 
 @Injectable()
 export class CategoryService {

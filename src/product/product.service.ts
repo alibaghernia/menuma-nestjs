@@ -32,7 +32,7 @@ export class ProductService {
           value: tag.value,
         });
       }
-      await product.setCategories(categories.map((cat) => cat.uuid));
+      await product.setBusinessCategories(categories.map((cat) => cat.uuid));
 
       await transaction.commit();
     } catch (error) {
