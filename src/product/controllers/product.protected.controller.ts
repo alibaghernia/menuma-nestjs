@@ -5,9 +5,10 @@ import { CreateProductDTO } from '../dto/create.dto';
 import { AccessControlService } from 'src/access_control/access_control.service';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
+
 @Controller('product')
-@UseGuards(SessionGuard)
 @UseGuards(CheckPermissionsGuard)
+@UseGuards(SessionGuard)
 export class ProductProtectedController {
   constructor(
     private productService: ProductService,

@@ -2,6 +2,33 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 const { v4: UUIDv4 } = require('uuid');
 
+const access_control = [
+  {
+    uuid: '286433b1-b2da-4e2f-86d4-6ec31a3ea99e',
+    title: 'See All Roles',
+    action: 'see-all-roles',
+  },
+  {
+    uuid: 'a5a9b327-a888-4f9d-8b24-9b428590d146',
+    title: 'See All Business Roles',
+    action: 'see-all-business-roles',
+  },
+  {
+    uuid: 'c4f90d3e-7570-41c0-abe5-471a8be9dd52',
+    title: 'Update System Role',
+    action: 'update-system-role',
+  },
+  {
+    uuid: '991163a9-c930-4e54-8e38-49b6884d93aa',
+    title: 'Update Business Role',
+    action: 'update-business-role',
+  },
+  {
+    uuid: '64fb8645-8a37-46b7-ab9d-f099e06c6756',
+    title: 'Remove Business Roles',
+    action: 'remove-business-roles',
+  },
+];
 const business_permissions = [
   {
     uuid: '3cd1e431-2e4b-4150-aa0c-d01d9e16fbd0',
@@ -70,6 +97,7 @@ const category_permissions = [
 ];
 
 const all_permissions = business_permissions.concat(
+  access_control,
   product_permissions,
   category_permissions,
 );
@@ -88,10 +116,12 @@ const roles = [
     permissions: all_permissions
       .filter((item) =>
         [
-          '3cd1e431-2e4b-4150-aa0c-d01d9e16fbd0',
-          '6dc2ce74f-eea0-462c-a339-c6c325a8c2ec',
-          '9638edcc-617a-4767-bee5-8a4886d58611',
-        ].includes(item.uuid),
+          'see-all-roles',
+          'update-system-role',
+          'create-business',
+          'remove-business',
+          'see-all-business',
+        ].includes(item.action),
       )
       .map((item) => item.uuid),
   },
@@ -123,20 +153,24 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.bulkDelete('role-permission', {
-      uuid: '*',
-    });
-    await queryInterface.bulkDelete(
-      'permissions',
-      all_permissions.map((item) => ({
-        uuid: item.uuid,
-      })),
-    );
-    await queryInterface.bulkDelete(
-      'roles',
-      roles.map((item) => ({
-        uuid: item.uuid,
-      })),
-    );
+    const permissionsUUID = all_permissions.map((item) => ({
+      uuid: item.uuid,
+    }));
+    for (const deleteItem of permissionsUUID.map((item) => ({
+      permission_uuid: item.uuid,
+    }))) {
+      const res1 = await queryInterface.bulkDelete('role-permission', [
+        deleteItem,
+      ]);
+    }
+
+    for (const deleteItem of permissionsUUID) {
+      const res1 = await queryInterface.bulkDelete('permissions', [deleteItem]);
+    }
+    for (const deleteItem of roles.map((item) => ({
+      uuid: item.uuid,
+    }))) {
+      const res1 = await queryInterface.bulkDelete('roles', [deleteItem]);
+    }
   },
 };

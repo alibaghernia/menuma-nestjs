@@ -18,8 +18,6 @@ export class AccessControlService {
     @Inject(REQUEST) private request: Request,
   ) {}
 
-  fetchAllRoles() {}
-
   async checkUserPermission(
     perDetail: { title?: string; action?: string },
     business_uuid: string,
