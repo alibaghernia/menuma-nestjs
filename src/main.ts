@@ -12,7 +12,12 @@ async function bootstrap() {
 
   const configService = app.get<ConfigService>(ConfigService);
 
-  const redisClient = createClient();
+  const redisClient = createClient({
+    socket: {
+      host: configService.get('REDIS_HOST', '127.0.0.1'),
+      port: configService.get<number>('REDIS_PORT', 6379),
+    },
+  });
   redisClient.connect().catch(console.error);
   //@ts-ignore
   const redisStore = new RedisStore({
