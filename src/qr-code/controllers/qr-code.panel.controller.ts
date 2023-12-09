@@ -12,6 +12,7 @@ import { ConfigService } from '@nestjs/config';
 import { QrCodePanelService } from '../services/qr-code.panel.service';
 import { CreateQrCodeDTO } from '../dto/create.dto';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
+import { UpdateQrCodeDTO } from '../dto/update.dto';
 
 @Controller(':business_uuid/qr-code')
 export class QrCodePanelController {
@@ -61,7 +62,7 @@ export class QrCodePanelController {
   async update(
     @Param('qr_code_uuid', new UUIDChecker('Qr Code uuid'))
     qr_code_uuid: string,
-    @Body() payload: CreateQrCodeDTO,
+    @Body() payload: UpdateQrCodeDTO,
   ) {
     try {
       await this.qrCodePanelService.update(qr_code_uuid, payload);

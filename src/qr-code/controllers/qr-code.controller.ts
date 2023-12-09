@@ -38,7 +38,9 @@ export class QrCodeController {
             ? `${dest}&${parsedQueryParams}`
             : `${dest}?${parsedQueryParams}`;
         }
-        return res.redirect(HttpStatus.PERMANENT_REDIRECT, dest);
+        return res
+          .setHeader('Cache-Control', 'no-store')
+          .redirect(HttpStatus.PERMANENT_REDIRECT, dest);
         break;
       }
     }
