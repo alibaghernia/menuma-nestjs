@@ -15,6 +15,7 @@ import { BusinessUserRole } from 'src/access_control/entities/business-user_role
 import { BusinessUserPermission } from 'src/access_control/entities/business-user_permission.entity';
 import { Tag } from './entities/tag.entity';
 import { BusinessCategoryProduct } from 'src/product/entities/business-category_product.entity';
+import { Image } from './entities/image.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -33,6 +34,7 @@ const config: SequelizeModuleOptions = {
     Product,
     BusinessUser,
     BusinessCategory,
+    Image,
     Social,
     Tag,
     Role,

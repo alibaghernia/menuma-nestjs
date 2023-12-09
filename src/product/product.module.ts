@@ -7,10 +7,11 @@ import { User } from 'src/users/entites/user.entity';
 import { ProductPanelController } from './controllers/product.panel.controller';
 import { AccessControlModule } from 'src/access_control/access_control.module';
 import { Tag } from 'src/database/entities/tag.entity';
+import { Image } from 'src/database/entities/image.entity';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Product, User, Tag]),
+    SequelizeModule.forFeature([Product, User, Tag, Image]),
     AccessControlModule,
   ],
   providers: [ProductPanelService],

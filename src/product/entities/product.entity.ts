@@ -22,6 +22,7 @@ import { BelongsToManySetAssociationsMixin } from 'sequelize';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
 import { BusinessCategoryProduct } from './business-category_product.entity';
 import { HasManyAddAssociationsMixin } from 'sequelize';
+import { Image } from 'src/database/entities/image.entity';
 
 export type ProductMetadata = {
   title: string;
@@ -83,6 +84,16 @@ export class Product extends Model<Product> {
   })
   tags: Tag[];
 
+  @HasMany(() => Image, {
+    as: 'images',
+    foreignKey: 'imageable_uuid',
+    sourceKey: 'uuid',
+    scope: {
+      imageable_type: 'product',
+    },
+  })
+  images: Image[];
+
   @BelongsTo(() => Business, {
     as: 'business',
     foreignKey: 'business_uuid',
@@ -111,4 +122,11 @@ export class Product extends Model<Product> {
   hasTag: HasManyHasAssociationMixin<Tag, Tag['uuid']>;
   removeTag: HasManyRemoveAssociationMixin<Tag, Tag['uuid']>;
   removeTags: HasManyRemoveAssociationsMixin<Tag, Tag['uuid']>;
+
+  createImage: HasManyCreateAssociationMixin<Image>;
+  addImages: HasManyAddAssociationsMixin<Image, Image['uuid']>;
+  addImage: HasManyAddAssociationMixin<Image, Image['uuid']>;
+  hasImage: HasManyHasAssociationMixin<Image, Image['uuid']>;
+  removeImage: HasManyRemoveAssociationMixin<Image, Image['uuid']>;
+  removeImages: HasManyRemoveAssociationsMixin<Image, Image['uuid']>;
 }

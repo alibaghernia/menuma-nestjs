@@ -5,10 +5,13 @@ import {
   Get,
   Logger,
   Param,
+  ParseFilePipe,
   Post,
   Put,
   Query,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { SessionGuard } from 'src/auth/guards';
 import { ProductPanelService } from '../services/product.panel.service';
@@ -17,6 +20,9 @@ import { CheckPermissions } from 'src/access_control/decorators/check_permission
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
 import { product_permissions } from 'src/access_control/constants';
 import { FindProductFiltersDTO } from '../dto/query.dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { ProductPhotoTypeValidator } from '../pipes/file_type_validator.pipe';
+import { ProductPhotoSizeValidator } from '../pipes/file_size_validator.pipe';
 
 @Controller(':business_uuid/panel/product')
 @UseGuards(CheckPermissionsGuard)
@@ -148,6 +154,41 @@ export class ProductPanelController {
       };
     } catch (error) {
       this.logger.log('Error during delete product');
+      throw error;
+    }
+  }
+
+  @Post(':uuid/upload-photos')
+  @UseInterceptors(FilesInterceptor('photos'))
+  async uploadPhotos(
+    @UploadedFiles(
+      new ParseFilePipe({
+        validators: [
+          new ProductPhotoTypeValidator({
+            fileType: /image\/jpeg|image\/png|image\/jpg/,
+          }),
+          new ProductPhotoSizeValidator({ maxSize: 1024 * 1024 * 2 }),
+        ],
+      }),
+    )
+    photos: Express.Multer.File[],
+    @Param('business_uuid') business_uuid: string,
+    @Param('uuid') product_uuid: string,
+    @Body('current_items') current_items: string[],
+  ) {
+    try {
+      await this.productService.savePhotos(
+        business_uuid,
+        product_uuid,
+        photos,
+        (typeof current_items == 'string' ? [current_items] : current_items) ||
+          [],
+      );
+      return {
+        ok: true,
+        message: 'Store photos was successfully!',
+      };
+    } catch (error) {
       throw error;
     }
   }

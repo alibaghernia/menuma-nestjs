@@ -11,6 +11,10 @@ import { Category } from 'src/category/entities/category.entity';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
 import { FindProductFiltersDTO } from '../dto/query.dto';
 import { Op, WhereOptions } from 'sequelize';
+import { ConfigService } from '@nestjs/config';
+import { join } from 'path';
+import * as fs from 'fs';
+import { Image } from 'src/database/entities/image.entity';
 
 @Injectable()
 export class ProductPanelService {
@@ -19,7 +23,9 @@ export class ProductPanelService {
     @InjectModel(Product) private productRepository: typeof Product,
     @InjectModel(User) private userRepository: typeof User,
     @InjectModel(Tag) private tagRepository: typeof Tag,
+    @InjectModel(Image) private imageRepository: typeof Image,
     @Inject(REQUEST) private request: Request,
+    private configService: ConfigService,
   ) {}
 
   async fetchAll(
@@ -226,9 +232,7 @@ export class ProductPanelService {
       );
       await this.tagRepository.destroy({
         where: {
-          uuid: {
-            [Op.or]: deletedTags.map((item) => item.uuid),
-          },
+          uuid: deletedTags.map((item) => item.uuid),
         },
       });
 
@@ -252,6 +256,81 @@ export class ProductPanelService {
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
+      throw error;
+    }
+  }
+
+  async savePhotos(
+    business_uuid: string,
+    product_uuid: string,
+    photos: Express.Multer.File[],
+    current_items: string[],
+  ) {
+    const t = await this.sequelize.transaction();
+    const savedPhotos = [];
+    const fs_path = join(__dirname, '../../../');
+    const static_images_path = join(
+      this.configService.get('IMAGES_PATH'),
+      'products',
+    );
+    try {
+      const product = await this.productRepository.findOne({
+        where: {
+          uuid: product_uuid,
+        },
+        include: [Image],
+      });
+      if (!product)
+        throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
+
+      if (!fs.existsSync(join(fs_path, static_images_path)))
+        fs.mkdirSync(join(fs_path, static_images_path), { recursive: true });
+      for (const photo of photos) {
+        const file_name = `${business_uuid}-${product_uuid}-${photo.originalname}`;
+        const savePath = join(fs_path, static_images_path, file_name);
+
+        // remove deleted items
+        const deletedImages = product.images.filter(
+          (item) =>
+            !photos.some((photo) => photo.originalname == item.name) &&
+            !current_items.some((cItem) => cItem == item.name),
+        );
+        await this.imageRepository.destroy({
+          where: {
+            uuid: deletedImages.map((item) => item.uuid),
+          },
+        });
+        for (const deletedImage of deletedImages) {
+          if (
+            fs.existsSync(join(fs_path, static_images_path, deletedImage.path))
+          )
+            fs.rmSync(join(fs_path, static_images_path, deletedImage.path));
+        }
+        const [, created] = await this.imageRepository.findOrCreate({
+          where: {
+            path: file_name,
+          },
+          defaults: {
+            imageable_type: 'product',
+            imageable_uuid: product.uuid,
+            path: file_name,
+            name: photo.originalname,
+          },
+        });
+        if (created) {
+          fs.writeFileSync(savePath, photo.buffer);
+          savedPhotos.push(savePath);
+        }
+      }
+
+      await t.commit();
+    } catch (error) {
+      await t.rollback();
+
+      for (const path of savedPhotos) {
+        if (fs.existsSync(path)) fs.rmSync(path);
+      }
+
       throw error;
     }
   }
