@@ -16,6 +16,7 @@ import { BusinessUserPermission } from 'src/access_control/entities/business-use
 import { Tag } from './entities/tag.entity';
 import { BusinessCategoryProduct } from 'src/product/entities/business-category_product.entity';
 import { Image } from './entities/image.entity';
+import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -28,6 +29,7 @@ const config: SequelizeModuleOptions = {
   database: `${process.env.DB_DATABASE}`,
   logging: (process.env.ORM_LOGGING || 'true') == 'true',
   models: [
+    QrCode,
     User,
     Category,
     Business,

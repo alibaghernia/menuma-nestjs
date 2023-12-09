@@ -23,6 +23,7 @@ import { FindProductFiltersDTO } from '../dto/query.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProductPhotoTypeValidator } from '../pipes/file_type_validator.pipe';
 import { ProductPhotoSizeValidator } from '../pipes/file_size_validator.pipe';
+import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 
 @Controller(':business_uuid/panel/product')
 @UseGuards(CheckPermissionsGuard)
@@ -34,8 +35,9 @@ export class ProductPanelController {
   @Get(':uuid')
   @CheckPermissions([product_permissions.readProducts.action])
   async findOneByUuid(
-    @Param('business_uuid') business_uuid: string,
-    @Param('uuid') uuid: string,
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Param('uuid', new UUIDChecker('Product UUID')) uuid: string,
   ) {
     this.logger.log('get product');
     try {
@@ -56,7 +58,8 @@ export class ProductPanelController {
   @Get('single')
   @CheckPermissions([product_permissions.readProducts.action])
   async findOne(
-    @Param('business_uuid') business_uuid: string,
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
     @Body() filters: FindProductFiltersDTO,
   ) {
     this.logger.log('get product');
@@ -75,7 +78,8 @@ export class ProductPanelController {
   @Get()
   @CheckPermissions([product_permissions.readProducts.action])
   async findAll(
-    @Param('business_uuid') business_uuid: string,
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
     @Body() filter: FindProductFiltersDTO,
     @Query('page') page: number,
     @Query('limit') limit: number,
@@ -103,7 +107,8 @@ export class ProductPanelController {
   @Post()
   @CheckPermissions([product_permissions.createProduct.action])
   async create(
-    @Param('business_uuid') business_uuid: string,
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
     @Body() payload: CreateProductDTO,
   ) {
     this.logger.log('create new product');
@@ -141,8 +146,9 @@ export class ProductPanelController {
   @Delete(':uuid')
   @CheckPermissions([product_permissions.deleteProduct.action])
   async delete(
-    @Param('business_uuid') business_uuid: string,
-    @Param('uuid') uuid: string,
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Param('uuid', new UUIDChecker('Product UUID')) uuid: string,
   ) {
     this.logger.log('delete product');
     try {
@@ -172,8 +178,9 @@ export class ProductPanelController {
       }),
     )
     photos: Express.Multer.File[],
-    @Param('business_uuid') business_uuid: string,
-    @Param('uuid') product_uuid: string,
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Param('uuid', new UUIDChecker('Product UUID')) product_uuid: string,
     @Body('current_items') current_items: string[],
   ) {
     try {

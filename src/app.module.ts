@@ -10,6 +10,7 @@ import typeormConfigs from 'src/database/config';
 import { RolesGuard } from './auth/guards/role.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { AccessControlModule } from './access_control/access_control.module';
+import { QrCodeModule } from './qr-code/qr-code.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AccessControlModule } from './access_control/access_control.module';
     CategoryModule,
     ProductModule,
     AccessControlModule,
+    QrCodeModule,
   ],
   controllers: [],
   providers: [

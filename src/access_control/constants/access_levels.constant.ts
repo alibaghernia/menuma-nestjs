@@ -51,7 +51,7 @@ export const business_permissions = {
     title: 'Remove Business',
     action: 'remove-business',
   },
-  seeAllBusiness: {
+  readBusinesses: {
     uuid: '9638edcc-617a-4767-bee5-8a4886d58611',
     title: 'See All Business',
     action: 'see-all-business',
@@ -112,5 +112,5 @@ export const administratorAccessPermissions = [
   access_control.updateSystemRole,
   business_permissions.createBusiness,
   business_permissions.removeBusiness,
-  business_permissions.seeAllBusiness,
+  business_permissions.readBusinesses,
 ];

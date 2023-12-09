@@ -3,6 +3,7 @@ import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissio
 import { SessionGuard } from 'src/auth/guards';
 import { CreateCategoryDTO } from '../dto';
 import { CategoryPanelService } from '../services/category.panel.service';
+import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 
 @Controller(':business_uuid/panel/category')
 @UseGuards(CheckPermissionsGuard)
@@ -11,7 +12,10 @@ export class CategoryPanelController {
   constructor(private categoryPanelService: CategoryPanelService) {}
 
   @Get()
-  async getCategories(@Param('business_uuid') business_uuid: string) {
+  async getCategories(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+  ) {
     try {
       const categories =
         await this.categoryPanelService.fetchAll(business_uuid);
@@ -26,7 +30,8 @@ export class CategoryPanelController {
 
   @Post()
   async createCategory(
-    @Param('business_uuid') business_uuid: string,
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
     @Body() payload: CreateCategoryDTO,
   ) {
     try {

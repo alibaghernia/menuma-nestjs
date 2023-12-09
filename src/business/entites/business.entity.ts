@@ -23,6 +23,7 @@ import {
   BelongsToManyHasAssociationMixin,
 } from 'sequelize';
 import { Role } from 'src/access_control/entities/role.entity';
+import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
 
 @Table({
   underscored: true,
@@ -124,6 +125,13 @@ export class Business extends Model<Business> {
     sourceKey: 'uuid',
   })
   roles: string;
+
+  @HasMany(() => QrCode, {
+    as: 'qrCodes',
+    foreignKey: 'business_uuid',
+    sourceKey: 'uuid',
+  })
+  qrCodes: QrCode;
 
   count: HasManyCountAssociationsMixin;
 

@@ -6,20 +6,20 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Business } from './entites/business.entity';
+import { Business } from '../entites/business.entity';
 import { HasManyAddAssociationsMixinOptions, WhereOptions } from 'sequelize';
-import { CreateBusinessDTO } from './dto';
+import { CreateBusinessDTO } from '../dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
-import { UpdateBusinessDTO } from './dto/update.dto';
+import { UpdateBusinessDTO } from '../dto/update.dto';
 import { Op } from 'sequelize';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { User } from 'src/users/entites/user.entity';
 
 @Injectable()
-export class BusinessService {
-  private logger = new Logger(BusinessService.name);
+export class BusinessPanelService {
+  private logger = new Logger(BusinessPanelService.name);
   constructor(
     @InjectModel(Business)
     private businessRepository: typeof Business,
@@ -45,8 +45,8 @@ export class BusinessService {
     });
   }
 
-  findBySlugOrId(slugOrId: string) {
-    return this.businessRepository.findOne({
+  async findBySlugOrId(slugOrId: string) {
+    const business = await this.businessRepository.findOne({
       where: {
         [Op.or]: {
           slug: slugOrId,
@@ -62,6 +62,11 @@ export class BusinessService {
         },
       ],
     });
+
+    if (!business)
+      throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
+
+    return business;
   }
 
   findOne(where: WhereOptions<Business>) {

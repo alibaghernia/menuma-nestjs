@@ -4,15 +4,19 @@ import { ConfigService } from '@nestjs/config';
 import * as session from 'express-session';
 import * as express from 'express';
 import * as passport from 'passport';
+import * as morgan from 'morgan';
 import { ValidationPipe } from '@nestjs/common';
 import { createClient } from 'redis';
 import RedisStore from 'connect-redis';
 import { join } from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    cors: true,
+  });
 
   const configService = app.get<ConfigService>(ConfigService);
+  app.use(morgan('tiny'));
   // public static images
   app.use(
     '/images',

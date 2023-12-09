@@ -11,29 +11,39 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { BusinessService } from './business.service';
-import { CreateBusinessDTO } from './dto';
+import { BusinessPanelService } from '../services/business.panel.service';
+import { CreateBusinessDTO } from '../dto';
 import { SessionGuard } from 'src/auth/guards';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/misc/role.enum';
-import { UpdateBusinessDTO } from './dto/update.dto';
+import { UpdateBusinessDTO } from '../dto/update.dto';
+import { NotEmptyPipe } from 'src/pipes/not_empty.pipe';
+import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
+import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
+import { business_permissions } from 'src/access_control/constants';
 
 @Controller('business')
-export class BusinessController {
-  constructor(private businessService: BusinessService) {}
+@UseGuards(SessionGuard)
+export class BusinessPanelController {
+  constructor(private businessService: BusinessPanelService) {}
 
   @Get()
+  @CheckPermissions([business_permissions.readBusinesses.action])
   getAll() {
     return this.businessService.findAll();
   }
 
   @Get(':slugOrId')
-  getBySlug(@Param('slugOrId') slugOrId: string) {
+  @CheckPermissions([business_permissions.readBusinesses.action])
+  getBySlug(
+    @Param('slugOrId', new NotEmptyPipe('Business Slug Or UUID'))
+    slugOrId: string,
+  ) {
     return this.businessService.findBySlugOrId(slugOrId);
   }
 
-  @UseGuards(SessionGuard)
   @Post('/create')
+  @CheckPermissions([business_permissions.createBusiness.action])
   @Roles(Role.Admin)
   async create(@Body() body: CreateBusinessDTO) {
     try {
@@ -55,12 +65,14 @@ export class BusinessController {
     }
   }
 
-  @Delete(':id')
-  @UseGuards(SessionGuard)
+  @Delete(':business_uuid')
+  @CheckPermissions([business_permissions.removeBusiness.action])
   @Roles(Role.Admin)
-  async remove(@Param('id') id: string) {
+  async remove(
+    @Param('business_uuid', new UUIDChecker('Business UUID')) uuid: string,
+  ) {
     try {
-      await this.businessService.remove(id);
+      await this.businessService.remove(uuid);
       return {
         ok: true,
         message: 'Business deleted successfully!',
@@ -73,10 +85,14 @@ export class BusinessController {
     }
   }
 
-  @Put(':id')
-  async update(@Param('id') id: string, @Body() payload: UpdateBusinessDTO) {
+  @Put(':business_uuid')
+  @CheckPermissions([business_permissions.updateBusinessInfo.action])
+  async update(
+    @Param('business_uuid', new UUIDChecker('Business UUID')) uuid: string,
+    @Body() payload: UpdateBusinessDTO,
+  ) {
     try {
-      await this.businessService.update(id, payload);
+      await this.businessService.update(uuid, payload);
       return {
         ok: true,
         message: 'business updated successfully!',
@@ -89,24 +105,21 @@ export class BusinessController {
     }
   }
 
-  @Post(':id/add_user/:user_id')
+  @Post(':business_uuid/add_user/:user_uuid')
+  @CheckPermissions([business_permissions.addUserToBusiness.action])
   async addUser(
-    @Param('id') id: string,
-    @Param('user_id') user_id: string,
+    @Param('business_uuid', new UUIDChecker('Business UUID')) id: string,
+    @Param('user_uuid', new UUIDChecker('User UUID')) user_uuid: string,
     @Query('role') role: any,
   ) {
     try {
-      await this.businessService.addUser(id, user_id, role);
+      await this.businessService.addUser(id, user_uuid, role);
       return {
         ok: true,
         message: 'business updated successfully!',
       };
     } catch (error) {
       throw error;
-      // throw new HttpException(
-      //   'An error occurred while updating business!',
-      //   HttpStatus.INTERNAL_SERVER_ERROR,
-      // );
     }
   }
 }
