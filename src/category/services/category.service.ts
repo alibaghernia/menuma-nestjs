@@ -35,7 +35,7 @@ export class CategoryService {
     return this.categoryRepository.create({
       title: category.title,
       slug: category.slug,
-      parent_uuid: category.parent,
+      parent_uuid: category.parent_uuid,
     });
   }
 
