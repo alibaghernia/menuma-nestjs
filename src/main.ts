@@ -62,13 +62,12 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-  .setTitle('menuma api docs')
-  .setDescription('this is menuma api docs')
-  .setVersion('1.0')
-  .build();
-const document = SwaggerModule.createDocument(app, config);
-SwaggerModule.setup('docs', app, document);
-
+    .setTitle('menuma api docs')
+    .setDescription('this is menuma api docs')
+    .setVersion('1.0')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('docs', app, document);
 
   const host = configService.get<string>('SERVER_HOST', '127.0.0.1');
   const port = configService.get<number>('SERVER_PORT', 3000);
