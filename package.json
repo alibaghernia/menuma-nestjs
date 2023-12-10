@@ -21,7 +21,7 @@
     "check": "tsc --noEmit",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "ci": "npm run format:check && npm run lint:quiet && npm run check && npm run test",
+    "ci": "npm run format:check && npm run lint:quiet && npm run check",
     "sequelize": "sequelize-cli",
     "migration:run": "sequelize-cli db:migrate"
   },

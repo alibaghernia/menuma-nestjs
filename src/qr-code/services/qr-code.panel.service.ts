@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { QrCode } from '../enitites/qr-code.entity';
 import { CreateQrCodeDTO } from '../dto/create.dto';
+import { QueryError } from 'sequelize';
 
 @Injectable()
 export class QrCodePanelService {
@@ -39,9 +40,13 @@ export class QrCodePanelService {
         ...payload,
       });
     } catch (error) {
-      console.log({
-        error,
-      });
+      if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {
+        // duplicate entry
+        throw new HttpException(
+          'Qr code slug or uuid is duplicate',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       throw error;
     }
   }
@@ -53,9 +58,13 @@ export class QrCodePanelService {
         },
       });
     } catch (error) {
-      console.log({
-        error,
-      });
+      if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {
+        // duplicate entry
+        throw new HttpException(
+          'Qr code slug or uuid is duplicate',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       throw error;
     }
   }
