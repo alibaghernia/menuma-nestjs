@@ -7,8 +7,9 @@ RUN npm i -g pnpm
 COPY package.json ./
 COPY pnpm-lock.yaml ./
 RUN pnpm i
+RUN pnpm build
 
 COPY . .
 
-CMD [ "npm", "run", "migration:run" ]
-CMD [ "npm", "run", "start" ]
+CMD [ "pnpm", "migration:run" ]
+CMD [ "pnpm", "start:prod" ]
