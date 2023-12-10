@@ -11,6 +11,7 @@ import { RolesGuard } from './auth/guards/role.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { AccessControlModule } from './access_control/access_control.module';
 import { QrCodeModule } from './qr-code/qr-code.module';
+import { VerionController } from './verion/verion.controller';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { QrCodeModule } from './qr-code/qr-code.module';
     AccessControlModule,
     QrCodeModule,
   ],
-  controllers: [],
+  controllers: [VerionController],
   providers: [
     {
       provide: APP_GUARD,
