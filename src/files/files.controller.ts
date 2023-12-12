@@ -3,17 +3,13 @@ import {
   Get,
   Param,
   ParseFilePipe,
-  ParseIntPipe,
   Post,
-  Redirect,
   Res,
   UploadedFile,
-  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { minio } from './minio';
-import { randomUUID } from 'crypto';
 import { InjectModel } from '@nestjs/sequelize';
 import { File } from './entities/file.entity';
 
