@@ -17,6 +17,7 @@ import { Tag } from './entities/tag.entity';
 import { BusinessCategoryProduct } from 'src/product/entities/business-category_product.entity';
 import { Image } from './entities/image.entity';
 import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
+import { File } from '../files/entities/file.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -30,6 +31,7 @@ const config: SequelizeModuleOptions = {
   logging: (process.env.ORM_LOGGING || 'true') == 'true',
   models: [
     QrCode,
+    File,
     User,
     Category,
     Business,

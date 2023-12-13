@@ -12,6 +12,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { AccessControlModule } from './access_control/access_control.module';
 import { QrCodeModule } from './qr-code/qr-code.module';
 import { VerionController } from './verion/verion.controller';
+import { FileModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { VerionController } from './verion/verion.controller';
     ProductModule,
     AccessControlModule,
     QrCodeModule,
+    FileModule,
   ],
   controllers: [VerionController],
   providers: [
