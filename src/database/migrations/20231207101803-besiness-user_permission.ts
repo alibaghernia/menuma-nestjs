@@ -11,6 +11,7 @@ module.exports = {
       },
       business_user_uuid: {
         type: DataTypes.UUID,
+        onDelete: 'CASCADE',
         references: {
           model: 'business-user',
           key: 'uuid',

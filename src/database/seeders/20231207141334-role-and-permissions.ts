@@ -3,6 +3,7 @@ import {
   business_permissions,
   category_permissions,
   product_permissions,
+  users_permissions,
 } from 'src/access_control/constants';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { v4 as UUIDv4 } from 'uuid';
@@ -11,6 +12,7 @@ const all_permissions = Object.values(business_permissions).concat(
   Object.values(access_control),
   Object.values(product_permissions),
   Object.values(category_permissions),
+  Object.values(users_permissions),
 );
 
 const roles = [

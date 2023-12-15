@@ -61,6 +61,11 @@ export const business_permissions = {
     title: 'Add User to Business',
     action: 'add-user-to-business',
   },
+  setBusinessManager: {
+    uuid: '0c0c4c28-7b3a-4b3e-8d07-de37f13f7c71',
+    title: 'Set Business Manager',
+    action: 'set-business-manager',
+  },
   removeUserFromBusiness: {
     uuid: 'c6419246-e9eb-44bf-b140-717916182822',
     title: 'Remove User from Business',
@@ -106,6 +111,28 @@ export const category_permissions = {
     action: 'delete-category',
   },
 };
+export const users_permissions = {
+  readUsers: {
+    uuid: '17a5eb1b-4221-429a-ac7d-fe8d1ba2897c',
+    title: 'Read Users',
+    action: 'read-users',
+  },
+  createUser: {
+    uuid: 'ad2c3958-80d1-4764-98eb-fbb9e08d1116',
+    title: 'Create User',
+    action: 'create-user',
+  },
+  updateUser: {
+    uuid: '6c78962b-19e3-42b6-a127-f9d9da6bdbee',
+    title: 'Update User',
+    action: 'update-user',
+  },
+  deleteUser: {
+    uuid: '90c2cac6-8f50-4676-80bc-681f15951428',
+    title: 'Delete User',
+    action: 'delete-user',
+  },
+};
 
 export const administratorAccessPermissions = [
   access_control.seeAllRoles,
@@ -113,4 +140,6 @@ export const administratorAccessPermissions = [
   business_permissions.createBusiness,
   business_permissions.removeBusiness,
   business_permissions.readBusinesses,
+  business_permissions.setBusinessManager,
+  ...Object.values(users_permissions),
 ];

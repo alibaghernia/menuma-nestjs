@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Injectable, Req } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
+import { UsersPanelService } from 'src/users/services/users.panel.service';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UsersService) {}
+  constructor(private readonly userService: UsersPanelService) {}
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.userService.findByMobile(email);
@@ -20,7 +20,7 @@ export class AuthService {
     return {
       uuid: user.uuid,
       email: user.email,
-      fname: user.firstName,
+      fname: user.first_name,
       role: user.role,
     };
   }

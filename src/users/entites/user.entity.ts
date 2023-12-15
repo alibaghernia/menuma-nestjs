@@ -25,18 +25,18 @@ export class User extends Model<User> {
   uuid: string;
 
   @Column({ allowNull: false, type: DataType.STRING(50) })
-  firstName: string;
+  first_name: string;
 
   @Column({ type: DataType.STRING(50) })
-  lastName: string;
+  last_name: string;
 
-  @Column({ allowNull: false, type: DataType.STRING(50) })
+  @Column({ type: DataType.STRING(50), unique: true })
   username: string;
 
-  @Column({ type: DataType.STRING(13) })
+  @Column({ type: DataType.STRING(13), unique: true })
   mobile: string;
 
-  @Column({ type: DataType.STRING(50) })
+  @Column({ type: DataType.STRING(50), unique: true })
   email: string;
 
   @Column({ allowNull: false, type: DataType.STRING(110) })

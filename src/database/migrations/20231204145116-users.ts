@@ -20,14 +20,15 @@ module.exports = {
         },
         username: {
           type: DataTypes.STRING(50),
-          allowNull: false,
+          unique: true,
         },
         mobile: {
           type: DataTypes.STRING(13),
-          allowNull: false,
+          unique: true,
         },
         email: {
           type: DataTypes.STRING(50),
+          unique: true,
         },
         password: {
           type: DataTypes.STRING(110),

@@ -43,7 +43,10 @@ export class QrCodePanelService {
       if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {
         // duplicate entry
         throw new HttpException(
-          'Qr code slug or uuid is duplicate',
+          {
+            message: `some fields are duplicate!`,
+            fields: Object.keys(error.fields),
+          },
           HttpStatus.BAD_REQUEST,
         );
       }
