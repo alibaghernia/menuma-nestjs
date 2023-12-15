@@ -16,6 +16,11 @@ import { Op } from 'sequelize';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { User } from 'src/users/entites/user.entity';
+import { SetBusinessManagerDTO } from '../dto/set_business_manager';
+import { BusinessUser } from '../entites/business_user.entity';
+import { roles } from 'src/access_control/constants';
+import { Role } from 'src/access_control/entities/role.entity';
+import { BusinessUserRole } from 'src/access_control/entities/business-user_role.entity';
 
 @Injectable()
 export class BusinessPanelService {
@@ -27,6 +32,8 @@ export class BusinessPanelService {
     private userRepository: typeof User,
     @InjectModel(Social)
     private socialRepository: typeof Social,
+    @InjectModel(BusinessUser)
+    private businessUserRepository: typeof BusinessUser,
     private sequelize: Sequelize,
     @Inject(REQUEST) private request: Request,
   ) {}
@@ -135,11 +142,7 @@ export class BusinessPanelService {
     });
   }
 
-  async addUser(
-    business_uuid: string,
-    user_uuid: string,
-    role?: 'manager' | 'employee',
-  ) {
+  async addUser(business_uuid: string, user_uuid: string) {
     const transaction = await this.sequelize.transaction();
     try {
       let business: Business;
@@ -180,14 +183,69 @@ export class BusinessPanelService {
           "Business not found or you dont' have enough permission!",
           HttpStatus.NOT_FOUND,
         );
-      await business.addUser(user_uuid, {
-        through: { role },
-      } as HasManyAddAssociationsMixinOptions);
+      if (await business.hasUser(user_uuid))
+        throw new HttpException(
+          'this user is already registered in this business!',
+          HttpStatus.BAD_REQUEST,
+        );
+      await business.addUser(user_uuid);
     } catch (error) {
       console.log({
         error,
       });
       transaction.rollback();
+      throw error;
+    }
+  }
+  async setBusinessManager(
+    business_uuid: string,
+    payload: SetBusinessManagerDTO,
+  ) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      const user = this.userRepository.findOne({
+        where: {
+          uuid: payload.user_uuid,
+        },
+      });
+      if (!user)
+        throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
+
+      const currentManager = await this.businessUserRepository.findOne({
+        where: {
+          business_uuid,
+        },
+        include: [
+          {
+            model: BusinessUserRole,
+            where: {
+              role_uuid: roles.Business_Manager.uuid,
+            },
+          },
+        ],
+      });
+      if (currentManager)
+        await currentManager.removeRole(roles.Business_Manager.uuid);
+
+      const newBusinessManager = await this.businessUserRepository.findOne({
+        where: {
+          business_uuid,
+          user_uuid: payload.user_uuid,
+        },
+      });
+      if (!newBusinessManager)
+        throw new HttpException(
+          "This user isn't registered in this business!",
+          HttpStatus.BAD_REQUEST,
+        );
+      await newBusinessManager.addRole(roles.Business_Manager.uuid);
+
+      await transaction.commit();
+    } catch (error) {
+      console.log({
+        error,
+      });
+      await transaction.rollback();
       throw error;
     }
   }

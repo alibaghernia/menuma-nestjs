@@ -143,3 +143,34 @@ export const administratorAccessPermissions = [
   business_permissions.setBusinessManager,
   ...Object.values(users_permissions),
 ];
+
+export const all_permissions = Object.values(business_permissions).concat(
+  Object.values(access_control),
+  Object.values(product_permissions),
+  Object.values(category_permissions),
+  Object.values(users_permissions),
+);
+export const roles = {
+  Administrator: {
+    uuid: 'cf0b5bfe-cbaa-4a0c-aad5-ff2cb7faf94b',
+    business_uuid: '',
+    title: 'Administrator',
+    permissions: all_permissions.map((item) => item.uuid),
+  },
+  Business_Manager: {
+    uuid: 'fcf1f8e3-8dba-4e70-97d9-3fd14b812af0',
+    business_uuid: '',
+    title: 'Business Manager',
+    permissions: all_permissions
+      .filter((item) =>
+        [
+          'see-all-roles',
+          'update-system-role',
+          'create-business',
+          'remove-business',
+          'see-all-business',
+        ].includes(item.action),
+      )
+      .map((item) => item.uuid),
+  },
+};

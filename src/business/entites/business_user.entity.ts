@@ -14,6 +14,10 @@ import { BusinessUserRole } from 'src/access_control/entities/business-user_role
 import { BusinessUserPermission } from 'src/access_control/entities/business-user_permission.entity';
 import { Role } from 'src/access_control/entities/role.entity';
 import { Permission } from 'src/access_control/entities/permission.entity';
+import {
+  BelongsToManyAddAssociationMixin,
+  BelongsToManyRemoveAssociationMixin,
+} from 'sequelize';
 
 @Table({
   tableName: 'business-user',
@@ -87,4 +91,7 @@ export class BusinessUser extends Model<BusinessUser> {
     targetKey: 'uuid',
   })
   permissions: Permission[];
+
+  removeRole: BelongsToManyRemoveAssociationMixin<Role, Role['uuid']>;
+  addRole: BelongsToManyAddAssociationMixin<Role, Role['uuid']>;
 }

@@ -8,7 +8,6 @@ import {
   Param,
   Post,
   Put,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { BusinessPanelService } from '../services/business.panel.service';
@@ -21,6 +20,7 @@ import { NotEmptyPipe } from 'src/pipes/not_empty.pipe';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
 import { business_permissions } from 'src/access_control/constants';
+import { SetBusinessManagerDTO } from '../dto/set_business_manager';
 
 @Controller('business')
 @UseGuards(SessionGuard)
@@ -110,13 +110,30 @@ export class BusinessPanelController {
   async addUser(
     @Param('business_uuid', new UUIDChecker('Business UUID')) id: string,
     @Param('user_uuid', new UUIDChecker('User UUID')) user_uuid: string,
-    @Query('role') role: any,
   ) {
     try {
-      await this.businessService.addUser(id, user_uuid, role);
+      await this.businessService.addUser(id, user_uuid);
       return {
         ok: true,
-        message: 'business updated successfully!',
+        message: 'User added to business successfully!',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post(':business_uuid/set-manager')
+  @CheckPermissions([business_permissions.setBusinessManager.action])
+  async setBusinessManager(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Body() payload: SetBusinessManagerDTO,
+  ) {
+    try {
+      await this.businessService.setBusinessManager(business_uuid, payload);
+      return {
+        ok: true,
+        message: 'Business manager updated successfully!',
       };
     } catch (error) {
       throw error;
