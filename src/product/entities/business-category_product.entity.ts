@@ -32,6 +32,7 @@ export class BusinessCategoryProduct extends Model<BusinessCategoryProduct> {
     as: 'businessCategory',
     foreignKey: 'business_category_uuid',
     targetKey: 'uuid',
+    onDelete: 'CASCADE',
   })
   businessCategory: BusinessCategory;
 

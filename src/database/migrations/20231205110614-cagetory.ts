@@ -23,6 +23,14 @@ module.exports = {
       slug: {
         type: DataTypes.STRING,
       },
+      image: {
+        type: DataTypes.STRING,
+        onDelete: 'SET NULL',
+        references: {
+          model: 'files',
+          key: 'uuid',
+        },
+      },
     });
   },
 

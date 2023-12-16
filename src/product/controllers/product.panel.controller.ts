@@ -12,6 +12,7 @@ import {
   UploadedFiles,
   UseGuards,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { SessionGuard } from 'src/auth/guards';
 import { ProductPanelService } from '../services/product.panel.service';
@@ -24,8 +25,11 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProductPhotoTypeValidator } from '../pipes/file_type_validator.pipe';
 import { ProductPhotoSizeValidator } from '../pipes/file_size_validator.pipe';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
+import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
+import { UpdateProductDTO } from '../dto/update.dto';
 
 @Controller(':business_uuid/panel/product')
+@UsePipes(new UUIDCheckerController('Business UUID', 'business_uuid'))
 @UseGuards(CheckPermissionsGuard)
 @UseGuards(SessionGuard)
 export class ProductPanelController {
@@ -127,12 +131,13 @@ export class ProductPanelController {
   @Put(':uuid')
   @CheckPermissions([product_permissions.createProduct.action])
   async update(
+    @Param('business_uuid') business_uuid: string,
     @Param('uuid') product_uuid: string,
-    @Body() payload: CreateProductDTO,
+    @Body() payload: UpdateProductDTO,
   ) {
     this.logger.log('update product');
     try {
-      await this.productService.update(product_uuid, payload);
+      await this.productService.update(business_uuid, product_uuid, payload);
 
       return {
         ok: true,

@@ -58,7 +58,13 @@ export class CategoryPanelService {
 
     return categories;
   }
-
+  async findOne(category_uuid: string) {
+    return await this.categoryRep.findOne({
+      where: {
+        uuid: category_uuid,
+      },
+    });
+  }
   // TODO: add checking duplicate category creation
   async create(business_uuid: string, payload: CreateCategoryDTO) {
     const transaction = await this.sequelize.transaction();

@@ -11,6 +11,7 @@ module.exports = {
       },
       business_uuid: {
         type: DataTypes.UUID,
+        onDelete: 'CASCADE',
         references: {
           model: 'businesses',
           key: 'uuid',
@@ -18,6 +19,7 @@ module.exports = {
       },
       category_uuid: {
         type: DataTypes.UUID,
+        onDelete: 'CASCADE',
         references: {
           model: 'categories',
           key: 'uuid',

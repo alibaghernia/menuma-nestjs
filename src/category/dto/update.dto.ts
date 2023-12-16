@@ -9,5 +9,8 @@ export class UpdateCategoryDTO extends CreateCategoryDTO {
   slug: string;
 
   @IsOptional()
+  image: string;
+
+  @IsOptional()
   parent_uuid: string;
 }

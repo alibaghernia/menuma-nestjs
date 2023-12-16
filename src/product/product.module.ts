@@ -8,10 +8,19 @@ import { ProductPanelController } from './controllers/product.panel.controller';
 import { AccessControlModule } from 'src/access_control/access_control.module';
 import { Tag } from 'src/database/entities/tag.entity';
 import { Image } from 'src/database/entities/image.entity';
+import { Business } from 'src/business/entites/business.entity';
+import { BusinessCategory } from 'src/business/entites/business_category.entity';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Product, User, Tag, Image]),
+    SequelizeModule.forFeature([
+      Product,
+      User,
+      Tag,
+      Image,
+      Business,
+      BusinessCategory,
+    ]),
     AccessControlModule,
   ],
   providers: [ProductPanelService],

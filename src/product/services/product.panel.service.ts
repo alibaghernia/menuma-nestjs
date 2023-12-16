@@ -15,6 +15,7 @@ import { ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as fs from 'fs';
 import { Image } from 'src/database/entities/image.entity';
+import { Business } from 'src/business/entites/business.entity';
 
 @Injectable()
 export class ProductPanelService {
@@ -24,6 +25,9 @@ export class ProductPanelService {
     @InjectModel(User) private userRepository: typeof User,
     @InjectModel(Tag) private tagRepository: typeof Tag,
     @InjectModel(Image) private imageRepository: typeof Image,
+    @InjectModel(Business) private businessRepository: typeof Business,
+    @InjectModel(BusinessCategory)
+    private businessCategoryRepository: typeof BusinessCategory,
     @Inject(REQUEST) private request: Request,
     private configService: ConfigService,
   ) {}
@@ -162,6 +166,13 @@ export class ProductPanelService {
   async create(business_uuid: string, payload: CreateProductDTO) {
     const transaction = await this.sequelize.transaction();
     try {
+      const business = await this.businessRepository.findOne({
+        where: {
+          uuid: business_uuid,
+        },
+      });
+      if (!business)
+        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
       const { categories, tags, ...prodPayload } = payload;
       const product = await this.productRepository.create({
         ...prodPayload,
@@ -181,7 +192,19 @@ export class ProductPanelService {
         });
         await product.addTag(newTag);
       }
-      await product.setBusinessCategories(categories.map((cat) => cat.uuid));
+      if (await business.hasCategories(categories.map((cat) => cat.uuid))) {
+        const categoriesIns = await this.businessCategoryRepository.findAll({
+          where: {
+            business_uuid,
+            category_uuid: categories.map((cat) => cat.uuid),
+          },
+        });
+        await product.setBusinessCategories(categoriesIns);
+      } else
+        throw new HttpException(
+          'One or more of these categories are not associate with this business!',
+          HttpStatus.BAD_REQUEST,
+        );
 
       await transaction.commit();
     } catch (error) {
@@ -189,9 +212,20 @@ export class ProductPanelService {
       throw error;
     }
   }
-  async update(product_uuid: string, payload: CreateProductDTO) {
+  async update(
+    business_uuid: string,
+    product_uuid: string,
+    payload: CreateProductDTO,
+  ) {
     const transaction = await this.sequelize.transaction();
     try {
+      const business = await this.businessRepository.findOne({
+        where: {
+          uuid: business_uuid,
+        },
+      });
+      if (!business)
+        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
       const { categories, tags, ...prodPayload } = payload;
       await this.productRepository.update(
         {
@@ -211,33 +245,51 @@ export class ProductPanelService {
       });
       if (!product)
         throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
-      for (const tag of tags) {
-        const [newTag] = await this.tagRepository.findOrCreate({
-          defaults: {
-            value: tag.value,
-            tagable_type: 'product',
-            tagable_uuid: product_uuid,
-          },
+
+      // if tags field is presented
+      if (tags) {
+        for (const tag of tags) {
+          const [newTag] = await this.tagRepository.findOrCreate({
+            defaults: {
+              value: tag.value,
+              tagable_type: 'product',
+              tagable_uuid: product_uuid,
+            },
+            where: {
+              value: tag.value,
+              uuid: product.uuid,
+            },
+          });
+          await product.addTag(newTag);
+        }
+
+        // check deleted tags
+        const deletedTags = product.tags.filter(
+          (item) => !tags.some((tag) => tag.value == item.value),
+        );
+        await this.tagRepository.destroy({
           where: {
-            value: tag.value,
-            uuid: product.uuid,
+            uuid: deletedTags.map((item) => item.uuid),
           },
         });
-        await product.addTag(newTag);
       }
 
-      // check deleted tags
-      const deletedTags = product.tags.filter(
-        (item) => !tags.some((tag) => tag.value == item.value),
-      );
-      await this.tagRepository.destroy({
-        where: {
-          uuid: deletedTags.map((item) => item.uuid),
-        },
-      });
-
-      await product.setBusinessCategories(categories.map((cat) => cat.uuid));
-
+      // if categories field is presented
+      if (categories) {
+        if (await business.hasCategories(categories.map((cat) => cat.uuid))) {
+          const categoriesIns = await this.businessCategoryRepository.findAll({
+            where: {
+              business_uuid,
+              category_uuid: categories.map((cat) => cat.uuid),
+            },
+          });
+          await product.setBusinessCategories(categoriesIns);
+        } else
+          throw new HttpException(
+            'One or more of these categories are not associate with this business!',
+            HttpStatus.BAD_REQUEST,
+          );
+      }
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();

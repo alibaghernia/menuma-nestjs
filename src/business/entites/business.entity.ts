@@ -22,6 +22,7 @@ import {
   BelongsToManyAddAssociationMixin,
   BelongsToManyHasAssociationMixin,
   BelongsToManyRemoveAssociationMixin,
+  BelongsToManyHasAssociationsMixin,
 } from 'sequelize';
 import { Role } from 'src/access_control/entities/role.entity';
 import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
@@ -153,5 +154,6 @@ export class Business extends Model<Business> {
   >;
   addCategory: BelongsToManyAddAssociationMixin<Category, Category['uuid']>;
   hasCategory: BelongsToManyHasAssociationMixin<Category, Category['uuid']>;
+  hasCategories: BelongsToManyHasAssociationsMixin<Category, Category['uuid']>;
   BusinessUser: BusinessUser;
 }

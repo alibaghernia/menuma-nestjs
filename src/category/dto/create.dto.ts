@@ -10,6 +10,10 @@ export class CreateCategoryDTO {
   slug: string;
 
   @IsOptional()
+  @IsString()
+  image: string;
+
+  @IsOptional()
   @IsUUID()
   parent_uuid: string;
 }

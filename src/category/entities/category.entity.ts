@@ -40,6 +40,11 @@ export class Category extends Model<Category> {
   })
   slug: string;
 
+  @Column({
+    type: DataType.STRING,
+  })
+  image: string;
+
   @HasMany(() => Category, {
     as: 'childs',
     foreignKey: 'parent_uuid',

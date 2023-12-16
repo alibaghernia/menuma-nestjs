@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
 import { SessionGuard } from 'src/auth/guards';
@@ -16,10 +17,12 @@ import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { UpdateCategoryDTO } from '../dto/update.dto';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
 import { category_permissions } from 'src/access_control/constants';
+import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
 
 @Controller(':business_uuid/panel/category')
 @UseGuards(CheckPermissionsGuard)
 @UseGuards(SessionGuard)
+@UsePipes(new UUIDCheckerController('Business UUID', 'business_uuid'))
 export class CategoryPanelController {
   constructor(private categoryPanelService: CategoryPanelService) {}
 
@@ -44,7 +47,7 @@ export class CategoryPanelController {
   @Post()
   @CheckPermissions([category_permissions.createCategory.action])
   async createCategory(
-    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    @Param('business_uuid')
     business_uuid: string,
     @Body() payload: CreateCategoryDTO,
   ) {
@@ -53,6 +56,23 @@ export class CategoryPanelController {
       return {
         ok: true,
         message: 'Category created successfully!',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get(':category_uuid')
+  @CheckPermissions([category_permissions.read.action])
+  async getCategory(
+    @Param('category_uuid', new UUIDChecker('Category UUID'))
+    category_uuid: string,
+  ) {
+    try {
+      const category = await this.categoryPanelService.findOne(category_uuid);
+      return {
+        ok: true,
+        data: category,
       };
     } catch (error) {
       throw error;
