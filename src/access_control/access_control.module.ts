@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AccessControlController } from './access_control.controller';
-import { AccessControlService } from './access_control.service';
+import { AccessControlPanelController } from './controllers/access_control.panel.controller';
+import { AccessControlPanelService } from './services/access_control.panel.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Role } from './entities/role.entity';
 import { Permission } from './entities/permission.entity';
@@ -20,8 +20,8 @@ import { BusinessUser } from 'src/business/entites/business_user.entity';
       BusinessUserPermission,
     ]),
   ],
-  controllers: [AccessControlController],
-  providers: [AccessControlService],
-  exports: [AccessControlService],
+  controllers: [AccessControlPanelController],
+  providers: [AccessControlPanelService],
+  exports: [AccessControlPanelService],
 })
 export class AccessControlModule {}

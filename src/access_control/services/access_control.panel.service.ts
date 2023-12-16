@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Role } from './entities/role.entity';
-import { Permission } from './entities/permission.entity';
+import { Role } from '../entities/role.entity';
+import { Permission } from '../entities/permission.entity';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { Sequelize } from 'sequelize-typescript';
@@ -10,12 +10,12 @@ import * as _ from 'lodash';
 import {
   AssignPermissionToBusinessRoleDTO,
   CreateBusinessRoleDTO,
-} from './dto/create.dto';
-import { administratorAccessPermissions } from './constants';
+} from '../dto/create.dto';
+import { administratorAccessPermissions } from '../constants';
 import { Op } from 'sequelize';
 
 @Injectable()
-export class AccessControlService {
+export class AccessControlPanelService {
   constructor(
     private sequelize: Sequelize,
     @InjectModel(Role) private roleRepo: typeof Role,
@@ -165,6 +165,82 @@ export class AccessControlService {
       },
     });
     return role?.permissions || [];
+  }
+  async getBusinessUserRoles(business_uuid: string, user_uuid: string) {
+    const businessUser = (
+      await this.businessUserRepo.findOne({
+        where: {
+          business_uuid,
+          user_uuid,
+        },
+        include: [
+          {
+            model: Role,
+            attributes: {
+              exclude: ['business_uuid'],
+            },
+            through: {
+              attributes: [],
+            },
+          },
+        ],
+      })
+    )?.get({ plain: true });
+    if (!businessUser)
+      throw new HttpException(
+        'Business or User is not valid!',
+        HttpStatus.BAD_REQUEST,
+      );
+    return businessUser.roles;
+  }
+  async getBusinessUserRolePermissions(
+    business_uuid: string,
+    user_uuid: string,
+    role_uuid: string,
+  ) {
+    const businessUser = (
+      await this.businessUserRepo.findOne({
+        where: {
+          business_uuid,
+          user_uuid,
+        },
+        include: [
+          {
+            model: Role,
+            attributes: {
+              exclude: ['business_uuid'],
+            },
+            include: [
+              {
+                model: Permission,
+                through: {
+                  attributes: [],
+                },
+              },
+            ],
+            through: {
+              attributes: [],
+            },
+            where: {
+              uuid: role_uuid,
+            },
+          },
+          {
+            model: Permission,
+            through: {
+              attributes: [],
+            },
+          },
+        ],
+      })
+    )?.get({ plain: true });
+    if (!businessUser)
+      throw new HttpException('Entry is not valid!', HttpStatus.BAD_REQUEST);
+    const permissions = businessUser.roles
+      .map((role) => role.permissions)
+      .concat(businessUser.permissions)
+      .flat();
+    return _.uniqBy(permissions, (item) => item.uuid);
   }
 
   async createBusinessRole(

@@ -6,7 +6,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { AccessControlService } from '../access_control.service';
+import { AccessControlPanelService } from '../services/access_control.panel.service';
 import { CHECK_PERMISSIONS } from '../decorators/check_permissions.decorator';
 import { Request } from 'express';
 
@@ -14,7 +14,7 @@ import { Request } from 'express';
 export class CheckPermissionsGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private accessControlService: AccessControlService,
+    private accessControlService: AccessControlPanelService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {

@@ -9,29 +9,29 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { CheckPermissionsGuard } from './guards/check_permissions.guard';
+import { CheckPermissionsGuard } from '../guards/check_permissions.guard';
 import { SessionGuard } from 'src/auth/guards';
-import { AccessControlService } from './access_control.service';
-import { CheckPermissions } from './decorators/check_permissions.decorator';
-import { access_control } from './constants';
+import { AccessControlPanelService } from '../services/access_control.panel.service';
+import { CheckPermissions } from '../decorators/check_permissions.decorator';
+import { access_control } from '../constants';
 import {
   AssignPermissionToBusinessRoleDTO,
   CreateBusinessRoleDTO,
-} from './dto/create.dto';
+} from '../dto/create.dto';
 
 @Controller('access-control')
 @UseGuards(CheckPermissionsGuard)
 @UseGuards(SessionGuard)
-export class AccessControlController {
-  private logger = new Logger(AccessControlController.name);
-  constructor(private accessConttolService: AccessControlService) {}
+export class AccessControlPanelController {
+  private logger = new Logger(AccessControlPanelController.name);
+  constructor(private accessControlService: AccessControlPanelService) {}
 
   @Get('/roles')
   @CheckPermissions([access_control.seeAllRoles.action])
   async getRoles() {
     this.logger.log('get system roles');
     try {
-      const roles = await this.accessConttolService.getSystemRoles();
+      const roles = await this.accessControlService.getSystemRoles();
       return {
         ok: true,
         data: roles,
@@ -47,7 +47,7 @@ export class AccessControlController {
   async getPermissions() {
     this.logger.log('get permissions');
     try {
-      const permissions = await this.accessConttolService.getPermissions();
+      const permissions = await this.accessControlService.getPermissions();
       return {
         ok: true,
         data: permissions,
@@ -63,7 +63,7 @@ export class AccessControlController {
   async getRole(@Param('role_uuid') role_uuid: string) {
     this.logger.log('get system roles');
     try {
-      const role = await this.accessConttolService.getSystemRole(role_uuid);
+      const role = await this.accessControlService.getSystemRole(role_uuid);
       if (!role)
         throw new HttpException('Role not found!', HttpStatus.NOT_FOUND);
       return {
@@ -82,7 +82,7 @@ export class AccessControlController {
     this.logger.log('get system roles');
     try {
       const permissions =
-        await this.accessConttolService.getSystemRolePermissions(role_uuid);
+        await this.accessControlService.getSystemRolePermissions(role_uuid);
       return {
         ok: true,
         data: permissions,
@@ -99,7 +99,7 @@ export class AccessControlController {
     this.logger.log('get business roles');
     try {
       const roles =
-        await this.accessConttolService.getBusinessRoles(business_uuid);
+        await this.accessControlService.getBusinessRoles(business_uuid);
       return {
         ok: true,
         data: roles,
@@ -118,7 +118,7 @@ export class AccessControlController {
     this.logger.log('get business roles with permissions');
     try {
       const roles =
-        await this.accessConttolService.getBusinessRolesWithPermissions(
+        await this.accessControlService.getBusinessRolesWithPermissions(
           business_uuid,
         );
       return {
@@ -140,7 +140,7 @@ export class AccessControlController {
     this.logger.log('get business role permissions');
     try {
       const permissions =
-        await this.accessConttolService.getBusinessRolePermissions(
+        await this.accessControlService.getBusinessRolePermissions(
           business_uuid,
           role_uuid,
         );
@@ -154,6 +154,53 @@ export class AccessControlController {
     }
   }
 
+  @Get(':business_uuid/roles/user/:user_uuid')
+  @CheckPermissions([access_control.seeAllBusinessRoles.action])
+  async getBusinessUserRoles(
+    @Param('business_uuid') business_uuid: string,
+    @Param('user_uuid') user_uuid: string,
+  ) {
+    this.logger.log('get business user roles');
+    try {
+      const roles = await this.accessControlService.getBusinessUserRoles(
+        business_uuid,
+        user_uuid,
+      );
+      return {
+        ok: true,
+        data: roles,
+      };
+    } catch (error) {
+      this.logger.error('error getting business user roles.');
+      throw error;
+    }
+  }
+
+  @Get(':business_uuid/permissions/user/:user_uuid/:role_uuid')
+  @CheckPermissions([access_control.seeAllPermissions.action])
+  async getBusinessUserRolePermissions(
+    @Param('business_uuid') business_uuid: string,
+    @Param('user_uuid') user_uuid: string,
+    @Param('role_uuid') role_uuid: string,
+  ) {
+    this.logger.log('get business user role permissions');
+    try {
+      const permissions =
+        await this.accessControlService.getBusinessUserRolePermissions(
+          business_uuid,
+          user_uuid,
+          role_uuid,
+        );
+      return {
+        ok: true,
+        data: permissions,
+      };
+    } catch (error) {
+      this.logger.error('error getting business user role permissions.');
+      throw error;
+    }
+  }
+
   @Post(':business_uuid/roles')
   @CheckPermissions([access_control.createBusinessRole.action])
   async createBusinessRole(
@@ -162,7 +209,7 @@ export class AccessControlController {
   ) {
     this.logger.log('create business role');
     try {
-      await this.accessConttolService.createBusinessRole(
+      await this.accessControlService.createBusinessRole(
         business_uuid,
         payload,
       );
@@ -185,7 +232,7 @@ export class AccessControlController {
   ) {
     this.logger.log('assign permission to business role');
     try {
-      await this.accessConttolService.assingPermissionToBusinessRole(
+      await this.accessControlService.assingPermissionToBusinessRole(
         business_uuid,
         role_uuid,
         payload,
@@ -209,7 +256,7 @@ export class AccessControlController {
   ) {
     this.logger.log('assign permission to business role');
     try {
-      await this.accessConttolService.unassingPermissionToBusinessRole(
+      await this.accessControlService.unassingPermissionToBusinessRole(
         business_uuid,
         role_uuid,
         payload,
