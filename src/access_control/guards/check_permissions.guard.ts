@@ -1,4 +1,10 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AccessControlService } from '../access_control.service';
 import { CHECK_PERMISSIONS } from '../decorators/check_permissions.decorator';
@@ -29,6 +35,11 @@ export class CheckPermissionsGuard implements CanActivate {
     } else {
       business_uuid = request.body[id_field];
     }
+    if (!business_uuid)
+      throw new HttpException(
+        "You don't have enough permissions!",
+        HttpStatus.FORBIDDEN,
+      );
 
     for (const permission of permissions) {
       await this.accessControlService.checkUserPermission(

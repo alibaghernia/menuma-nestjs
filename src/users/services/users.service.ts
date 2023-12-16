@@ -18,6 +18,10 @@ export class UsersService {
       include: [
         {
           model: Business,
+          attributes: ['uuid', 'name', 'slug'],
+          through: {
+            attributes: [],
+          },
         },
       ],
     });
