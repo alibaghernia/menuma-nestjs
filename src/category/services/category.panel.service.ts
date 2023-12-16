@@ -6,6 +6,7 @@ import { BusinessCategory } from 'src/business/entites/business_category.entity'
 import { Business } from 'src/business/entites/business.entity';
 import { Category } from '../entities/category.entity';
 import { UpdateCategoryDTO } from '../dto/update.dto';
+import { BusinessCategoryProduct } from 'src/product/entities/business-category_product.entity';
 
 @Injectable()
 export class CategoryPanelService {
@@ -17,26 +18,45 @@ export class CategoryPanelService {
     private categoryRep: typeof Category,
     @InjectModel(Business)
     private businessRep: typeof Business,
+    @InjectModel(BusinessCategoryProduct)
+    private businessCategoryProductRep: typeof BusinessCategoryProduct,
   ) {}
 
   async fetchAll(business_uuid: string) {
-    const business = await this.businessRep.findOne({
-      where: {
-        uuid: business_uuid,
-      },
-      include: [
-        {
-          model: Category,
-          through: {
-            attributes: [],
-          },
+    const business = (
+      await this.businessRep.findOne({
+        where: {
+          uuid: business_uuid,
         },
-      ],
-    });
+        include: [
+          {
+            model: Category,
+            through: {
+              // attributes: [],
+            },
+          },
+        ],
+      })
+    )?.get({ plain: true });
 
     if (!business)
       throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-    return business.categories;
+
+    const categories = business.categories as (Category & {
+      BusinessCategory: any;
+      products_count: number;
+    })[];
+
+    for (const category of categories) {
+      category.products_count = await this.businessCategoryProductRep.count({
+        where: {
+          business_category_uuid: category.BusinessCategory.uuid,
+        },
+      });
+      delete category.BusinessCategory;
+    }
+
+    return categories;
   }
 
   // TODO: add checking duplicate category creation
