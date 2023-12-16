@@ -19,7 +19,6 @@ import { User } from 'src/users/entites/user.entity';
 import { SetBusinessManagerDTO } from '../dto/set_business_manager';
 import { BusinessUser } from '../entites/business_user.entity';
 import { roles } from 'src/access_control/constants';
-import { Role } from 'src/access_control/entities/role.entity';
 import { BusinessUserRole } from 'src/access_control/entities/business-user_role.entity';
 
 @Injectable()
