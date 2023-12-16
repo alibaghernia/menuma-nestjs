@@ -95,6 +95,11 @@ export const product_permissions = {
   },
 };
 export const category_permissions = {
+  read: {
+    uuid: '03b4b9a9-a1d8-44fd-b74f-a912861b5958',
+    title: 'Read category',
+    action: 'read-category',
+  },
   createCategory: {
     uuid: 'fceed642-bf28-4cea-9cb6-39040748a031',
     title: 'Create new category',
@@ -162,14 +167,11 @@ export const roles = {
     business_uuid: '',
     title: 'Business Manager',
     permissions: all_permissions
-      .filter((item) =>
-        [
-          'see-all-roles',
-          'update-system-role',
-          'create-business',
-          'remove-business',
-          'see-all-business',
-        ].includes(item.action),
+      .filter(
+        (item) =>
+          !administratorAccessPermissions
+            .map((item) => item.action)
+            .includes(item.action),
       )
       .map((item) => item.uuid),
   },

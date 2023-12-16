@@ -21,8 +21,10 @@ import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
 import { business_permissions } from 'src/access_control/constants';
 import { SetBusinessManagerDTO } from '../dto/set_business_manager';
+import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
 
 @Controller('business')
+@UseGuards(CheckPermissionsGuard)
 @UseGuards(SessionGuard)
 export class BusinessPanelController {
   constructor(private businessService: BusinessPanelService) {}

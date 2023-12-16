@@ -14,6 +14,8 @@ import { CreateCategoryDTO } from '../dto';
 import { CategoryPanelService } from '../services/category.panel.service';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { UpdateCategoryDTO } from '../dto/update.dto';
+import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
+import { category_permissions } from 'src/access_control/constants';
 
 @Controller(':business_uuid/panel/category')
 @UseGuards(CheckPermissionsGuard)
@@ -22,6 +24,7 @@ export class CategoryPanelController {
   constructor(private categoryPanelService: CategoryPanelService) {}
 
   @Get()
+  @CheckPermissions([category_permissions.read.action])
   async getCategories(
     @Param('business_uuid', new UUIDChecker('Business UUID'))
     business_uuid: string,
@@ -39,6 +42,7 @@ export class CategoryPanelController {
   }
 
   @Post()
+  @CheckPermissions([category_permissions.createCategory.action])
   async createCategory(
     @Param('business_uuid', new UUIDChecker('Business UUID'))
     business_uuid: string,
@@ -56,6 +60,7 @@ export class CategoryPanelController {
   }
 
   @Put(':category_uuid')
+  @CheckPermissions([category_permissions.updateCategory.action])
   async updateCategory(
     @Param('category_uuid', new UUIDChecker('Category UUID'))
     category_uuid: string,
@@ -74,6 +79,7 @@ export class CategoryPanelController {
 
   //TODO: fix delete
   @Delete(':category_uuid')
+  @CheckPermissions([category_permissions.deleteCategory.action])
   async removeCategory(
     @Param('business_uuid', new UUIDChecker('Business UUID'))
     business_uuid: string,
