@@ -201,6 +201,29 @@ export class AccessControlPanelController {
     }
   }
 
+  @Get(':business_uuid/permissions/user/:user_uuid')
+  @CheckPermissions([access_control.seeAllPermissions.action])
+  async getBusinessUserAllPermissions(
+    @Param('business_uuid') business_uuid: string,
+    @Param('user_uuid') user_uuid: string,
+  ) {
+    this.logger.log('get business user all permissions');
+    try {
+      const permissions =
+        await this.accessControlService.getBusinessUserAllPermissions(
+          business_uuid,
+          user_uuid,
+        );
+      return {
+        ok: true,
+        data: permissions,
+      };
+    } catch (error) {
+      this.logger.error('error getting business user all permissions.');
+      throw error;
+    }
+  }
+
   @Post(':business_uuid/roles')
   @CheckPermissions([access_control.createBusinessRole.action])
   async createBusinessRole(

@@ -242,6 +242,53 @@ export class AccessControlPanelService {
       .flat();
     return _.uniqBy(permissions, (item) => item.uuid);
   }
+  async getBusinessUserAllPermissions(
+    business_uuid: string,
+    user_uuid: string,
+  ) {
+    const roles = await this.getBusinessUserRoles(business_uuid, user_uuid);
+    const businessUser = (
+      await this.businessUserRepo.findOne({
+        where: {
+          business_uuid,
+          user_uuid,
+        },
+        include: [
+          {
+            model: Role,
+            attributes: {
+              exclude: ['business_uuid'],
+            },
+            include: [
+              {
+                model: Permission,
+                through: {
+                  attributes: [],
+                },
+              },
+            ],
+            through: {
+              attributes: [],
+            },
+            where: {
+              uuid: roles.map((role) => role.uuid),
+            },
+          },
+          {
+            model: Permission,
+            through: {
+              attributes: [],
+            },
+          },
+        ],
+      })
+    )?.get({ plain: true });
+    const permissions = businessUser.roles
+      .map((role) => role.permissions)
+      .concat(businessUser.permissions)
+      .flat();
+    return _.uniqBy(permissions, (item) => item.uuid);
+  }
 
   async createBusinessRole(
     business_uuid: string,
