@@ -10,7 +10,6 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
-import { SessionGuard } from 'src/auth/guards';
 import { CreateCategoryDTO } from '../dto';
 import { CategoryPanelService } from '../services/category.panel.service';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
@@ -21,7 +20,6 @@ import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
 
 @Controller(':business_uuid/panel/category')
 @UseGuards(CheckPermissionsGuard)
-@UseGuards(SessionGuard)
 @UsePipes(new UUIDCheckerController('Business UUID', 'business_uuid'))
 export class CategoryPanelController {
   constructor(private categoryPanelService: CategoryPanelService) {}

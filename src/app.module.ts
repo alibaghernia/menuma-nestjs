@@ -7,8 +7,6 @@ import { BusinessModule } from './business/business.module';
 import { CategoryModule } from './category/category.module';
 import { ProductModule } from './product/product.module';
 import typeormConfigs from 'src/database/config';
-import { RolesGuard } from './auth/guards/role.guard';
-import { APP_GUARD } from '@nestjs/core';
 import { AccessControlModule } from './access_control/access_control.module';
 import { QrCodeModule } from './qr-code/qr-code.module';
 import { VerionController } from './verion/verion.controller';
@@ -28,11 +26,5 @@ import { FileModule } from './files/files.module';
     FileModule,
   ],
   controllers: [VerionController],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    },
-  ],
 })
 export class AppModule {}

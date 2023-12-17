@@ -1,2 +1,2 @@
-export * from './local.guard';
-export * from './session.guard';
+export * from './auth.guard';
+export * from './auth.guard';

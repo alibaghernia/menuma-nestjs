@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CheckPermissionsGuard } from '../guards/check_permissions.guard';
-import { SessionGuard } from 'src/auth/guards';
 import { AccessControlPanelService } from '../services/access_control.panel.service';
 import { CheckPermissions } from '../decorators/check_permissions.decorator';
 import { access_control } from '../constants';
@@ -21,7 +20,6 @@ import {
 
 @Controller('access-control')
 @UseGuards(CheckPermissionsGuard)
-@UseGuards(SessionGuard)
 export class AccessControlPanelController {
   private logger = new Logger(AccessControlPanelController.name);
   constructor(private accessControlService: AccessControlPanelService) {}

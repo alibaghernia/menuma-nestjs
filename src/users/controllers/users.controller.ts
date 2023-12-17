@@ -1,10 +1,8 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { SessionGuard } from 'src/auth/guards';
+import { Controller, Get, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { UsersService } from '../services/users.service';
 
 @Controller('users')
-@UseGuards(SessionGuard)
 export class UsersController {
   constructor(private usersService: UsersService) {}
 

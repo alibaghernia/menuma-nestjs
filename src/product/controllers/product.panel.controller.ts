@@ -14,7 +14,6 @@ import {
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
-import { SessionGuard } from 'src/auth/guards';
 import { ProductPanelService } from '../services/product.panel.service';
 import { CreateProductDTO } from '../dto/create.dto';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
@@ -31,7 +30,6 @@ import { UpdateProductDTO } from '../dto/update.dto';
 @Controller(':business_uuid/panel/product')
 @UsePipes(new UUIDCheckerController('Business UUID', 'business_uuid'))
 @UseGuards(CheckPermissionsGuard)
-@UseGuards(SessionGuard)
 export class ProductPanelController {
   private logger = new Logger('ProductController');
   constructor(private productService: ProductPanelService) {}

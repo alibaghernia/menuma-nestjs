@@ -1,7 +1,16 @@
-import { Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
+import { LoginDTO } from './dto/login';
+import { IsPublic } from './decorators/is_public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -12,9 +21,13 @@ export class AuthController {
     return this.authService.logout(request);
   }
 
-  @UseGuards(LocalGuard)
+  @IsPublic()
+  @HttpCode(HttpStatus.OK)
   @Post('login')
-  login(): Promise<any> {
-    return this.authService.login();
+  login(@Body() loadingPayload: LoginDTO): Promise<any> {
+    return this.authService.login(
+      loadingPayload.mobile,
+      loadingPayload.password,
+    );
   }
 }

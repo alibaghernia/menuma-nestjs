@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { BusinessPanelService } from '../services/business.panel.service';
 import { CreateBusinessDTO } from '../dto';
-import { SessionGuard } from 'src/auth/guards';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/misc/role.enum';
 import { UpdateBusinessDTO } from '../dto/update.dto';
@@ -25,7 +24,6 @@ import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissio
 
 @Controller('business')
 @UseGuards(CheckPermissionsGuard)
-@UseGuards(SessionGuard)
 export class BusinessPanelController {
   constructor(private businessService: BusinessPanelService) {}
 

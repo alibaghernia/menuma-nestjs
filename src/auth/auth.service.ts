@@ -2,13 +2,17 @@ import { HttpException, HttpStatus, Injectable, Req } from '@nestjs/common';
 import { UsersPanelService } from 'src/users/services/users.panel.service';
 import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UsersPanelService) {}
+  constructor(
+    private readonly userService: UsersPanelService,
+    private jwtService: JwtService,
+  ) {}
 
-  async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.userService.findByMobile(email);
+  async validateUser(mobile: string, password: string): Promise<any> {
+    const user = await this.userService.findByMobile(mobile);
     if (!user) throw new HttpException('User Not Found!', HttpStatus.NOT_FOUND);
     const passwordMatch: boolean = await this.passwordMatch(
       password,
@@ -19,9 +23,6 @@ export class AuthService {
 
     return {
       uuid: user.uuid,
-      email: user.email,
-      fname: user.first_name,
-      role: user.role,
     };
   }
 
@@ -29,20 +30,14 @@ export class AuthService {
     return await bcrypt.compare(password, hash);
   }
 
-  async login(): Promise<any> {
+  async login(mobile: string, password: string): Promise<any> {
+    const userPayload = await this.validateUser(mobile, password);
     return {
-      message: 'Login successful',
-      statusCode: HttpStatus.OK,
+      access_token: await this.jwtService.signAsync(userPayload),
     };
   }
 
   async logout(@Req() request: Request): Promise<any> {
     //@ts-ignore
-    request.session.destroy(() => {
-      return {
-        message: 'Logout successful',
-        statusCode: HttpStatus.OK,
-      };
-    });
   }
 }
