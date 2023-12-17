@@ -2,7 +2,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import * as express from 'express';
-import * as passport from 'passport';
 import * as morgan from 'morgan';
 import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';

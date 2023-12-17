@@ -23,6 +23,7 @@ export class AuthService {
 
     return {
       uuid: user.uuid,
+      role: user.role,
     };
   }
 
@@ -33,7 +34,10 @@ export class AuthService {
   async login(mobile: string, password: string): Promise<any> {
     const userPayload = await this.validateUser(mobile, password);
     return {
-      access_token: await this.jwtService.signAsync(userPayload),
+      ok: true,
+      data: {
+        access_token: await this.jwtService.signAsync(userPayload),
+      },
     };
   }
 

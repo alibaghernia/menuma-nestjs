@@ -5,6 +5,7 @@ declare module 'express' {
   interface Request {
     user?: {
       uuid: string;
+      role: string;
     };
   }
 }
