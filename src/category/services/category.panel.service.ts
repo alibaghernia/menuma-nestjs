@@ -7,6 +7,8 @@ import { Business } from 'src/business/entites/business.entity';
 import { Category } from '../entities/category.entity';
 import { UpdateCategoryDTO } from '../dto/update.dto';
 import { BusinessCategoryProduct } from 'src/product/entities/business-category_product.entity';
+import { FiltersDTO } from '../dto/filters.dto';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class CategoryPanelService {
@@ -22,7 +24,13 @@ export class CategoryPanelService {
     private businessCategoryProductRep: typeof BusinessCategoryProduct,
   ) {}
 
-  async fetchAll(business_uuid: string) {
+  async fetchAll(business_uuid: string, _filters: FiltersDTO) {
+    const { page, limit, ...filters } = _filters;
+    const categoriesFilters = filters
+      ? Object.fromEntries(
+          Object.entries(filters).map(([k, v]) => [k, { [Op.like]: `%${v}%` }]),
+        )
+      : {};
     const business = (
       await this.businessRep.findOne({
         where: {
@@ -31,6 +39,7 @@ export class CategoryPanelService {
         include: [
           {
             model: Category,
+            where: categoriesFilters,
             through: {
               // attributes: [],
             },
@@ -38,7 +47,7 @@ export class CategoryPanelService {
         ],
       })
     )?.get({ plain: true });
-
+    if (filters && !business) return [];
     if (!business)
       throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
 
@@ -56,7 +65,10 @@ export class CategoryPanelService {
       delete category.BusinessCategory;
     }
 
-    return categories;
+    return {
+      categories: categories.slice(page * limit - limit, page * limit),
+      total: categories.length,
+    };
   }
   async findOne(category_uuid: string) {
     return await this.categoryRep.findOne({

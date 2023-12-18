@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import { UpdateCategoryDTO } from '../dto/update.dto';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
 import { category_permissions } from 'src/access_control/constants';
 import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
+import { FiltersDTO } from '../dto/filters.dto';
 
 @Controller(':business_uuid/panel/category')
 @UseGuards(CheckPermissionsGuard)
@@ -29,10 +31,13 @@ export class CategoryPanelController {
   async getCategories(
     @Param('business_uuid', new UUIDChecker('Business UUID'))
     business_uuid: string,
+    @Query() filters: FiltersDTO,
   ) {
     try {
-      const categories =
-        await this.categoryPanelService.fetchAll(business_uuid);
+      const categories = await this.categoryPanelService.fetchAll(
+        business_uuid,
+        filters,
+      );
       return {
         ok: true,
         data: categories,

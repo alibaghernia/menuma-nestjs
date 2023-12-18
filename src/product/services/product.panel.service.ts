@@ -16,6 +16,7 @@ import { join } from 'path';
 import * as fs from 'fs';
 import { Image } from 'src/database/entities/image.entity';
 import { Business } from 'src/business/entites/business.entity';
+import { FiltersDTO } from '../dto/filters.dto';
 
 @Injectable()
 export class ProductPanelService {
@@ -32,11 +33,8 @@ export class ProductPanelService {
     private configService: ConfigService,
   ) {}
 
-  async fetchAll(
-    business_uuid: string,
-    pagination: { page: number; limit: number },
-    filter: FindProductFiltersDTO,
-  ) {
+  async fetchAll(business_uuid: string, _filters: FiltersDTO) {
+    const { page, limit, ...filter } = _filters;
     // parse filters
     const parsedFilter = Object.fromEntries(
       Object.entries(filter)
@@ -49,8 +47,8 @@ export class ProductPanelService {
     };
     const products = await this.productRepository.findAll({
       where,
-      offset: pagination.page * pagination.limit - pagination.limit,
-      limit: pagination.page * pagination.limit,
+      offset: page * limit - limit,
+      limit: page * limit,
       attributes: {
         exclude: ['business_uuid'],
       },

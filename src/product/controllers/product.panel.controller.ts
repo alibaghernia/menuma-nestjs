@@ -26,6 +26,7 @@ import { ProductPhotoSizeValidator } from '../pipes/file_size_validator.pipe';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
 import { UpdateProductDTO } from '../dto/update.dto';
+import { FiltersDTO } from '../dto/filters.dto';
 
 @Controller(':business_uuid/panel/product')
 @UsePipes(new UUIDCheckerController('Business UUID', 'business_uuid'))
@@ -82,19 +83,13 @@ export class ProductPanelController {
   async findAll(
     @Param('business_uuid', new UUIDChecker('Business UUID'))
     business_uuid: string,
-    @Body() filter: FindProductFiltersDTO,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
+    @Query() filters: FiltersDTO,
   ) {
     this.logger.log('get products');
     try {
       const products = await this.productService.fetchAll(
         business_uuid,
-        {
-          page,
-          limit,
-        },
-        filter,
+        filters,
       );
 
       return {

@@ -21,13 +21,24 @@ export class FilesController {
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   async newFile(@UploadedFile(pipe) file: Express.Multer.File) {
-    const id = (await this.fileRepo.create()).uuid;
-    await minio.putObject('files', id, file.buffer);
-    return { id };
+    try {
+      const uuid = (await this.fileRepo.create()).uuid;
+      await minio.putObject('files', uuid, file.buffer);
+      return {
+        ok: true,
+        data: {
+          uuid,
+        },
+      };
+    } catch (error) {
+      console.log({
+        error,
+      });
+    }
   }
-  @Get(':id')
-  async redirect(@Res() res, @Param('id') id) {
-    const url = await minio.presignedUrl('GET', 'files', id);
+  @Get(':uuid')
+  async redirect(@Res() res, @Param('uuid') uuid) {
+    const url = await minio.presignedUrl('GET', 'files', uuid);
     return res.redirect(url, 301);
   }
 }
