@@ -9,7 +9,7 @@ import { File } from 'src/files/entities/file.entity';
 import { Product } from './product.entity';
 
 @Table({
-  tableName: 'file_product',
+  tableName: 'file-product',
   timestamps: false,
 })
 export class FileProduct extends Model<FileProduct> {

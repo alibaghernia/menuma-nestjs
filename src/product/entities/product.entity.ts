@@ -38,6 +38,7 @@ export type ProductPrice = {
   tableName: 'products',
   timestamps: true,
   underscored: true,
+  paranoid: false,
 })
 export class Product extends Model<Product> {
   @Column({

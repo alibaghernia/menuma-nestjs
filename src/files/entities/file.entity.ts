@@ -12,7 +12,7 @@ import { Product } from 'src/product/entities/product.entity';
   underscored: true,
   timestamps: true,
   tableName: 'files',
-  paranoid: true,
+  // paranoid: true,
 })
 export class File extends Model<File> {
   @Column({

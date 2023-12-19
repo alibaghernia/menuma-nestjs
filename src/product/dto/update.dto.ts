@@ -38,9 +38,7 @@ export class UpdateProductDTO {
   prices: ProductPrice[];
 
   @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => String)
+  @IsString({ each: true })
   categories: string[];
 
   @IsOptional()

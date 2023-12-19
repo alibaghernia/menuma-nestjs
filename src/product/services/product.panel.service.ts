@@ -16,6 +16,7 @@ import { Image } from 'src/database/entities/image.entity';
 import { Business } from 'src/business/entites/business.entity';
 import { FiltersDTO } from '../dto/filters.dto';
 import { FilesPanelService } from 'src/files/services/files.panel.service';
+import { File } from 'src/files/entities/file.entity';
 
 @Injectable()
 export class ProductPanelService {
@@ -110,6 +111,12 @@ export class ProductPanelService {
               {
                 model: Category,
               },
+              {
+                model: File,
+                through: {
+                  attributes: [],
+                },
+              },
             ],
           },
         ],
@@ -147,6 +154,9 @@ export class ProductPanelService {
               },
             ],
           },
+          {
+            model: File,
+          },
         ],
       })
     )?.get({ plain: true });
@@ -158,7 +168,6 @@ export class ProductPanelService {
 
     (product as Product & { categories?: Category[] }).categories =
       businessCategories.map((besCat) => besCat.category);
-
     return product;
   }
   async create(business_uuid: string, payload: CreateProductDTO) {
@@ -195,8 +204,7 @@ export class ProductPanelService {
         }
       // handle image
       if (image) {
-        const imageItem = await this.filesService.getFileById(image);
-        await product.setImages([imageItem]);
+        await product.setImages([image]);
       }
       if (await business.hasCategories(categories.map((cat) => cat))) {
         const categoriesIns = await this.businessCategoryRepository.findAll({
@@ -268,11 +276,6 @@ export class ProductPanelService {
           });
           await product.addTag(newTag);
         }
-        // handle image
-        if (image) {
-          const imageItem = await this.filesService.getFileById(image);
-          await product.setImages([imageItem]);
-        }
         // check deleted tags
         const deletedTags = product.tags.filter(
           (item) => !tags.some((tag) => tag.value == item.value),
@@ -282,6 +285,11 @@ export class ProductPanelService {
             uuid: deletedTags.map((item) => item.uuid),
           },
         });
+      }
+
+      // handle image
+      if (image) {
+        await product.setImages([image]);
       }
 
       // if categories field is presented
