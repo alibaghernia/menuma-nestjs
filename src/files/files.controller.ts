@@ -12,6 +12,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { minio } from './minio';
 import { InjectModel } from '@nestjs/sequelize';
 import { File } from './entities/file.entity';
+import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 
 const pipe = new ParseFilePipe();
 
@@ -36,6 +37,7 @@ export class FilesController {
       });
     }
   }
+  @IsPublic()
   @Get(':uuid')
   async redirect(@Res() res, @Param('uuid') uuid) {
     const url = await minio.presignedUrl('GET', 'files', uuid);
