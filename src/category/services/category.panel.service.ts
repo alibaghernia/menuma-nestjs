@@ -47,7 +47,11 @@ export class CategoryPanelService {
         ],
       })
     )?.get({ plain: true });
-    if (filters && !business) return [];
+    if (filters && !business)
+      return {
+        categories: [],
+        total: 0,
+      };
     if (!business)
       throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
 
