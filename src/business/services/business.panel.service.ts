@@ -133,12 +133,51 @@ export class BusinessPanelService {
       },
     });
   }
-  update(business_uuid: string, business: UpdateBusinessDTO) {
-    return this.businessRepository.update(business, {
-      where: {
-        uuid: business_uuid,
-      },
-    });
+  async update(business_uuid: string, _business: UpdateBusinessDTO) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      const business = await this.businessRepository.findOne({
+        where: {
+          uuid: business_uuid,
+        },
+      });
+
+      if (!business)
+        throw new HttpException('Business Not found!', HttpStatus.NOT_FOUND);
+      const { instagram, telegram, whatsapp, twitter_x, ...businessProps } =
+        _business;
+      const socials = Object.entries({
+        instagram,
+        telegram,
+        whatsapp,
+        twitter_x,
+      }).filter(([, v]) => !!v);
+      for (const [socialName, socialLink] of socials) {
+        const social = await this.socialRepository.findOne({
+          where: {
+            socialable_type: 'business',
+            socialable_uuid: business.uuid,
+            type: socialName,
+          },
+        });
+        if (social) {
+          if (social.link != socialLink)
+            await social.update({
+              link: socialLink,
+            });
+        } else
+          await business.createSocial({
+            type: socialName,
+            link: socialLink,
+          });
+      }
+      await business.update(businessProps);
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   }
 
   async addUser(business_uuid: string, user_uuid: string) {

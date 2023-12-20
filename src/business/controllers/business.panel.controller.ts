@@ -34,12 +34,20 @@ export class BusinessPanelController {
   }
 
   @Get(':slugOrId')
-  @CheckPermissions([business_permissions.readBusinesses.action])
-  getBySlug(
+  // @CheckPermissions([business_permissions.readBusinesses.action])
+  async getBySlug(
     @Param('slugOrId', new NotEmptyPipe('Business Slug Or UUID'))
     slugOrId: string,
   ) {
-    return this.businessService.findBySlugOrId(slugOrId);
+    try {
+      const business = await this.businessService.findBySlugOrId(slugOrId);
+      return {
+        ok: true,
+        data: business,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Post('/create')
@@ -98,6 +106,9 @@ export class BusinessPanelController {
         message: 'business updated successfully!',
       };
     } catch (error) {
+      console.log({
+        error,
+      });
       throw new HttpException(
         'An error occurred while updating business!',
         HttpStatus.INTERNAL_SERVER_ERROR,

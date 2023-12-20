@@ -1,12 +1,9 @@
-import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
   IsNotEmpty,
   IsOptional,
   IsString,
-  ValidateNested,
-  isString,
 } from 'class-validator';
 
 export class UpdateBusinessDTO {
@@ -64,8 +61,6 @@ export class UpdateBusinessDTO {
 
   @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => isString)
   readonly working_hours?: object[];
 
   @IsOptional()

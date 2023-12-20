@@ -56,6 +56,11 @@ export const business_permissions = {
     title: 'See All Business',
     action: 'see-all-business',
   },
+  readBusiness: {
+    uuid: 'c226a47c-10e2-4ef3-9c07-d6da5d99a17c',
+    title: 'get Business',
+    action: 'get-business',
+  },
   addUserToBusiness: {
     uuid: '49c328f1-0d47-483f-b646-f52cf30599eb',
     title: 'Add User to Business',

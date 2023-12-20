@@ -156,4 +156,7 @@ export class Business extends Model<Business> {
   hasCategory: BelongsToManyHasAssociationMixin<Category, Category['uuid']>;
   hasCategories: BelongsToManyHasAssociationsMixin<Category, Category['uuid']>;
   BusinessUser: BusinessUser;
+
+  addSocial: HasManyAddAssociationMixin<Social, Social['uuid']>;
+  createSocial: HasManyCreateAssociationMixin<Social>;
 }
