@@ -9,10 +9,17 @@ import { BusinessService } from './services/business.service';
 import { BusinessPanelController } from './controllers/business.panel.controller';
 import { BusinessUser } from './entites/business_user.entity';
 import { AccessControlModule } from 'src/access_control/access_control.module';
+import { BusinessTable } from './entites/business_tables.entity';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Business, Social, User, BusinessUser]),
+    SequelizeModule.forFeature([
+      Business,
+      Social,
+      User,
+      BusinessUser,
+      BusinessTable,
+    ]),
     AccessControlModule,
   ],
   providers: [BusinessPanelService, BusinessService],

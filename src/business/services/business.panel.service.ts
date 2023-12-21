@@ -8,10 +8,10 @@ import {
 import { InjectModel } from '@nestjs/sequelize';
 import { Business } from '../entites/business.entity';
 import { HasManyAddAssociationsMixinOptions, WhereOptions } from 'sequelize';
-import { CreateBusinessDTO } from '../dto';
+import { CreateBusinessDTO, CreateTableDTO } from '../dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
-import { UpdateBusinessDTO } from '../dto/update.dto';
+import { UpdateBusinessDTO, UpdateTableDTO } from '../dto/update.dto';
 import { Op } from 'sequelize';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
@@ -20,6 +20,7 @@ import { SetBusinessManagerDTO } from '../dto/set_business_manager';
 import { BusinessUser } from '../entites/business_user.entity';
 import { roles } from 'src/access_control/constants';
 import { BusinessUserRole } from 'src/access_control/entities/business-user_role.entity';
+import { BusinessTable } from '../entites/business_tables.entity';
 
 @Injectable()
 export class BusinessPanelService {
@@ -33,6 +34,8 @@ export class BusinessPanelService {
     private socialRepository: typeof Social,
     @InjectModel(BusinessUser)
     private businessUserRepository: typeof BusinessUser,
+    @InjectModel(BusinessTable)
+    private businessTableRepository: typeof BusinessTable,
     private sequelize: Sequelize,
     @Inject(REQUEST) private request: Request,
   ) {}
@@ -283,6 +286,70 @@ export class BusinessPanelService {
       console.log({
         error,
       });
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  async createTable(business_uuid: string, payload: CreateTableDTO) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      const business = await this.businessRepository.findOne({
+        where: {
+          uuid: business_uuid,
+        },
+      });
+      if (!business)
+        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
+
+      await business.createTable(
+        {
+          code: payload.code,
+        },
+        {
+          transaction,
+        },
+      );
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+  async removeTable(business_uuid: string, table_uuid: string) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      const business = await this.businessRepository.findOne({
+        where: {
+          uuid: business_uuid,
+        },
+      });
+      if (!business)
+        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
+
+      await business.removeTable(table_uuid, {
+        transaction,
+      });
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+  async updateTable(table_uuid: string, payload: UpdateTableDTO) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      await this.businessTableRepository.update(payload, {
+        where: {
+          uuid: table_uuid,
+        },
+        transaction,
+      });
+
+      await transaction.commit();
+    } catch (error) {
       await transaction.rollback();
       throw error;
     }

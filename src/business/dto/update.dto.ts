@@ -71,3 +71,9 @@ export class UpdateBusinessDTO {
   @IsString()
   readonly banner?: string;
 }
+
+export class UpdateTableDTO {
+  @IsOptional()
+  @IsString()
+  code: string;
+}

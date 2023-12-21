@@ -7,7 +7,6 @@ import { CategoryPanelService } from './services/category.panel.service';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
 import { Business } from 'src/business/entites/business.entity';
 import { CategoryPanelController } from './controllers/category.panel.controller';
-import { CategoryProtectedController } from './controllers/category.protected.controller';
 import { AccessControlModule } from 'src/access_control/access_control.module';
 import { BusinessCategoryProduct } from 'src/product/entities/business-category_product.entity';
 
@@ -22,10 +21,6 @@ import { BusinessCategoryProduct } from 'src/product/entities/business-category_
     AccessControlModule,
   ],
   providers: [CategoryService, CategoryPanelService],
-  controllers: [
-    CategoryController,
-    CategoryPanelController,
-    CategoryProtectedController,
-  ],
+  controllers: [CategoryController, CategoryPanelController],
 })
 export class CategoryModule {}

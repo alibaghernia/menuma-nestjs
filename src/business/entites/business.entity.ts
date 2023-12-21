@@ -26,6 +26,7 @@ import {
 } from 'sequelize';
 import { Role } from 'src/access_control/entities/role.entity';
 import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
+import { BusinessTable } from './business_tables.entity';
 
 @Table({
   underscored: true,
@@ -135,6 +136,13 @@ export class Business extends Model<Business> {
   })
   qrCodes: QrCode;
 
+  @HasMany(() => BusinessTable, {
+    as: 'tables',
+    foreignKey: 'business_uuid',
+    sourceKey: 'uuid',
+  })
+  tables: BusinessTable[];
+
   count: HasManyCountAssociationsMixin;
 
   addUser: HasManyAddAssociationMixin<User, User['uuid']>;
@@ -159,4 +167,10 @@ export class Business extends Model<Business> {
 
   addSocial: HasManyAddAssociationMixin<Social, Social['uuid']>;
   createSocial: HasManyCreateAssociationMixin<Social>;
+
+  createTable: HasManyCreateAssociationMixin<BusinessTable>;
+  removeTable: HasManyRemoveAssociationMixin<
+    BusinessTable,
+    BusinessTable['uuid']
+  >;
 }

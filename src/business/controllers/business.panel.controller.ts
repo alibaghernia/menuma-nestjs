@@ -11,10 +11,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BusinessPanelService } from '../services/business.panel.service';
-import { CreateBusinessDTO } from '../dto';
+import { CreateBusinessDTO, CreateTableDTO } from '../dto';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/misc/role.enum';
-import { UpdateBusinessDTO } from '../dto/update.dto';
+import { UpdateBusinessDTO, UpdateTableDTO } from '../dto/update.dto';
 import { NotEmptyPipe } from 'src/pipes/not_empty.pipe';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
@@ -145,6 +145,61 @@ export class BusinessPanelController {
       return {
         ok: true,
         message: 'Business manager updated successfully!',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post(':business_uuid/create-table')
+  @CheckPermissions([business_permissions.manageBusinessTables.action])
+  async createTable(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Body() payload: CreateTableDTO,
+  ) {
+    try {
+      await this.businessService.createTable(business_uuid, payload);
+      return {
+        ok: true,
+        message: 'Business table added successfully!',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post(':business_uuid/create-table/:table_uuid')
+  @CheckPermissions([business_permissions.manageBusinessTables.action])
+  async removeTable(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Param('table_uuid', new UUIDChecker('Table UUID'))
+    table_uuid: string,
+  ) {
+    try {
+      await this.businessService.removeTable(business_uuid, table_uuid);
+      return {
+        ok: true,
+        message: 'Business table removed successfully!',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Put(':business_uuid/create-table/:table_uuid')
+  @CheckPermissions([business_permissions.manageBusinessTables.action])
+  async updateTable(
+    @Param('table_uuid', new UUIDChecker('Table UUID'))
+    table_uuid: string,
+    @Body() payload: UpdateTableDTO,
+  ) {
+    try {
+      await this.businessService.updateTable(table_uuid, payload);
+      return {
+        ok: true,
+        message: 'Business table updated successfully!',
       };
     } catch (error) {
       throw error;

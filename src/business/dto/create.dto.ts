@@ -81,3 +81,8 @@ export class CreateBusinessDTO {
   @IsUUID()
   readonly manager: string;
 }
+
+export class CreateTableDTO {
+  @IsString()
+  code: string;
+}
