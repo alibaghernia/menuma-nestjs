@@ -35,9 +35,9 @@ export class CheckPermissionsGuard implements CanActivate {
     } else {
       business_uuid = request.body[id_field];
     }
-    if (!business_uuid)
+    if (!business_uuid || business_uuid == ':business_uuid')
       throw new HttpException(
-        "You don't have enough permissions!",
+        "Business hasn't specified!",
         HttpStatus.FORBIDDEN,
       );
 

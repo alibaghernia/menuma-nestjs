@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { BusinessPanelService } from '../services/business.panel.service';
@@ -21,6 +22,7 @@ import { CheckPermissions } from 'src/access_control/decorators/check_permission
 import { business_permissions } from 'src/access_control/constants';
 import { SetBusinessManagerDTO } from '../dto/set_business_manager';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
+import { TablesFiltersDTO } from '../dto/filters.dto';
 
 @Controller('business')
 @UseGuards(CheckPermissionsGuard)
@@ -151,7 +153,28 @@ export class BusinessPanelController {
     }
   }
 
-  @Post(':business_uuid/create-table')
+  @Get(':business_uuid/tables')
+  @CheckPermissions([business_permissions.manageBusinessTables.action])
+  async getTable(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Query() filters: TablesFiltersDTO,
+  ) {
+    try {
+      const tables = await this.businessService.getTables(
+        business_uuid,
+        filters,
+      );
+      return {
+        ok: true,
+        data: tables,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post(':business_uuid/tables')
   @CheckPermissions([business_permissions.manageBusinessTables.action])
   async createTable(
     @Param('business_uuid', new UUIDChecker('Business UUID'))
@@ -169,7 +192,7 @@ export class BusinessPanelController {
     }
   }
 
-  @Post(':business_uuid/create-table/:table_uuid')
+  @Delete(':business_uuid/tables/:table_uuid')
   @CheckPermissions([business_permissions.manageBusinessTables.action])
   async removeTable(
     @Param('business_uuid', new UUIDChecker('Business UUID'))
@@ -188,7 +211,7 @@ export class BusinessPanelController {
     }
   }
 
-  @Put(':business_uuid/create-table/:table_uuid')
+  @Put(':business_uuid/tables/:table_uuid')
   @CheckPermissions([business_permissions.manageBusinessTables.action])
   async updateTable(
     @Param('table_uuid', new UUIDChecker('Table UUID'))

@@ -22,6 +22,10 @@ export class BusinessTable extends Model<BusinessTable> {
   uuid: string;
 
   @ForeignKey(() => Business)
+  @Column({
+    type: DataType.UUID,
+    allowNull: false,
+  })
   business_uuid: string;
 
   @Column({

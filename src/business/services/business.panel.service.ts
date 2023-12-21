@@ -21,6 +21,7 @@ import { BusinessUser } from '../entites/business_user.entity';
 import { roles } from 'src/access_control/constants';
 import { BusinessUserRole } from 'src/access_control/entities/business-user_role.entity';
 import { BusinessTable } from '../entites/business_tables.entity';
+import { TablesFiltersDTO } from '../dto/filters.dto';
 
 @Injectable()
 export class BusinessPanelService {
@@ -290,7 +291,27 @@ export class BusinessPanelService {
       throw error;
     }
   }
+  async getTables(business_uuid: string, filters: TablesFiltersDTO) {
+    const { page, limit, ...whereFilters } = filters;
 
+    const tables = await this.businessTableRepository.findAll({
+      where: {
+        business_uuid,
+        ...whereFilters,
+      },
+      limit: page * limit,
+      offset: page * limit - limit,
+    });
+    const count = await this.businessTableRepository.count({
+      where: {
+        business_uuid,
+      },
+    });
+    return {
+      tables,
+      total: count,
+    };
+  }
   async createTable(business_uuid: string, payload: CreateTableDTO) {
     const transaction = await this.sequelize.transaction();
     try {
@@ -301,7 +322,11 @@ export class BusinessPanelService {
       });
       if (!business)
         throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-
+      if (await business.hasTable({ code: payload.code }))
+        throw new HttpException(
+          'Table is already exists!',
+          HttpStatus.BAD_REQUEST,
+        );
       await business.createTable(
         {
           code: payload.code,
