@@ -339,7 +339,11 @@ export class BusinessPanelService {
         throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
       if (await business.hasTable({ code: payload.code }))
         throw new HttpException(
-          'Table is already exists!',
+          {
+            ok: false,
+            code: 4001,
+            message: 'Table is already exists!',
+          },
           HttpStatus.BAD_REQUEST,
         );
       await business.createTable(
@@ -357,19 +361,13 @@ export class BusinessPanelService {
       throw error;
     }
   }
-  async removeTable(business_uuid: string, table_uuid: string) {
+  async removeTable(table_uuid: string) {
     const transaction = await this.sequelize.transaction();
     try {
-      const business = await this.businessRepository.findOne({
+      await this.businessTableRepository.destroy({
         where: {
-          uuid: business_uuid,
+          uuid: table_uuid,
         },
-      });
-      if (!business)
-        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-
-      await business.removeTable(table_uuid, {
-        transaction,
       });
 
       await transaction.commit();
@@ -378,9 +376,32 @@ export class BusinessPanelService {
       throw error;
     }
   }
-  async updateTable(table_uuid: string, payload: UpdateTableDTO) {
+  async updateTable(
+    business_uuid: string,
+    table_uuid: string,
+    payload: UpdateTableDTO,
+  ) {
     const transaction = await this.sequelize.transaction();
     try {
+      if (
+        await this.businessTableRepository.count({
+          where: {
+            business_uuid,
+            code: payload.code,
+            [Op.not]: {
+              uuid: table_uuid,
+            },
+          },
+        })
+      )
+        throw new HttpException(
+          {
+            ok: false,
+            code: 4001,
+            message: 'Table is already exists!',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
       await this.businessTableRepository.update(payload, {
         where: {
           uuid: table_uuid,

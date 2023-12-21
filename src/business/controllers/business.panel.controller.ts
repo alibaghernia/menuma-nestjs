@@ -217,13 +217,11 @@ export class BusinessPanelController {
   @Delete(':business_uuid/tables/:table_uuid')
   @CheckPermissions([business_permissions.manageBusinessTables.action])
   async removeTable(
-    @Param('business_uuid', new UUIDChecker('Business UUID'))
-    business_uuid: string,
     @Param('table_uuid', new UUIDChecker('Table UUID'))
     table_uuid: string,
   ) {
     try {
-      await this.businessService.removeTable(business_uuid, table_uuid);
+      await this.businessService.removeTable(table_uuid);
       return {
         ok: true,
         message: 'Business table removed successfully!',
@@ -236,12 +234,18 @@ export class BusinessPanelController {
   @Put(':business_uuid/tables/:table_uuid')
   @CheckPermissions([business_permissions.manageBusinessTables.action])
   async updateTable(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
     @Param('table_uuid', new UUIDChecker('Table UUID'))
     table_uuid: string,
     @Body() payload: UpdateTableDTO,
   ) {
     try {
-      await this.businessService.updateTable(table_uuid, payload);
+      await this.businessService.updateTable(
+        business_uuid,
+        table_uuid,
+        payload,
+      );
       return {
         ok: true,
         message: 'Business table updated successfully!',
