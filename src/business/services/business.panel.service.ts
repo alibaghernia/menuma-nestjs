@@ -299,6 +299,9 @@ export class BusinessPanelService {
         business_uuid,
         ...whereFilters,
       },
+      attributes: {
+        exclude: ['business_uuid'],
+      },
       limit: page * limit,
       offset: page * limit - limit,
     });
@@ -311,6 +314,18 @@ export class BusinessPanelService {
       tables,
       total: count,
     };
+  }
+  async getTable(business_uuid: string, table_uuid: string) {
+    const table = await this.businessTableRepository.findOne({
+      where: {
+        business_uuid,
+        uuid: table_uuid,
+      },
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+    });
+    return table;
   }
   async createTable(business_uuid: string, payload: CreateTableDTO) {
     const transaction = await this.sequelize.transaction();

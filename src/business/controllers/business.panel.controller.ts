@@ -153,9 +153,31 @@ export class BusinessPanelController {
     }
   }
 
-  @Get(':business_uuid/tables')
+  @Get(':business_uuid/tables/:table_uuid')
   @CheckPermissions([business_permissions.manageBusinessTables.action])
   async getTable(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Param('table_uuid', new UUIDChecker('Table UUID'))
+    table_uuid: string,
+  ) {
+    try {
+      const table = await this.businessService.getTable(
+        business_uuid,
+        table_uuid,
+      );
+      return {
+        ok: true,
+        data: table,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get(':business_uuid/tables')
+  @CheckPermissions([business_permissions.manageBusinessTables.action])
+  async getTables(
     @Param('business_uuid', new UUIDChecker('Business UUID'))
     business_uuid: string,
     @Query() filters: TablesFiltersDTO,
