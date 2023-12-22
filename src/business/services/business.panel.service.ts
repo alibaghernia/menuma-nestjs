@@ -427,10 +427,14 @@ export class BusinessPanelService {
     business_uuid: string,
     filters: PagerRequestsFiltersDTO,
   ) {
-    const { table, page, limit } = filters;
+    const { table, page, limit, status } = filters;
+    const whereFilters = Object.fromEntries(
+      Object.entries({ status }).filter(([, v]) => !!v),
+    );
     const queryObj: FindOptions<PagerRequest> = {
       where: {
         business_uuid,
+        ...whereFilters,
       },
       include: [
         {

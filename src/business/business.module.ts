@@ -11,6 +11,7 @@ import { BusinessUser } from './entites/business_user.entity';
 import { AccessControlModule } from 'src/access_control/access_control.module';
 import { BusinessTable } from './entites/business_tables.entity';
 import { PagerRequest } from './entites/pager_request.entity';
+import { PagerRequestgGateway } from './gateways/pager_request.gateway';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { PagerRequest } from './entites/pager_request.entity';
     ]),
     AccessControlModule,
   ],
-  providers: [BusinessPanelService, BusinessService],
+  providers: [BusinessPanelService, BusinessService, PagerRequestgGateway],
   controllers: [BusinessController, BusinessPanelController],
 })
 export class BusinessModule {}

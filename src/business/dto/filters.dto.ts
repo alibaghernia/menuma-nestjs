@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class TablesFiltersDTO {
   @IsOptional()
@@ -11,11 +11,14 @@ export class TablesFiltersDTO {
   @IsString()
   limit: number;
 }
-
 export class PagerRequestsFiltersDTO {
   @IsOptional()
   @IsString()
   table: string;
+
+  @IsOptional()
+  @IsEnum({ todo: 'TODO', doing: 'DOING', done: 'DONE' })
+  status: 'TODO' | 'DOING' | 'DONE';
 
   @IsString()
   page: number;

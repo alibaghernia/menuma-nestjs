@@ -27,8 +27,11 @@ export class BusinessController {
     };
   }
   @Delete('pager-request/:request_uuid')
-  async cencelPagerRequest(@Param('request_uuid') request_uuid: string) {
-    await this.businessService.cancelPagerRequest(request_uuid);
+  async cencelPagerRequest(
+    @Param('business_uuid') business_uuid: string,
+    @Param('request_uuid') request_uuid: string,
+  ) {
+    await this.businessService.cancelPagerRequest(business_uuid, request_uuid);
     return {
       ok: true,
       message: 'pager request canceled successfully!',
