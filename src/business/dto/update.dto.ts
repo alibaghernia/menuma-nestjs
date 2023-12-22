@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsBoolean,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -76,4 +77,10 @@ export class UpdateTableDTO {
   @IsOptional()
   @IsString()
   code: string;
+}
+
+export class UpdatePagerRequestDTO {
+  @IsOptional()
+  @IsEnum({ todo: 'TODO', doing: 'DOING', done: 'DONE' })
+  status: string;
 }

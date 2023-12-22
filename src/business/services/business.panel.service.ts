@@ -15,7 +15,11 @@ import {
 import { CreateBusinessDTO, CreateTableDTO } from '../dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
-import { UpdateBusinessDTO, UpdateTableDTO } from '../dto/update.dto';
+import {
+  UpdateBusinessDTO,
+  UpdatePagerRequestDTO,
+  UpdateTableDTO,
+} from '../dto/update.dto';
 import { Op } from 'sequelize';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
@@ -450,8 +454,8 @@ export class BusinessPanelService {
     };
     const requests = await this.pagerRequestRepository.findAll({
       ...queryObj,
-      offset: page * limit - limit,
-      limit: page * limit,
+      offset: page && limit ? page * limit - limit : undefined,
+      limit: page && limit ? page * limit : undefined,
     });
     const total = await this.pagerRequestRepository.count(queryObj);
     return {
@@ -480,5 +484,15 @@ export class BusinessPanelService {
       },
     });
     return request;
+  }
+  async updatePagerRequest(
+    request_uuid: string,
+    payload: UpdatePagerRequestDTO,
+  ) {
+    await this.pagerRequestRepository.update(payload, {
+      where: {
+        uuid: request_uuid,
+      },
+    });
   }
 }

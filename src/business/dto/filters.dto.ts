@@ -20,9 +20,11 @@ export class PagerRequestsFiltersDTO {
   @IsEnum({ todo: 'TODO', doing: 'DOING', done: 'DONE' })
   status: 'TODO' | 'DOING' | 'DONE';
 
+  @IsOptional()
   @IsString()
   page: number;
 
+  @IsOptional()
   @IsString()
   limit: number;
 }

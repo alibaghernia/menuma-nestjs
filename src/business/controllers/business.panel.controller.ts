@@ -15,7 +15,11 @@ import { BusinessPanelService } from '../services/business.panel.service';
 import { CreateBusinessDTO, CreateTableDTO } from '../dto';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/misc/role.enum';
-import { UpdateBusinessDTO, UpdateTableDTO } from '../dto/update.dto';
+import {
+  UpdateBusinessDTO,
+  UpdatePagerRequestDTO,
+  UpdateTableDTO,
+} from '../dto/update.dto';
 import { NotEmptyPipe } from 'src/pipes/not_empty.pipe';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
@@ -299,6 +303,19 @@ export class BusinessPanelController {
     return {
       ok: true,
       data: request,
+    };
+  }
+  @Put(':business_uuid/pager-requests/:request_uuid')
+  async updatePagerRequest(
+    @Param('request_uuid', new UUIDChecker('Request UUID'))
+    request_uuid: string,
+    @Body() payload: UpdatePagerRequestDTO,
+  ) {
+    await this.businessService.updatePagerRequest(request_uuid, payload);
+
+    return {
+      ok: true,
+      message: 'pager request updated successfully!',
     };
   }
 }

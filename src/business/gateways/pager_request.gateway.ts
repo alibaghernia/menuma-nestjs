@@ -44,10 +44,10 @@ export class PagerRequestgGateway
     const business_uuid = request.business_uuid;
     const clients = this.connectedClients[business_uuid];
     for (const client of clients) {
-      console.log({
-        request,
+      client.emit('new-request', {
+        request_uuid: request.uuid,
+        table: request.table,
       });
-      client.emit('new-request', { table: request.table });
     }
   }
   async broadcastCancelPagerNotification(
