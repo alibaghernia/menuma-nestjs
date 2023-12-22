@@ -18,7 +18,7 @@ import {
   CreateBusinessRoleDTO,
 } from '../dto/create.dto';
 
-@Controller('access-control')
+@Controller('panel/access-control')
 @UseGuards(CheckPermissionsGuard)
 export class AccessControlPanelController {
   private logger = new Logger(AccessControlPanelController.name);
