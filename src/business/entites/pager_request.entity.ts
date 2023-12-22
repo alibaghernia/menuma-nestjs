@@ -3,38 +3,43 @@ import {
   Column,
   DataType,
   ForeignKey,
-  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
 import { Business } from './business.entity';
-import { PagerRequest } from './pager_request.entity';
+import { BusinessTable } from './business_tables.entity';
 
 @Table({
-  tableName: 'business-tables',
+  tableName: 'pager-requests',
   timestamps: true,
   underscored: true,
 })
-export class BusinessTable extends Model<BusinessTable> {
+export class PagerRequest extends Model<PagerRequest> {
   @Column({
-    primaryKey: true,
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
+    primaryKey: true,
   })
   uuid: string;
 
   @ForeignKey(() => Business)
-  @Column({
-    type: DataType.UUID,
-    allowNull: false,
-  })
   business_uuid: string;
+
+  @ForeignKey(() => BusinessTable)
+  table_uuid: string;
 
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
-  code: string;
+  status: string;
+
+  @BelongsTo(() => BusinessTable, {
+    as: 'table',
+    foreignKey: 'table_uuid',
+    targetKey: 'uuid',
+  })
+  table: BusinessTable;
 
   @BelongsTo(() => Business, {
     as: 'business',
@@ -42,11 +47,4 @@ export class BusinessTable extends Model<BusinessTable> {
     targetKey: 'uuid',
   })
   business: Business;
-
-  @HasMany(() => PagerRequest, {
-    as: 'pagerRequests',
-    foreignKey: 'table_uuid',
-    sourceKey: 'uuid',
-  })
-  pagerRequests: PagerRequest[];
 }

@@ -28,6 +28,7 @@ import {
 import { Role } from 'src/access_control/entities/role.entity';
 import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
 import { BusinessTable } from './business_tables.entity';
+import { PagerRequest } from './pager_request.entity';
 
 @Table({
   underscored: true,
@@ -143,6 +144,13 @@ export class Business extends Model<Business> {
     sourceKey: 'uuid',
   })
   tables: BusinessTable[];
+
+  @HasMany(() => PagerRequest, {
+    as: 'pagerRequests',
+    foreignKey: 'business_uuid',
+    sourceKey: 'uuid',
+  })
+  pagerRequests: PagerRequest[];
 
   count: HasManyCountAssociationsMixin;
 

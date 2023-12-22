@@ -7,7 +7,11 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Business } from '../entites/business.entity';
-import { HasManyAddAssociationsMixinOptions, WhereOptions } from 'sequelize';
+import {
+  FindOptions,
+  HasManyAddAssociationsMixinOptions,
+  WhereOptions,
+} from 'sequelize';
 import { CreateBusinessDTO, CreateTableDTO } from '../dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
@@ -21,7 +25,8 @@ import { BusinessUser } from '../entites/business_user.entity';
 import { roles } from 'src/access_control/constants';
 import { BusinessUserRole } from 'src/access_control/entities/business-user_role.entity';
 import { BusinessTable } from '../entites/business_tables.entity';
-import { TablesFiltersDTO } from '../dto/filters.dto';
+import { PagerRequestsFiltersDTO, TablesFiltersDTO } from '../dto/filters.dto';
+import { PagerRequest } from '../entites/pager_request.entity';
 
 @Injectable()
 export class BusinessPanelService {
@@ -37,6 +42,8 @@ export class BusinessPanelService {
     private businessUserRepository: typeof BusinessUser,
     @InjectModel(BusinessTable)
     private businessTableRepository: typeof BusinessTable,
+    @InjectModel(PagerRequest)
+    private pagerRequestRepository: typeof PagerRequest,
     private sequelize: Sequelize,
     @Inject(REQUEST) private request: Request,
   ) {}
@@ -414,5 +421,60 @@ export class BusinessPanelService {
       await transaction.rollback();
       throw error;
     }
+  }
+
+  async getPagerRequests(
+    business_uuid: string,
+    filters: PagerRequestsFiltersDTO,
+  ) {
+    const { table, page, limit } = filters;
+    const queryObj: FindOptions<PagerRequest> = {
+      where: {
+        business_uuid,
+      },
+      include: [
+        {
+          model: BusinessTable,
+          //@ts-ignore
+          where: {
+            code: {
+              [Op.like]: `%${table || ''}%`,
+            },
+          },
+        },
+      ],
+    };
+    const requests = await this.pagerRequestRepository.findAll({
+      ...queryObj,
+      offset: page * limit - limit,
+      limit: page * limit,
+    });
+    const total = await this.pagerRequestRepository.count(queryObj);
+    return {
+      requests,
+      total,
+    };
+  }
+  async getPagerRequest(business_uuid: string, request_uuid: string) {
+    const request = await this.pagerRequestRepository.findOne({
+      where: {
+        business_uuid,
+        uuid: request_uuid,
+      },
+      include: [
+        {
+          model: BusinessTable,
+        },
+      ],
+    });
+    return request;
+  }
+  async deletePagerRequest(request_uuid: string) {
+    const request = await this.pagerRequestRepository.destroy({
+      where: {
+        uuid: request_uuid,
+      },
+    });
+    return request;
   }
 }

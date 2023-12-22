@@ -20,7 +20,7 @@ import { category_permissions } from 'src/access_control/constants';
 import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
 import { FiltersDTO } from '../dto/filters.dto';
 
-@Controller(':business_uuid/panel/category')
+@Controller('panel/business/:business_uuid/category')
 @UseGuards(CheckPermissionsGuard)
 @UsePipes(new UUIDCheckerController('Business UUID', 'business_uuid'))
 export class CategoryPanelController {

@@ -11,3 +11,15 @@ export class TablesFiltersDTO {
   @IsString()
   limit: number;
 }
+
+export class PagerRequestsFiltersDTO {
+  @IsOptional()
+  @IsString()
+  table: string;
+
+  @IsString()
+  page: number;
+
+  @IsString()
+  limit: number;
+}

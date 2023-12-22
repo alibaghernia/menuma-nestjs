@@ -22,9 +22,9 @@ import { CheckPermissions } from 'src/access_control/decorators/check_permission
 import { business_permissions } from 'src/access_control/constants';
 import { SetBusinessManagerDTO } from '../dto/set_business_manager';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
-import { TablesFiltersDTO } from '../dto/filters.dto';
+import { PagerRequestsFiltersDTO, TablesFiltersDTO } from '../dto/filters.dto';
 
-@Controller('business')
+@Controller('panel/business')
 @UseGuards(CheckPermissionsGuard)
 export class BusinessPanelController {
   constructor(private businessService: BusinessPanelService) {}
@@ -253,5 +253,52 @@ export class BusinessPanelController {
     } catch (error) {
       throw error;
     }
+  }
+
+  @Get(':business_uuid/pager-requests')
+  async getPagerRequests(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Query() filters: PagerRequestsFiltersDTO,
+  ) {
+    const requests = await this.businessService.getPagerRequests(
+      business_uuid,
+      filters,
+    );
+
+    return {
+      ok: true,
+      data: requests,
+    };
+  }
+
+  @Get(':business_uuid/pager-requests/:request_uuid')
+  async getPagerRequest(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Param('request_uuid', new UUIDChecker('Request UUID'))
+    request_uuid: string,
+  ) {
+    const request = await this.businessService.getPagerRequest(
+      business_uuid,
+      request_uuid,
+    );
+
+    return {
+      ok: true,
+      data: request,
+    };
+  }
+  @Delete(':business_uuid/pager-requests/:request_uuid')
+  async deletePagerRequest(
+    @Param('request_uuid', new UUIDChecker('Request UUID'))
+    request_uuid: string,
+  ) {
+    const request = await this.businessService.deletePagerRequest(request_uuid);
+
+    return {
+      ok: true,
+      data: request,
+    };
   }
 }
