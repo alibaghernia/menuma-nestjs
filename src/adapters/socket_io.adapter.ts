@@ -13,6 +13,7 @@ export class SocketIoAdapter extends IoAdapter {
 
   createIOServer(_, options?: ServerOptions) {
     const port = this.configService.get('WEBSOCKET_SERVER_PORT', 3001);
+    options.path = '/socket.io';
     options.cors = {
       origin: '*',
     };

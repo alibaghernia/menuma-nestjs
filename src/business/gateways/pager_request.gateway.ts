@@ -7,7 +7,6 @@ import { Socket } from 'socket.io';
 import { PagerRequest } from '../entites/pager_request.entity';
 
 @WebSocketGateway({
-  path: '/panel',
   namespace: 'pager_requests',
 })
 export class PagerRequestgGateway
