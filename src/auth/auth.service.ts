@@ -19,7 +19,7 @@ export class AuthService {
       user.password,
     );
     if (!passwordMatch)
-      throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Invalid credentials', HttpStatus.FORBIDDEN);
 
     return {
       uuid: user.uuid,
