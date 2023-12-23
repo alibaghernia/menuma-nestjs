@@ -7,15 +7,17 @@ import {
   Param,
   Post,
   Put,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
 import { users_permissions } from 'src/access_control/constants';
 import { UsersPanelService } from '../services/users.panel.service';
 import { CreateUserDTO } from '../dto/create_user.dto';
-import { UpdateUserDTO } from '../dto/update_user.dto';
+import { UpdateUserDTO, UpdateUserProfileDTO } from '../dto/update_user.dto';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
+import { Request } from 'express';
 
 @Controller('users')
 @UseGuards(CheckPermissionsGuard)
@@ -76,6 +78,27 @@ export class UsersPanelController {
         error,
       });
       this.logger.log('Error while update user');
+      throw error;
+    }
+  }
+
+  @Put()
+  async updateProfile(
+    @Req() request: Request,
+    @Body() payload: UpdateUserProfileDTO,
+  ) {
+    this.logger.log('Update user profile');
+    try {
+      await this.usersService.updateUser(request.user.uuid, payload);
+      return {
+        ok: true,
+        message: 'User profile updated successfully!',
+      };
+    } catch (error) {
+      console.log({
+        error,
+      });
+      this.logger.log('Error while updating user profile');
       throw error;
     }
   }
