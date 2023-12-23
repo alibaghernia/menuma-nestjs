@@ -24,7 +24,7 @@ module.exports = {
         type: DataTypes.STRING,
       },
       image: {
-        type: DataTypes.STRING,
+        type: DataTypes.UUID,
         onDelete: 'SET NULL',
         references: {
           model: 'files',

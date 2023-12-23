@@ -23,7 +23,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "ci": "npm run format:check && npm run lint:quiet && npm run check",
     "sequelize": "sequelize-cli",
-    "migration:run": "sequelize-cli db:migrate"
+    "migration:run": "sequelize-cli db:migrate",
+    "seed:run": "sequelize-cli db:seed:all"
   },
   "dependencies": {
     "@nestjs/cli": "^10.0.0",
