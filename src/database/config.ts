@@ -18,6 +18,9 @@ import { BusinessCategoryProduct } from 'src/product/entities/business-category_
 import { Image } from './entities/image.entity';
 import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
 import { File } from '../files/entities/file.entity';
+import { FileProduct } from 'src/product/entities/file_product.entity';
+import { BusinessTable } from 'src/business/entites/business_tables.entity';
+import { PagerRequest } from 'src/business/entites/pager_request.entity';
 import { Event } from '../event/entities/event.entity';
 import { EventImage } from '../event/entities/event_image.entity';
 
@@ -34,6 +37,7 @@ const config: SequelizeModuleOptions = {
   models: [
     QrCode,
     File,
+    FileProduct,
     User,
     Category,
     Business,
@@ -49,6 +53,8 @@ const config: SequelizeModuleOptions = {
     BusinessUserRole,
     BusinessUserPermission,
     BusinessCategoryProduct,
+    BusinessTable,
+    PagerRequest,
     Event,
     EventImage,
   ],

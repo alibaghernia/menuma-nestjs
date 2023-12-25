@@ -14,7 +14,7 @@ import { CreateQrCodeDTO } from '../dto/create.dto';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { UpdateQrCodeDTO } from '../dto/update.dto';
 
-@Controller(':business_uuid/qr-code')
+@Controller('/panel/business/:business_uuid/qr-code')
 export class QrCodePanelController {
   constructor(
     private qrCodePanelService: QrCodePanelService,

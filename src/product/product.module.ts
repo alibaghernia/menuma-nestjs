@@ -10,6 +10,7 @@ import { Tag } from 'src/database/entities/tag.entity';
 import { Image } from 'src/database/entities/image.entity';
 import { Business } from 'src/business/entites/business.entity';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
+import { FileModule } from 'src/files/files.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { BusinessCategory } from 'src/business/entites/business_category.entity'
       Business,
       BusinessCategory,
     ]),
+    FileModule,
     AccessControlModule,
   ],
   providers: [ProductPanelService],

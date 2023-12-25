@@ -9,6 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { AccessControlPanelService } from '../services/access_control.panel.service';
 import { CHECK_PERMISSIONS } from '../decorators/check_permissions.decorator';
 import { Request } from 'express';
+import { administratorAccessPermissions } from '../constants';
 
 @Injectable()
 export class CheckPermissionsGuard implements CanActivate {
@@ -35,9 +36,22 @@ export class CheckPermissionsGuard implements CanActivate {
     } else {
       business_uuid = request.body[id_field];
     }
-    if (!business_uuid)
+
+    if (
+      //check admin permissions
+      request.user.role != 'admin' &&
+      administratorAccessPermissions.some((adPer) =>
+        permissions.some((per) => per == adPer.action),
+      )
+    )
       throw new HttpException(
-        "You don't have enough permissions!",
+        "You don't have administration permissions!",
+        HttpStatus.FORBIDDEN,
+      );
+
+    if (!business_uuid || business_uuid == ':business_uuid')
+      throw new HttpException(
+        "Business hasn't specified!",
         HttpStatus.FORBIDDEN,
       );
 

@@ -7,11 +7,19 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Business } from '../entites/business.entity';
-import { HasManyAddAssociationsMixinOptions, WhereOptions } from 'sequelize';
-import { CreateBusinessDTO } from '../dto';
+import {
+  FindOptions,
+  HasManyAddAssociationsMixinOptions,
+  WhereOptions,
+} from 'sequelize';
+import { CreateBusinessDTO, CreateTableDTO } from '../dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
-import { UpdateBusinessDTO } from '../dto/update.dto';
+import {
+  UpdateBusinessDTO,
+  UpdatePagerRequestDTO,
+  UpdateTableDTO,
+} from '../dto/update.dto';
 import { Op } from 'sequelize';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
@@ -20,6 +28,9 @@ import { SetBusinessManagerDTO } from '../dto/set_business_manager';
 import { BusinessUser } from '../entites/business_user.entity';
 import { roles } from 'src/access_control/constants';
 import { BusinessUserRole } from 'src/access_control/entities/business-user_role.entity';
+import { BusinessTable } from '../entites/business_tables.entity';
+import { PagerRequestsFiltersDTO, TablesFiltersDTO } from '../dto/filters.dto';
+import { PagerRequest } from '../entites/pager_request.entity';
 
 @Injectable()
 export class BusinessPanelService {
@@ -33,6 +44,10 @@ export class BusinessPanelService {
     private socialRepository: typeof Social,
     @InjectModel(BusinessUser)
     private businessUserRepository: typeof BusinessUser,
+    @InjectModel(BusinessTable)
+    private businessTableRepository: typeof BusinessTable,
+    @InjectModel(PagerRequest)
+    private pagerRequestRepository: typeof PagerRequest,
     private sequelize: Sequelize,
     @Inject(REQUEST) private request: Request,
   ) {}
@@ -133,12 +148,51 @@ export class BusinessPanelService {
       },
     });
   }
-  update(business_uuid: string, business: UpdateBusinessDTO) {
-    return this.businessRepository.update(business, {
-      where: {
-        uuid: business_uuid,
-      },
-    });
+  async update(business_uuid: string, _business: UpdateBusinessDTO) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      const business = await this.businessRepository.findOne({
+        where: {
+          uuid: business_uuid,
+        },
+      });
+
+      if (!business)
+        throw new HttpException('Business Not found!', HttpStatus.NOT_FOUND);
+      const { instagram, telegram, whatsapp, twitter_x, ...businessProps } =
+        _business;
+      const socials = Object.entries({
+        instagram,
+        telegram,
+        whatsapp,
+        twitter_x,
+      }).filter(([, v]) => !!v);
+      for (const [socialName, socialLink] of socials) {
+        const social = await this.socialRepository.findOne({
+          where: {
+            socialable_type: 'business',
+            socialable_uuid: business.uuid,
+            type: socialName,
+          },
+        });
+        if (social) {
+          if (social.link != socialLink)
+            await social.update({
+              link: socialLink,
+            });
+        } else
+          await business.createSocial({
+            type: socialName,
+            link: socialLink,
+          });
+      }
+      await business.update(businessProps);
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   }
 
   async addUser(business_uuid: string, user_uuid: string) {
@@ -247,5 +301,198 @@ export class BusinessPanelService {
       await transaction.rollback();
       throw error;
     }
+  }
+  async getTables(business_uuid: string, filters: TablesFiltersDTO) {
+    const { page, limit, ...whereFilters } = filters;
+
+    const tables = await this.businessTableRepository.findAll({
+      where: {
+        business_uuid,
+        ...whereFilters,
+      },
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+      limit: page * limit,
+      offset: page * limit - limit,
+    });
+    const count = await this.businessTableRepository.count({
+      where: {
+        business_uuid,
+      },
+    });
+    return {
+      tables,
+      total: count,
+    };
+  }
+  async getTable(business_uuid: string, table_uuid: string) {
+    const table = await this.businessTableRepository.findOne({
+      where: {
+        business_uuid,
+        uuid: table_uuid,
+      },
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+    });
+    return table;
+  }
+  async createTable(business_uuid: string, payload: CreateTableDTO) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      const business = await this.businessRepository.findOne({
+        where: {
+          uuid: business_uuid,
+        },
+      });
+      if (!business)
+        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
+      if (await business.hasTable({ code: payload.code }))
+        throw new HttpException(
+          {
+            ok: false,
+            code: 4001,
+            message: 'Table is already exists!',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      await business.createTable(
+        {
+          code: payload.code,
+        },
+        {
+          transaction,
+        },
+      );
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+  async removeTable(table_uuid: string) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      await this.businessTableRepository.destroy({
+        where: {
+          uuid: table_uuid,
+        },
+      });
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+  async updateTable(
+    business_uuid: string,
+    table_uuid: string,
+    payload: UpdateTableDTO,
+  ) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      if (
+        await this.businessTableRepository.count({
+          where: {
+            business_uuid,
+            code: payload.code,
+            [Op.not]: {
+              uuid: table_uuid,
+            },
+          },
+        })
+      )
+        throw new HttpException(
+          {
+            ok: false,
+            code: 4001,
+            message: 'Table is already exists!',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      await this.businessTableRepository.update(payload, {
+        where: {
+          uuid: table_uuid,
+        },
+        transaction,
+      });
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  async getPagerRequests(
+    business_uuid: string,
+    filters: PagerRequestsFiltersDTO,
+  ) {
+    const { table, page, limit, status } = filters;
+    const whereFilters = Object.fromEntries(
+      Object.entries({ status }).filter(([, v]) => !!v),
+    );
+    const queryObj: FindOptions<PagerRequest> = {
+      where: {
+        business_uuid,
+        ...whereFilters,
+      },
+      include: [
+        {
+          model: BusinessTable,
+          //@ts-ignore
+          where: {
+            code: {
+              [Op.like]: `%${table || ''}%`,
+            },
+          },
+        },
+      ],
+    };
+    const requests = await this.pagerRequestRepository.findAll({
+      ...queryObj,
+      offset: page && limit ? page * limit - limit : undefined,
+      limit: page && limit ? page * limit : undefined,
+    });
+    const total = await this.pagerRequestRepository.count(queryObj);
+    return {
+      requests,
+      total,
+    };
+  }
+  async getPagerRequest(business_uuid: string, request_uuid: string) {
+    const request = await this.pagerRequestRepository.findOne({
+      where: {
+        business_uuid,
+        uuid: request_uuid,
+      },
+      include: [
+        {
+          model: BusinessTable,
+        },
+      ],
+    });
+    return request;
+  }
+  async deletePagerRequest(request_uuid: string) {
+    const request = await this.pagerRequestRepository.destroy({
+      where: {
+        uuid: request_uuid,
+      },
+    });
+    return request;
+  }
+  async updatePagerRequest(
+    request_uuid: string,
+    payload: UpdatePagerRequestDTO,
+  ) {
+    await this.pagerRequestRepository.update(payload, {
+      where: {
+        uuid: request_uuid,
+      },
+    });
   }
 }

@@ -23,9 +23,12 @@ import {
   BelongsToManyHasAssociationMixin,
   BelongsToManyRemoveAssociationMixin,
   BelongsToManyHasAssociationsMixin,
+  WhereOptions,
 } from 'sequelize';
 import { Role } from 'src/access_control/entities/role.entity';
 import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
+import { BusinessTable } from './business_tables.entity';
+import { PagerRequest } from './pager_request.entity';
 
 @Table({
   underscored: true,
@@ -135,6 +138,20 @@ export class Business extends Model<Business> {
   })
   qrCodes: QrCode;
 
+  @HasMany(() => BusinessTable, {
+    as: 'tables',
+    foreignKey: 'business_uuid',
+    sourceKey: 'uuid',
+  })
+  tables: BusinessTable[];
+
+  @HasMany(() => PagerRequest, {
+    as: 'pagerRequests',
+    foreignKey: 'business_uuid',
+    sourceKey: 'uuid',
+  })
+  pagerRequests: PagerRequest[];
+
   count: HasManyCountAssociationsMixin;
 
   addUser: HasManyAddAssociationMixin<User, User['uuid']>;
@@ -156,4 +173,22 @@ export class Business extends Model<Business> {
   hasCategory: BelongsToManyHasAssociationMixin<Category, Category['uuid']>;
   hasCategories: BelongsToManyHasAssociationsMixin<Category, Category['uuid']>;
   BusinessUser: BusinessUser;
+
+  addSocial: HasManyAddAssociationMixin<Social, Social['uuid']>;
+  createSocial: HasManyCreateAssociationMixin<Social>;
+
+  async hasTable(where: WhereOptions<BusinessTable>) {
+    const table = await BusinessTable.count({
+      where: {
+        business_uuid: this.uuid,
+        ...where,
+      },
+    });
+    return !!table;
+  }
+  createTable: HasManyCreateAssociationMixin<BusinessTable>;
+  removeTable: HasManyRemoveAssociationMixin<
+    BusinessTable,
+    BusinessTable['uuid']
+  >;
 }

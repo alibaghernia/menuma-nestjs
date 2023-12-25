@@ -1,16 +1,40 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import { BusinessPanelService } from '../services/business.panel.service';
-import { NotEmptyPipe } from 'src/pipes/not_empty.pipe';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  UsePipes,
+} from '@nestjs/common';
+import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
+import { NewPagerRequestDTO } from '../dto';
+import { BusinessService } from '../services/business.service';
 
-@Controller('business')
+@Controller('business/:business_uuid')
+@UsePipes(UUIDCheckerController)
 export class BusinessController {
-  constructor(private businessService: BusinessPanelService) {}
+  constructor(private businessService: BusinessService) {}
 
-  @Get(':slug')
-  getBySlug(
-    @Param('slug', new NotEmptyPipe('Business Slug Or UUID'))
-    slugOrId: string,
+  @Post('pager-request')
+  async pagerRequest(
+    @Param('business_uuid') business_uuid: string,
+    @Body() payload: NewPagerRequestDTO,
   ) {
-    return this.businessService.findBySlugOrId(slugOrId);
+    await this.businessService.createPagerRequest(business_uuid, payload);
+    return {
+      ok: true,
+      message: 'pager request established successfully!',
+    };
+  }
+  @Delete('pager-request/:request_uuid')
+  async cencelPagerRequest(
+    @Param('business_uuid') business_uuid: string,
+    @Param('request_uuid') request_uuid: string,
+  ) {
+    await this.businessService.cancelPagerRequest(business_uuid, request_uuid);
+    return {
+      ok: true,
+      message: 'pager request canceled successfully!',
+    };
   }
 }

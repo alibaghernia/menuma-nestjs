@@ -1,12 +1,10 @@
-import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
+  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
-  ValidateNested,
-  isString,
 } from 'class-validator';
 
 export class UpdateBusinessDTO {
@@ -64,8 +62,6 @@ export class UpdateBusinessDTO {
 
   @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => isString)
   readonly working_hours?: object[];
 
   @IsOptional()
@@ -75,4 +71,16 @@ export class UpdateBusinessDTO {
   @IsOptional()
   @IsString()
   readonly banner?: string;
+}
+
+export class UpdateTableDTO {
+  @IsOptional()
+  @IsString()
+  code: string;
+}
+
+export class UpdatePagerRequestDTO {
+  @IsOptional()
+  @IsEnum({ todo: 'TODO', doing: 'DOING', done: 'DONE' })
+  status: string;
 }

@@ -1,4 +1,4 @@
-import { IsOptional, IsString } from 'class-validator';
+import { Equals, IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserDTO {
   @IsOptional()
@@ -20,4 +20,9 @@ export class UpdateUserDTO {
   @IsOptional()
   @IsString()
   password?: string;
+}
+
+export class UpdateUserProfileDTO extends UpdateUserDTO {
+  @Equals(undefined)
+  mobile: string;
 }

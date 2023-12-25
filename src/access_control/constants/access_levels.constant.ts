@@ -41,6 +41,11 @@ export const business_permissions = {
     title: 'Create Business',
     action: 'create-business',
   },
+  manageBusinessTables: {
+    uuid: '377b5c05-c3b8-4c37-ab67-c77814e93fdc',
+    title: 'Manage Business Tables',
+    action: 'manage-business-tables',
+  },
   updateBusinessInfo: {
     uuid: '6ccd3769-75e3-4a4e-8abb-a03a7121df90',
     title: 'Update Business Info',
@@ -55,6 +60,11 @@ export const business_permissions = {
     uuid: '9638edcc-617a-4767-bee5-8a4886d58611',
     title: 'See All Business',
     action: 'see-all-business',
+  },
+  readBusiness: {
+    uuid: 'c226a47c-10e2-4ef3-9c07-d6da5d99a17c',
+    title: 'get Business',
+    action: 'get-business',
   },
   addUserToBusiness: {
     uuid: '49c328f1-0d47-483f-b646-f52cf30599eb',

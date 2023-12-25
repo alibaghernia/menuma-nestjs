@@ -81,3 +81,14 @@ export class CreateBusinessDTO {
   @IsUUID()
   readonly manager: string;
 }
+
+export class CreateTableDTO {
+  @IsString()
+  code: string;
+}
+
+export class NewPagerRequestDTO {
+  @IsNotEmpty()
+  @IsUUID()
+  table_uuid: string;
+}

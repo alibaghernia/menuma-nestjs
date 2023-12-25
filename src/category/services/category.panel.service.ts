@@ -47,7 +47,11 @@ export class CategoryPanelService {
         ],
       })
     )?.get({ plain: true });
-    if (filters && !business) return [];
+    if (filters && !business)
+      return {
+        categories: [],
+        total: 0,
+      };
     if (!business)
       throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
 
@@ -64,9 +68,11 @@ export class CategoryPanelService {
       });
       delete category.BusinessCategory;
     }
-
     return {
-      categories: categories.slice(page * limit - limit, page * limit),
+      categories:
+        page && limit
+          ? categories.slice(page * limit - limit, page * limit)
+          : categories,
       total: categories.length,
     };
   }

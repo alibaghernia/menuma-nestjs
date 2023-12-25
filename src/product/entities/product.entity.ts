@@ -22,7 +22,8 @@ import { BelongsToManySetAssociationsMixin } from 'sequelize';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
 import { BusinessCategoryProduct } from './business-category_product.entity';
 import { HasManyAddAssociationsMixin } from 'sequelize';
-import { Image } from 'src/database/entities/image.entity';
+import { FileProduct } from './file_product.entity';
+import { File } from 'src/files/entities/file.entity';
 
 export type ProductMetadata = {
   title: string;
@@ -37,6 +38,7 @@ export type ProductPrice = {
   tableName: 'products',
   timestamps: true,
   underscored: true,
+  paranoid: false,
 })
 export class Product extends Model<Product> {
   @Column({
@@ -84,16 +86,6 @@ export class Product extends Model<Product> {
   })
   tags: Tag[];
 
-  @HasMany(() => Image, {
-    as: 'images',
-    foreignKey: 'imageable_uuid',
-    sourceKey: 'uuid',
-    scope: {
-      imageable_type: 'product',
-    },
-  })
-  images: Image[];
-
   @BelongsTo(() => Business, {
     as: 'business',
     foreignKey: 'business_uuid',
@@ -111,6 +103,16 @@ export class Product extends Model<Product> {
   })
   businessCategories: BusinessCategory[];
 
+  @BelongsToMany(() => File, {
+    through: () => FileProduct,
+    as: 'images',
+    foreignKey: 'product_uuid',
+    otherKey: 'file_uuid',
+    sourceKey: 'uuid',
+    targetKey: 'uuid',
+  })
+  images: File[];
+
   setBusiness: BelongsToSetAssociationMixin<Business, Business['uuid']>;
   setBusinessCategories: BelongsToManySetAssociationsMixin<
     BusinessCategory,
@@ -123,10 +125,5 @@ export class Product extends Model<Product> {
   removeTag: HasManyRemoveAssociationMixin<Tag, Tag['uuid']>;
   removeTags: HasManyRemoveAssociationsMixin<Tag, Tag['uuid']>;
 
-  createImage: HasManyCreateAssociationMixin<Image>;
-  addImages: HasManyAddAssociationsMixin<Image, Image['uuid']>;
-  addImage: HasManyAddAssociationMixin<Image, Image['uuid']>;
-  hasImage: HasManyHasAssociationMixin<Image, Image['uuid']>;
-  removeImage: HasManyRemoveAssociationMixin<Image, Image['uuid']>;
-  removeImages: HasManyRemoveAssociationsMixin<Image, Image['uuid']>;
+  setImages: BelongsToManySetAssociationsMixin<File, File['uuid']>;
 }

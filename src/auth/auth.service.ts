@@ -1,7 +1,7 @@
-import { HttpException, HttpStatus, Injectable, Req } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersPanelService } from 'src/users/services/users.panel.service';
 import * as bcrypt from 'bcrypt';
-import { Request } from 'express';
+// import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class AuthService {
       user.password,
     );
     if (!passwordMatch)
-      throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Invalid credentials', HttpStatus.FORBIDDEN);
 
     return {
       uuid: user.uuid,
@@ -41,7 +41,7 @@ export class AuthService {
     };
   }
 
-  async logout(@Req() request: Request): Promise<any> {
-    //@ts-ignore
-  }
+  // async logout(@Req() request: Request): Promise<any> {
+  //   //@ts-ignore
+  // }
 }

@@ -3,31 +3,23 @@ import { DataTypes } from 'sequelize';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    return queryInterface.createTable('categories', {
+    return queryInterface.createTable('file-product', {
       uuid: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
       },
-      parent_uuid: {
+      file_uuid: {
         type: DataTypes.UUID,
         references: {
-          model: 'categories',
+          model: 'files',
           key: 'uuid',
         },
       },
-      title: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      slug: {
-        type: DataTypes.STRING,
-      },
-      image: {
+      product_uuid: {
         type: DataTypes.UUID,
-        onDelete: 'SET NULL',
         references: {
-          model: 'files',
+          model: 'products',
           key: 'uuid',
         },
       },
@@ -35,6 +27,6 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    return queryInterface.dropTable('categories');
+    return queryInterface.dropTable('file-product');
   },
 };

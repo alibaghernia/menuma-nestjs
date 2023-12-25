@@ -6,6 +6,7 @@ import * as morgan from 'morgan';
 import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SocketIoAdapter } from './adapters/socket_io.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -29,6 +30,7 @@ async function bootstrap() {
       forbidUnknownValues: true,
     }),
   );
+  app.useWebSocketAdapter(new SocketIoAdapter(app, configService));
 
   const config = new DocumentBuilder()
     .setTitle('menuma api docs')

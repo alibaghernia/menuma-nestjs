@@ -12,11 +12,11 @@ import { BusinessCategory } from 'src/business/entites/business_category.entity'
 import { FindProductFiltersDTO } from '../dto/query.dto';
 import { Op, WhereOptions } from 'sequelize';
 import { ConfigService } from '@nestjs/config';
-import { join } from 'path';
-import * as fs from 'fs';
 import { Image } from 'src/database/entities/image.entity';
 import { Business } from 'src/business/entites/business.entity';
 import { FiltersDTO } from '../dto/filters.dto';
+import { FilesPanelService } from 'src/files/services/files.panel.service';
+import { File } from 'src/files/entities/file.entity';
 
 @Injectable()
 export class ProductPanelService {
@@ -31,6 +31,7 @@ export class ProductPanelService {
     private businessCategoryRepository: typeof BusinessCategory,
     @Inject(REQUEST) private request: Request,
     private configService: ConfigService,
+    private filesService: FilesPanelService,
   ) {}
 
   async fetchAll(business_uuid: string, _filters: FiltersDTO) {
@@ -110,6 +111,12 @@ export class ProductPanelService {
               {
                 model: Category,
               },
+              {
+                model: File,
+                through: {
+                  attributes: [],
+                },
+              },
             ],
           },
         ],
@@ -147,6 +154,9 @@ export class ProductPanelService {
               },
             ],
           },
+          {
+            model: File,
+          },
         ],
       })
     )?.get({ plain: true });
@@ -158,7 +168,6 @@ export class ProductPanelService {
 
     (product as Product & { categories?: Category[] }).categories =
       businessCategories.map((besCat) => besCat.category);
-
     return product;
   }
   async create(business_uuid: string, payload: CreateProductDTO) {
@@ -171,30 +180,37 @@ export class ProductPanelService {
       });
       if (!business)
         throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-      const { categories, tags, ...prodPayload } = payload;
+      const { categories, tags, image, ...prodPayload } = payload;
       const product = await this.productRepository.create({
         ...prodPayload,
         business_uuid,
       });
-      for (const tag of tags) {
-        const [newTag] = await this.tagRepository.findOrCreate({
-          defaults: {
-            value: tag.value,
-            tagable_type: 'product',
-            tagable_uuid: product.uuid,
-          },
-          where: {
-            value: tag.value,
-            uuid: product.uuid,
-          },
-        });
-        await product.addTag(newTag);
+
+      // handle tags
+      if (tags)
+        for (const tag of tags) {
+          const [newTag] = await this.tagRepository.findOrCreate({
+            defaults: {
+              value: tag.value,
+              tagable_type: 'product',
+              tagable_uuid: product.uuid,
+            },
+            where: {
+              value: tag.value,
+              uuid: product.uuid,
+            },
+          });
+          await product.addTag(newTag);
+        }
+      // handle image
+      if (image) {
+        await product.setImages([image]);
       }
-      if (await business.hasCategories(categories.map((cat) => cat.uuid))) {
+      if (await business.hasCategories(categories.map((cat) => cat))) {
         const categoriesIns = await this.businessCategoryRepository.findAll({
           where: {
             business_uuid,
-            category_uuid: categories.map((cat) => cat.uuid),
+            category_uuid: categories.map((cat) => cat),
           },
         });
         await product.setBusinessCategories(categoriesIns);
@@ -224,7 +240,7 @@ export class ProductPanelService {
       });
       if (!business)
         throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-      const { categories, tags, ...prodPayload } = payload;
+      const { categories, tags, image, ...prodPayload } = payload;
       await this.productRepository.update(
         {
           ...prodPayload,
@@ -260,7 +276,6 @@ export class ProductPanelService {
           });
           await product.addTag(newTag);
         }
-
         // check deleted tags
         const deletedTags = product.tags.filter(
           (item) => !tags.some((tag) => tag.value == item.value),
@@ -272,13 +287,18 @@ export class ProductPanelService {
         });
       }
 
+      // handle image
+      if (image) {
+        await product.setImages([image]);
+      }
+
       // if categories field is presented
       if (categories) {
-        if (await business.hasCategories(categories.map((cat) => cat.uuid))) {
+        if (await business.hasCategories(categories.map((cat) => cat))) {
           const categoriesIns = await this.businessCategoryRepository.findAll({
             where: {
               business_uuid,
-              category_uuid: categories.map((cat) => cat.uuid),
+              category_uuid: categories.map((cat) => cat),
             },
           });
           await product.setBusinessCategories(categoriesIns);
@@ -310,78 +330,78 @@ export class ProductPanelService {
     }
   }
 
-  async savePhotos(
-    business_uuid: string,
-    product_uuid: string,
-    photos: Express.Multer.File[],
-    current_items: string[],
-  ) {
-    const t = await this.sequelize.transaction();
-    const savedPhotos = [];
-    const fs_path = join(__dirname, '../../../');
-    const static_images_path = join(
-      this.configService.get('IMAGES_PATH'),
-      'products',
-    );
-    try {
-      const product = await this.productRepository.findOne({
-        where: {
-          uuid: product_uuid,
-        },
-        include: [Image],
-      });
-      if (!product)
-        throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
+  // async savePhotos(
+  //   business_uuid: string,
+  //   product_uuid: string,
+  //   photos: Express.Multer.File[],
+  //   current_items: string[],
+  // ) {
+  //   const t = await this.sequelize.transaction();
+  //   const savedPhotos = [];
+  //   const fs_path = join(__dirname, '../../../');
+  //   const static_images_path = join(
+  //     this.configService.get('IMAGES_PATH'),
+  //     'products',
+  //   );
+  //   try {
+  //     const product = await this.productRepository.findOne({
+  //       where: {
+  //         uuid: product_uuid,
+  //       },
+  //       include: [Image],
+  //     });
+  //     if (!product)
+  //       throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
 
-      if (!fs.existsSync(join(fs_path, static_images_path)))
-        fs.mkdirSync(join(fs_path, static_images_path), { recursive: true });
-      for (const photo of photos) {
-        const file_name = `${business_uuid}-${product_uuid}-${photo.originalname}`;
-        const savePath = join(fs_path, static_images_path, file_name);
+  //     if (!fs.existsSync(join(fs_path, static_images_path)))
+  //       fs.mkdirSync(join(fs_path, static_images_path), { recursive: true });
+  //     for (const photo of photos) {
+  //       const file_name = `${business_uuid}-${product_uuid}-${photo.originalname}`;
+  //       const savePath = join(fs_path, static_images_path, file_name);
 
-        // remove deleted items
-        const deletedImages = product.images.filter(
-          (item) =>
-            !photos.some((photo) => photo.originalname == item.name) &&
-            !current_items.some((cItem) => cItem == item.name),
-        );
-        await this.imageRepository.destroy({
-          where: {
-            uuid: deletedImages.map((item) => item.uuid),
-          },
-        });
-        for (const deletedImage of deletedImages) {
-          if (
-            fs.existsSync(join(fs_path, static_images_path, deletedImage.path))
-          )
-            fs.rmSync(join(fs_path, static_images_path, deletedImage.path));
-        }
-        const [, created] = await this.imageRepository.findOrCreate({
-          where: {
-            path: file_name,
-          },
-          defaults: {
-            imageable_type: 'product',
-            imageable_uuid: product.uuid,
-            path: file_name,
-            name: photo.originalname,
-          },
-        });
-        if (created) {
-          fs.writeFileSync(savePath, photo.buffer);
-          savedPhotos.push(savePath);
-        }
-      }
+  //       // remove deleted items
+  //       const deletedImages = product.images.filter(
+  //         (item) =>
+  //           !photos.some((photo) => photo.originalname == item.name) &&
+  //           !current_items.some((cItem) => cItem == item.name),
+  //       );
+  //       await this.imageRepository.destroy({
+  //         where: {
+  //           uuid: deletedImages.map((item) => item.uuid),
+  //         },
+  //       });
+  //       for (const deletedImage of deletedImages) {
+  //         if (
+  //           fs.existsSync(join(fs_path, static_images_path, deletedImage.path))
+  //         )
+  //           fs.rmSync(join(fs_path, static_images_path, deletedImage.path));
+  //       }
+  //       const [, created] = await this.imageRepository.findOrCreate({
+  //         where: {
+  //           path: file_name,
+  //         },
+  //         defaults: {
+  //           imageable_type: 'product',
+  //           imageable_uuid: product.uuid,
+  //           path: file_name,
+  //           name: photo.originalname,
+  //         },
+  //       });
+  //       if (created) {
+  //         fs.writeFileSync(savePath, photo.buffer);
+  //         savedPhotos.push(savePath);
+  //       }
+  //     }
 
-      await t.commit();
-    } catch (error) {
-      await t.rollback();
+  //     await t.commit();
+  //   } catch (error) {
+  //     await t.rollback();
 
-      for (const path of savedPhotos) {
-        if (fs.existsSync(path)) fs.rmSync(path);
-      }
+  //     for (const path of savedPhotos) {
+  //       if (fs.existsSync(path)) fs.rmSync(path);
+  //     }
 
-      throw error;
-    }
-  }
+  //     throw error;
+  //   }
+  // }
 }
