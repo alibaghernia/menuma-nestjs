@@ -1,6 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import * as fs from 'fs/promises';
-import { IsPublic } from '../auth/decorators/is_public.decorator.ts';
+import { IsPublic } from '../auth/decorators/is_public.decorator';
 
 @Controller('verion')
 export class VerionController {
