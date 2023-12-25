@@ -41,7 +41,7 @@ export class PagerRequestgGateway
 
   async broadcastPagerNotification(request: PagerRequest) {
     const business_uuid = request.business_uuid;
-    const clients = this.connectedClients[business_uuid];
+    const clients = this.connectedClients[business_uuid] || [];
     for (const client of clients) {
       client.emit('new-request', {
         request_uuid: request.uuid,
@@ -53,7 +53,7 @@ export class PagerRequestgGateway
     business_uuid: string,
     request_uuid: string,
   ) {
-    const clients = this.connectedClients[business_uuid];
+    const clients = this.connectedClients[business_uuid] || [];
     for (const client of clients) {
       client.emit('cancel-request', { request_uuid });
     }
