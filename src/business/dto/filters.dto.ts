@@ -1,5 +1,12 @@
 import { IsEnum, IsOptional, IsString } from 'class-validator';
 
+export class BusinessesFiltersDTO {
+  @IsString()
+  page: number;
+
+  @IsString()
+  limit: number;
+}
 export class TablesFiltersDTO {
   @IsOptional()
   @IsString()

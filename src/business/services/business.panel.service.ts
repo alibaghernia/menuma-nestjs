@@ -29,8 +29,13 @@ import { BusinessUser } from '../entites/business_user.entity';
 import { roles } from 'src/access_control/constants';
 import { BusinessUserRole } from 'src/access_control/entities/business-user_role.entity';
 import { BusinessTable } from '../entites/business_tables.entity';
-import { PagerRequestsFiltersDTO, TablesFiltersDTO } from '../dto/filters.dto';
+import {
+  BusinessesFiltersDTO,
+  PagerRequestsFiltersDTO,
+  TablesFiltersDTO,
+} from '../dto/filters.dto';
 import { PagerRequest } from '../entites/pager_request.entity';
+import { Role } from 'src/access_control/entities/role.entity';
 
 @Injectable()
 export class BusinessPanelService {
@@ -52,10 +57,36 @@ export class BusinessPanelService {
     @Inject(REQUEST) private request: Request,
   ) {}
 
-  findAll() {
+  async findAll(filters: BusinessesFiltersDTO) {
     this.logger.log('fetch all businesses');
-    return this.businessRepository.findAll({
+    const { page, limit } = filters;
+    const businesses = await this.businessRepository.findAll({
       include: [
+        {
+          model: BusinessUser,
+          attributes: {
+            exclude: ['business_uuid', 'user_uuid', 'role'],
+          },
+          include: [
+            {
+              model: Role,
+              required: false,
+              attributes: {
+                exclude: ['business_uuid'],
+              },
+              where: {
+                uuid: roles.Business_Manager.uuid,
+              },
+              through: {
+                attributes: [],
+              },
+            },
+            {
+              model: User,
+              attributes: ['uuid', 'first_name', 'last_name'],
+            },
+          ],
+        },
         {
           model: Social,
           attributes: {
@@ -63,7 +94,15 @@ export class BusinessPanelService {
           },
         },
       ],
+      limit: page * limit,
+      offset: page * limit - limit,
     });
+    const count = await this.businessRepository.count();
+
+    return {
+      businesses,
+      total: count,
+    };
   }
 
   async findBySlugOrId(slugOrId: string) {

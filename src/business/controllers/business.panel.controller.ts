@@ -26,7 +26,11 @@ import { CheckPermissions } from 'src/access_control/decorators/check_permission
 import { business_permissions } from 'src/access_control/constants';
 import { SetBusinessManagerDTO } from '../dto/set_business_manager';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
-import { PagerRequestsFiltersDTO, TablesFiltersDTO } from '../dto/filters.dto';
+import {
+  BusinessesFiltersDTO,
+  PagerRequestsFiltersDTO,
+  TablesFiltersDTO,
+} from '../dto/filters.dto';
 
 @Controller('panel/business')
 @UseGuards(CheckPermissionsGuard)
@@ -35,8 +39,16 @@ export class BusinessPanelController {
 
   @Get()
   @CheckPermissions([business_permissions.readBusinesses.action])
-  getAll() {
-    return this.businessService.findAll();
+  async getAll(@Query() filters: BusinessesFiltersDTO) {
+    try {
+      const businesses = await this.businessService.findAll(filters);
+      return {
+        ok: true,
+        data: businesses,
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   @Get(':slugOrId')
