@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class FiltersDTO {
   @IsOptional()
@@ -16,12 +16,6 @@ export class FiltersDTO {
 }
 
 export class FetchCategoriesDTO extends FiltersDTO {
-  @IsNotEmpty()
-  page: number;
-
-  @IsNotEmpty()
-  limit: number;
-
   @IsOptional()
   @IsBoolean()
   @Transform(({ value }) => {

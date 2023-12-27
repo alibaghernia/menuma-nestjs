@@ -30,8 +30,8 @@ export class CategoryService {
     };
     const categories = await this.businessCategoryRepository.findAll({
       where,
-      limit: page * limit,
-      offset: page * limit - limit,
+      limit: !page || !limit ? undefined : page * limit,
+      offset: !page || !limit ? undefined : page * limit - limit,
       include: [
         with_items && {
           model: Product,

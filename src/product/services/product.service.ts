@@ -30,8 +30,8 @@ export class ProductService {
     };
     const products = await this.productRepository.findAll({
       where,
-      limit: page * limit,
-      offset: page * limit - limit,
+      limit: !page || !limit ? undefined : page * limit,
+      offset: !page || !limit ? undefined : page * limit - limit,
       attributes: {
         exclude: ['business_uuid'],
       },
@@ -48,9 +48,6 @@ export class ProductService {
           ],
         },
       ].filter(Boolean),
-    });
-    console.log({
-      products,
     });
     let result;
     if (with_categories) {

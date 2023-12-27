@@ -4,18 +4,23 @@ import { IsBoolean, IsOptional, IsString } from 'class-validator';
 export class FiltersDTO {
   @IsOptional()
   @IsString()
-  title: string;
+  readonly title: string;
 
   @IsString()
-  page: number;
+  readonly page: number;
 
   @IsString()
-  limit: number;
+  readonly limit: number;
 }
 
 export class FetchAllProductsDTO extends FiltersDTO {
   @IsOptional()
+  readonly page: number;
+
+  @IsOptional()
+  readonly limit: number;
+  @IsOptional()
   @IsBoolean()
   @Transform(({ value }) => value == '1' || value == 'true')
-  with_categories: boolean;
+  readonly with_categories: boolean;
 }
