@@ -2,14 +2,61 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Category } from '../entities/category.entity';
 import { CreateCategoryDTO } from '../dto';
+import { FetchCategoriesDTO } from '../dto/filters.dto';
+import { WhereOptions } from 'sequelize';
+import { Business } from 'src/business/entites/business.entity';
+import { BusinessCategory } from 'src/business/entites/business_category.entity';
+import { Product } from 'src/product/entities/product.entity';
 
 @Injectable()
 export class CategoryService {
   constructor(
     @InjectModel(Category) private categoryRepository: typeof Category,
+    @InjectModel(BusinessCategory)
+    private businessCategoryRepository: typeof BusinessCategory,
+    @InjectModel(Business) private businessRepository: typeof Business,
   ) {}
-  findAll() {
-    return this.categoryRepository.findAll({});
+  async findAll(business_slug: string, filters: FetchCategoriesDTO) {
+    const { page, limit, with_items } = filters;
+    const business = await this.businessRepository.findOne({
+      where: {
+        slug: business_slug,
+      },
+    });
+    if (!business)
+      throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
+    const where: WhereOptions<BusinessCategory> = {
+      business_uuid: business.uuid,
+    };
+    const categories = await this.businessCategoryRepository.findAll({
+      where,
+      limit: page * limit,
+      offset: page * limit - limit,
+      include: [
+        with_items && {
+          model: Product,
+          attributes: { exclude: ['business_uuid'] },
+          through: { attributes: [] },
+        },
+        { model: Category },
+      ].filter(Boolean),
+    });
+    const count = await this.businessCategoryRepository.count({
+      where,
+    });
+    const result = categories.map((cat) => {
+      const category = cat.get({
+        plain: true,
+      });
+      return {
+        ...category.category,
+        products: category.products,
+      };
+    });
+    return {
+      categories: result,
+      total: count,
+    };
   }
   findAllWithChilds() {
     return this.categoryRepository.findAll({
@@ -29,6 +76,26 @@ export class CategoryService {
         slug,
       },
     });
+  }
+  async findByUUID(uuid: string, with_items: boolean) {
+    let category = await this.businessCategoryRepository.findOne({
+      where: {
+        category_uuid: uuid,
+      },
+      include: [
+        with_items && {
+          model: Product,
+          attributes: { exclude: ['business_uuid'] },
+          through: { attributes: [] },
+        },
+        { model: Category },
+      ].filter(Boolean),
+    });
+    if (!category)
+      throw new HttpException('Category not found!', HttpStatus.NOT_FOUND);
+    category = category.get({ plain: true });
+    const result = { ...category.category, products: category.products };
+    return result;
   }
 
   create(category: CreateCategoryDTO) {
