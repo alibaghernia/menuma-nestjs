@@ -1,4 +1,5 @@
-import { IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class FiltersDTO {
   @IsOptional()
@@ -10,4 +11,11 @@ export class FiltersDTO {
 
   @IsString()
   limit: number;
+}
+
+export class FetchAllProductsDTO extends FiltersDTO {
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => value == '1' || value == 'true')
+  with_categories: boolean;
 }

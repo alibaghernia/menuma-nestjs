@@ -52,6 +52,13 @@ export class Category extends Model<Category> {
   })
   childs: Category[];
 
+  @HasMany(() => BusinessCategory, {
+    as: 'businessCategories',
+    foreignKey: 'category_uuid',
+    sourceKey: 'uuid',
+  })
+  businessCategories: BusinessCategory[];
+
   @BelongsTo(() => Category, {
     foreignKey: 'parent_uuid',
     as: 'parent',

@@ -11,6 +11,7 @@ import { Image } from 'src/database/entities/image.entity';
 import { Business } from 'src/business/entites/business.entity';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
 import { FileModule } from 'src/files/files.module';
+import { ProductService } from './services/product.service';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { FileModule } from 'src/files/files.module';
     FileModule,
     AccessControlModule,
   ],
-  providers: [ProductPanelService],
+  providers: [ProductPanelService, ProductService],
   controllers: [ProductController, ProductPanelController],
 })
 export class ProductModule {}
