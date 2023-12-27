@@ -2,9 +2,11 @@ import { Controller, Get, Param, Query, UsePipes } from '@nestjs/common';
 import { SlugCheckerController } from 'src/pipes/slug_checker_controller.pipe';
 import { FetchAllProductsDTO } from '../dto/filters.dto';
 import { ProductService } from '../services/product.service';
+import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 
 @Controller('product/:business_slug')
 @UsePipes(SlugCheckerController)
+@IsPublic()
 export class ProductController {
   constructor(private productService: ProductService) {}
 
