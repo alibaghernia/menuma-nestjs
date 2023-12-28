@@ -3,7 +3,7 @@ import { PhotographyService } from './photography.service';
 import { PhotographyController } from './photography.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { AccessControlModule } from '../access_control/access_control.module';
-import { PhotographyEntity } from "./entities/photography.entity";
+import { PhotographyEntity } from './entities/photography.entity';
 
 @Module({
   imports: [
