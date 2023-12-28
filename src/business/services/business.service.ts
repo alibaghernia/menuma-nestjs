@@ -15,6 +15,8 @@ export class BusinessService {
     private businessRepository: typeof Business,
     @InjectModel(PagerRequest)
     private pagerRequestRepository: typeof PagerRequest,
+    @InjectModel(BusinessTable)
+    private businessTableRepository: typeof BusinessTable,
     private pagerRequestGateway: PagerRequestgGateway,
   ) {}
 
@@ -53,6 +55,7 @@ export class BusinessService {
         ],
       });
       await this.pagerRequestGateway.broadcastPagerNotification(request);
+      return request;
     } catch (error) {
       throw error;
     }
@@ -68,6 +71,24 @@ export class BusinessService {
         business_uuid,
         request_uuid,
       );
+    } catch (error) {
+      throw error;
+    }
+  }
+  async getTable(business_uuid: string, table_code: string) {
+    try {
+      const table = await this.businessTableRepository.findOne({
+        where: {
+          business_uuid,
+          code: table_code,
+        },
+        attributes: {
+          exclude: ['business_uuid'],
+        },
+      });
+      if (!table)
+        throw new HttpException('Table not found!', HttpStatus.NOT_FOUND);
+      return table;
     } catch (error) {
       throw error;
     }

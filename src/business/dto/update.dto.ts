@@ -2,17 +2,16 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
-  IsNotEmpty,
   IsOptional,
   IsString,
 } from 'class-validator';
 
 export class UpdateBusinessDTO {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   readonly name: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   readonly slug: string;
 

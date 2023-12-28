@@ -124,13 +124,7 @@ export class BusinessPanelController {
         message: 'business updated successfully!',
       };
     } catch (error) {
-      console.log({
-        error,
-      });
-      throw new HttpException(
-        'An error occurred while updating business!',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw error;
     }
   }
 
