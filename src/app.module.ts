@@ -11,6 +11,7 @@ import { AccessControlModule } from './access_control/access_control.module';
 import { QrCodeModule } from './qr-code/qr-code.module';
 import { VerionController } from './verion/verion.controller';
 import { FileModule } from './files/files.module';
+import { EventModule } from './event/event.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { FileModule } from './files/files.module';
     AccessControlModule,
     QrCodeModule,
     FileModule,
+    EventModule,
   ],
   controllers: [VerionController],
 })
