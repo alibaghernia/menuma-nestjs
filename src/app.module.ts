@@ -12,6 +12,7 @@ import { QrCodeModule } from './qr-code/qr-code.module';
 import { VerionController } from './verion/verion.controller';
 import { FileModule } from './files/files.module';
 import { EventModule } from './event/event.module';
+import { PhotographyModule } from './photography/photography.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { EventModule } from './event/event.module';
     QrCodeModule,
     FileModule,
     EventModule,
+    PhotographyModule,
   ],
   controllers: [VerionController],
 })
