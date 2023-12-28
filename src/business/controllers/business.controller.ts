@@ -18,6 +18,19 @@ import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 export class BusinessController {
   constructor(private businessService: BusinessService) {}
 
+  @Get()
+  async getPublicBusinesses() {
+    try {
+      const businesses = await this.businessService.getPublicBusinesses();
+      return {
+        ok: true,
+        data: businesses,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get(':business_slug')
   async getBySlug(@Param('business_slug') business_slug: string) {
     try {
