@@ -7,6 +7,7 @@ import { WhereOptions } from 'sequelize';
 import { Business } from 'src/business/entites/business.entity';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { File } from 'src/files/entities/file.entity';
 
 @Injectable()
 export class CategoryService {
@@ -37,6 +38,12 @@ export class CategoryService {
           model: Product,
           attributes: { exclude: ['business_uuid'] },
           through: { attributes: [] },
+          include: [
+            {
+              model: File,
+              through: { attributes: [] },
+            },
+          ],
         },
         { model: Category },
       ].filter(Boolean),
@@ -50,7 +57,11 @@ export class CategoryService {
       });
       return {
         ...category.category,
-        products: category.products,
+        products: category.products.map((product) => ({
+          ...product,
+          category_uuid: category.category.uuid,
+          images: product.images.map((img) => img.uuid),
+        })),
       };
     });
     return {

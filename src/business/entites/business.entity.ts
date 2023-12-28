@@ -80,6 +80,9 @@ export class Business extends Model<Business> {
   @Column({ type: DataType.STRING })
   banner: string;
 
+  @Column({ type: DataType.BOOLEAN })
+  pager: boolean;
+
   @BelongsToMany(() => User, {
     through: () => BusinessUser,
     as: 'users',

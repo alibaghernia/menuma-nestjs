@@ -71,6 +71,10 @@ export class UpdateBusinessDTO {
   @IsOptional()
   @IsString()
   readonly banner?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  readonly pager?: boolean;
 }
 
 export class UpdateTableDTO {

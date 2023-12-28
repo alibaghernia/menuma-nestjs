@@ -6,6 +6,7 @@ import { BusinessCategory } from 'src/business/entites/business_category.entity'
 import { Business } from 'src/business/entites/business.entity';
 import { FetchAllProductsDTO } from '../dto/filters.dto';
 import { Category } from 'src/category/entities/category.entity';
+import { File } from 'src/files/entities/file.entity';
 
 @Injectable()
 export class ProductService {
@@ -94,6 +95,10 @@ export class ProductService {
               },
             ],
           },
+          {
+            model: File,
+            through: { attributes: [] },
+          },
         ].filter(Boolean),
       })
     )?.get({ plain: true });
@@ -106,7 +111,12 @@ export class ProductService {
         categories: product.businessCategories.map((bCat) => bCat.category),
       };
       delete result.businessCategories;
+    } else {
+      result = product;
     }
+    // reform images
+    result.images = result.images.map((img) => img.uuid);
+
     return result || product;
   }
 

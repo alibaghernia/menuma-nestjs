@@ -51,6 +51,9 @@ module.exports = {
         banner: {
           type: DataTypes.STRING,
         },
+        pager: {
+          type: DataTypes.BOOLEAN,
+        },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
         deleted_at: DataTypes.DATE,

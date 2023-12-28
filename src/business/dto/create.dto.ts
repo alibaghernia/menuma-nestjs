@@ -78,6 +78,10 @@ export class CreateBusinessDTO {
   readonly banner?: string;
 
   @IsOptional()
+  @IsBoolean()
+  readonly pager?: boolean;
+
+  @IsOptional()
   @IsUUID()
   readonly manager: string;
 }
