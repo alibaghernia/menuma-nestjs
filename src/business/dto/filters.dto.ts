@@ -18,6 +18,19 @@ export class TablesFiltersDTO {
   @IsString()
   limit: number;
 }
+
+export class HallsFiltersDTO {
+  @IsOptional()
+  @IsString()
+  code: string;
+
+  @IsString()
+  page: number;
+
+  @IsString()
+  limit: number;
+}
+
 export class PagerRequestsFiltersDTO {
   @IsOptional()
   @IsString()

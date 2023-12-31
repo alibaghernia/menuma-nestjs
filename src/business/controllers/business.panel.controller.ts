@@ -12,11 +12,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { BusinessPanelService } from '../services/business.panel.service';
-import { CreateBusinessDTO, CreateTableDTO } from '../dto';
+import { CreateBusinessDTO, CreateHallDTO, CreateTableDTO } from '../dto';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { Role } from 'src/auth/misc/role.enum';
 import {
   UpdateBusinessDTO,
+  UpdateHallDTO,
   UpdatePagerRequestDTO,
   UpdateTableDTO,
 } from '../dto/update.dto';
@@ -28,6 +29,7 @@ import { SetBusinessManagerDTO } from '../dto/set_business_manager';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
 import {
   BusinessesFiltersDTO,
+  HallsFiltersDTO,
   PagerRequestsFiltersDTO,
   TablesFiltersDTO,
 } from '../dto/filters.dto';
@@ -259,6 +261,79 @@ export class BusinessPanelController {
       return {
         ok: true,
         message: 'Business table updated successfully!',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get(':business_uuid/halls')
+  @CheckPermissions([business_permissions.manageBusinessHalls.action])
+  async getHalls(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Query() filters: HallsFiltersDTO,
+  ) {
+    try {
+      const halls = await this.businessService.getHalls(business_uuid, filters);
+      return {
+        ok: true,
+        data: halls,
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post(':business_uuid/halls')
+  @CheckPermissions([business_permissions.manageBusinessHalls.action])
+  async createHall(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Body() payload: CreateHallDTO,
+  ) {
+    try {
+      await this.businessService.createHall(business_uuid, payload);
+      return {
+        ok: true,
+        message: 'Business hall added successfully!',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Delete(':business_uuid/halls/:hall_uuid')
+  @CheckPermissions([business_permissions.manageBusinessHalls.action])
+  async removeHall(
+    @Param('hall_uuid', new UUIDChecker('Hall UUID'))
+    hall_uuid: string,
+  ) {
+    try {
+      await this.businessService.removeHall(hall_uuid);
+      return {
+        ok: true,
+        message: 'Business hall removed successfully!',
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Put(':business_uuid/halls/:hall_uuid')
+  @CheckPermissions([business_permissions.manageBusinessHalls.action])
+  async updateHall(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Param('hall_uuid', new UUIDChecker('Hall UUID'))
+    hall_uuid: string,
+    @Body() payload: UpdateHallDTO,
+  ) {
+    try {
+      await this.businessService.updateHall(business_uuid, hall_uuid, payload);
+      return {
+        ok: true,
+        message: 'Business hall updated successfully!',
       };
     } catch (error) {
       throw error;

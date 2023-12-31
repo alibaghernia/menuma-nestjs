@@ -2,6 +2,8 @@ import {
   IsArray,
   IsBoolean,
   IsEnum,
+  IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -80,6 +82,20 @@ export class UpdateTableDTO {
   @IsOptional()
   @IsString()
   code: string;
+}
+
+export class UpdateHallDTO {
+  @IsNotEmpty()
+  @IsString()
+  code: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  limit: number;
+
+  @IsOptional()
+  @IsString()
+  description: string;
 }
 
 export class UpdatePagerRequestDTO {
