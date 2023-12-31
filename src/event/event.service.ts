@@ -6,6 +6,7 @@ import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { doInTransaction } from '../transaction';
 import { CreateEventDTO } from './dto/create.dto';
+import { Order, WhereOptions } from 'sequelize/types/model';
 
 @Injectable()
 export class EventService {
@@ -39,7 +40,12 @@ export class EventService {
   async getById(uuid: string) {
     return this.eventRepository.findOne({ where: { uuid } });
   }
-  async getAll() {
-    return this.eventRepository.findAll();
+  async getAll(
+    skip: number,
+    limit: number,
+    where: WhereOptions<Event>,
+    order: Order,
+  ) {
+    return this.eventRepository.findAll({ offset: skip, limit, where, order });
   }
 }
