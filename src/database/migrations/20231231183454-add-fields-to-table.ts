@@ -4,7 +4,7 @@ import { DataTypes } from 'sequelize';
 import { DataType } from 'sequelize-typescript';
 
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface) => {
     await queryInterface.addColumn('business-tables', 'hall_uuid', {
       type: DataTypes.UUID,
       reference: {
