@@ -20,6 +20,13 @@ export class BusinessService {
     private pagerRequestGateway: PagerRequestgGateway,
   ) {}
 
+  async getPublicBusinesses() {
+    const businesses = await this.businessRepository.findAll({
+      where: { public: true },
+    });
+    return businesses;
+  }
+
   async findBySlug(slug: string) {
     const business = await this.businessRepository.findOne({
       where: {
