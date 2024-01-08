@@ -1,22 +1,18 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
-  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
 import { Business } from './business.entity';
-import { PagerRequest } from './pager_request.entity';
-import { Hall } from './hall.entity';
 
 @Table({
-  tableName: 'business-tables',
+  tableName: 'business-halls',
   timestamps: true,
   underscored: true,
 })
-export class BusinessTable extends Model<BusinessTable> {
+export class Hall extends Model<Hall> {
   @Column({
     primaryKey: true,
     type: DataType.UUID,
@@ -37,20 +33,6 @@ export class BusinessTable extends Model<BusinessTable> {
   })
   code: string;
 
-  @BelongsTo(() => Business, {
-    as: 'business',
-    foreignKey: 'business_uuid',
-    targetKey: 'uuid',
-  })
-  business: Business;
-
-  @HasMany(() => PagerRequest, {
-    as: 'pagerRequests',
-    foreignKey: 'table_uuid',
-    sourceKey: 'uuid',
-  })
-  pagerRequests: PagerRequest[];
-
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -62,11 +44,4 @@ export class BusinessTable extends Model<BusinessTable> {
     allowNull: true,
   })
   description: string;
-
-  @ForeignKey(() => Hall)
-  @Column({
-    type: DataType.UUID,
-    allowNull: false,
-  })
-  hall_uuid: string;
 }

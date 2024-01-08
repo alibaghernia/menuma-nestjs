@@ -3,11 +3,12 @@ import {
   IsArray,
   IsBoolean,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
+  isString,
   IsUUID,
   ValidateNested,
-  isString,
 } from 'class-validator';
 
 export class CreateBusinessDTO {
@@ -89,6 +90,19 @@ export class CreateBusinessDTO {
 export class CreateTableDTO {
   @IsString()
   code: string;
+}
+export class CreateHallDTO {
+  @IsNotEmpty()
+  @IsString()
+  code: string;
+
+  @IsNotEmpty()
+  @IsNumber()
+  limit: number;
+
+  @IsOptional()
+  @IsString()
+  description: string;
 }
 
 export class NewPagerRequestDTO {

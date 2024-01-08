@@ -46,6 +46,11 @@ export const business_permissions = {
     title: 'Manage Business Tables',
     action: 'manage-business-tables',
   },
+  manageBusinessHalls: {
+    uuid: '5cd2147c-1e1b-450b-96dc-514f17b897e6',
+    title: 'Manage Business Halls',
+    action: 'manage-business-halls',
+  },
   updateBusinessInfo: {
     uuid: '6ccd3769-75e3-4a4e-8abb-a03a7121df90',
     title: 'Update Business Info',

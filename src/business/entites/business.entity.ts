@@ -13,22 +13,23 @@ import { BusinessCategory } from './business_category.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { Product } from 'src/product/entities/product.entity';
 import {
+  BelongsToManyAddAssociationMixin,
+  BelongsToManyCreateAssociationMixin,
+  BelongsToManyHasAssociationMixin,
+  BelongsToManyHasAssociationsMixin,
+  BelongsToManyRemoveAssociationMixin,
   HasManyAddAssociationMixin,
-  HasManyRemoveAssociationMixin,
   HasManyCountAssociationsMixin,
   HasManyCreateAssociationMixin,
   HasManyHasAssociationMixin,
-  BelongsToManyCreateAssociationMixin,
-  BelongsToManyAddAssociationMixin,
-  BelongsToManyHasAssociationMixin,
-  BelongsToManyRemoveAssociationMixin,
-  BelongsToManyHasAssociationsMixin,
+  HasManyRemoveAssociationMixin,
   WhereOptions,
 } from 'sequelize';
 import { Role } from 'src/access_control/entities/role.entity';
 import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
 import { BusinessTable } from './business_tables.entity';
 import { PagerRequest } from './pager_request.entity';
+import { Hall } from './hall.entity';
 
 @Table({
   underscored: true,
@@ -191,6 +192,15 @@ export class Business extends Model<Business> {
       },
     });
     return !!table;
+  }
+  async hasHall(where: WhereOptions<BusinessTable>) {
+    const hall = await Hall.count({
+      where: {
+        business_uuid: this.uuid,
+        ...where,
+      },
+    });
+    return !!hall;
   }
   createTable: HasManyCreateAssociationMixin<BusinessTable>;
   removeTable: HasManyRemoveAssociationMixin<

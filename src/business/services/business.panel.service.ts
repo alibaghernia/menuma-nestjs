@@ -10,17 +10,18 @@ import { Business } from '../entites/business.entity';
 import {
   FindOptions,
   HasManyAddAssociationsMixinOptions,
+  Op,
   WhereOptions,
 } from 'sequelize';
-import { CreateBusinessDTO, CreateTableDTO } from '../dto';
+import { CreateBusinessDTO, CreateHallDTO, CreateTableDTO } from '../dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
 import {
   UpdateBusinessDTO,
+  UpdateHallDTO,
   UpdatePagerRequestDTO,
   UpdateTableDTO,
 } from '../dto/update.dto';
-import { Op } from 'sequelize';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { User } from 'src/users/entites/user.entity';
@@ -31,11 +32,13 @@ import { BusinessUserRole } from 'src/access_control/entities/business-user_role
 import { BusinessTable } from '../entites/business_tables.entity';
 import {
   BusinessesFiltersDTO,
+  HallsFiltersDTO,
   PagerRequestsFiltersDTO,
   TablesFiltersDTO,
 } from '../dto/filters.dto';
 import { PagerRequest } from '../entites/pager_request.entity';
 import { Role } from 'src/access_control/entities/role.entity';
+import { Hall } from '../entites/hall.entity';
 
 @Injectable()
 export class BusinessPanelService {
@@ -51,6 +54,8 @@ export class BusinessPanelService {
     private businessUserRepository: typeof BusinessUser,
     @InjectModel(BusinessTable)
     private businessTableRepository: typeof BusinessTable,
+    @InjectModel(Hall)
+    private HallRepository: typeof Hall,
     @InjectModel(PagerRequest)
     private pagerRequestRepository: typeof PagerRequest,
     private sequelize: Sequelize,
@@ -455,6 +460,119 @@ export class BusinessPanelService {
       await this.businessTableRepository.update(payload, {
         where: {
           uuid: table_uuid,
+        },
+        transaction,
+      });
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  async getHalls(business_uuid: string, filters: HallsFiltersDTO) {
+    const { page, limit, ...whereFilters } = filters;
+
+    const halls = await this.HallRepository.findAll({
+      where: {
+        business_uuid,
+        ...whereFilters,
+      },
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+      limit: page * limit,
+      offset: page * limit - limit,
+    });
+    const count = await this.HallRepository.count({
+      where: {
+        business_uuid,
+      },
+    });
+    return {
+      halls,
+      total: count,
+    };
+  }
+  async createHall(business_uuid: string, payload: CreateHallDTO) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      const business = await this.businessRepository.findOne({
+        where: {
+          uuid: business_uuid,
+        },
+      });
+      if (!business)
+        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
+      if (await business.hasHall({ code: payload.code }))
+        throw new HttpException(
+          {
+            ok: false,
+            code: 401,
+            message: 'Hall is already exists!',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      await this.HallRepository.create(
+        { ...payload },
+        {
+          transaction,
+        },
+      );
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  async removeHall(hall_uuid: string) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      await this.HallRepository.destroy({
+        where: {
+          uuid: hall_uuid,
+        },
+      });
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
+  }
+
+  async updateHall(
+    business_uuid: string,
+    hall_uuid: string,
+    payload: UpdateHallDTO,
+  ) {
+    const transaction = await this.sequelize.transaction();
+    try {
+      if (
+        await this.HallRepository.count({
+          where: {
+            business_uuid,
+            code: payload.code,
+            [Op.not]: {
+              uuid: hall_uuid,
+            },
+          },
+        })
+      )
+        throw new HttpException(
+          {
+            ok: false,
+            code: 401,
+            message: 'Hall is already exists!',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      await this.HallRepository.update(payload, {
+        where: {
+          uuid: hall_uuid,
         },
         transaction,
       });
