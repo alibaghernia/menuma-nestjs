@@ -23,6 +23,7 @@ import { BusinessTable } from 'src/business/entites/business_tables.entity';
 import { PagerRequest } from 'src/business/entites/pager_request.entity';
 import { Event } from '../event/entities/event.entity';
 import { EventImage } from '../event/entities/event_image.entity';
+import { PhotographyEntity } from '../photography/entities/photography.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -57,6 +58,7 @@ const config: SequelizeModuleOptions = {
     PagerRequest,
     Event,
     EventImage,
+    PhotographyEntity,
   ],
 };
 
