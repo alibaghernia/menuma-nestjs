@@ -3,8 +3,6 @@ import {
   Controller,
   Delete,
   Get,
-  HttpException,
-  HttpStatus,
   Param,
   Post,
   Put,
@@ -42,15 +40,11 @@ export class BusinessPanelController {
   @Get()
   @CheckPermissions([business_permissions.readBusinesses.action])
   async getAll(@Query() filters: BusinessesFiltersDTO) {
-    try {
-      const businesses = await this.businessService.findAll(filters);
-      return {
-        ok: true,
-        data: businesses,
-      };
-    } catch (error) {
-      throw error;
-    }
+    const businesses = await this.businessService.findAll(filters);
+    return {
+      ok: true,
+      data: businesses,
+    };
   }
 
   @Get(':slugOrId')
@@ -59,38 +53,24 @@ export class BusinessPanelController {
     @Param('slugOrId', new NotEmptyPipe('Business Slug Or UUID'))
     slugOrId: string,
   ) {
-    try {
-      const business = await this.businessService.findBySlugOrId(slugOrId);
-      return {
-        ok: true,
-        data: business,
-      };
-    } catch (error) {
-      throw error;
-    }
+    const business = await this.businessService.findBySlugOrId(slugOrId);
+    return {
+      ok: true,
+      data: business,
+    };
   }
 
   @Post('/create')
   @CheckPermissions([business_permissions.createBusiness.action])
   @Roles(Role.Admin)
   async create(@Body() body: CreateBusinessDTO) {
-    try {
-      const business = await this.businessService.create(
-        body as unknown as Required<CreateBusinessDTO>,
-      );
-      return {
-        ok: true,
-        message: `${business.name} crearted successfully!`,
-      };
-    } catch (error) {
-      console.log({
-        error,
-      });
-      throw new HttpException(
-        'Business creation error!',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
+    const business = await this.businessService.create(
+      body as unknown as Required<CreateBusinessDTO>,
+    );
+    return {
+      ok: true,
+      message: `${business.name} crearted successfully!`,
+    };
   }
 
   @Delete(':business_uuid')
@@ -99,18 +79,11 @@ export class BusinessPanelController {
   async remove(
     @Param('business_uuid', new UUIDChecker('Business UUID')) uuid: string,
   ) {
-    try {
-      await this.businessService.remove(uuid);
-      return {
-        ok: true,
-        message: 'Business deleted successfully!',
-      };
-    } catch (error) {
-      throw new HttpException(
-        'An error occurred while deleting business',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    await this.businessService.remove(uuid);
+    return {
+      ok: true,
+      message: 'Business deleted successfully!',
+    };
   }
 
   @Put(':business_uuid')
@@ -119,15 +92,11 @@ export class BusinessPanelController {
     @Param('business_uuid', new UUIDChecker('Business UUID')) uuid: string,
     @Body() payload: UpdateBusinessDTO,
   ) {
-    try {
-      await this.businessService.update(uuid, payload);
-      return {
-        ok: true,
-        message: 'business updated successfully!',
-      };
-    } catch (error) {
-      throw error;
-    }
+    await this.businessService.update(uuid, payload);
+    return {
+      ok: true,
+      message: 'business updated successfully!',
+    };
   }
 
   @Post(':business_uuid/add_user/:user_uuid')
@@ -136,15 +105,11 @@ export class BusinessPanelController {
     @Param('business_uuid', new UUIDChecker('Business UUID')) id: string,
     @Param('user_uuid', new UUIDChecker('User UUID')) user_uuid: string,
   ) {
-    try {
-      await this.businessService.addUser(id, user_uuid);
-      return {
-        ok: true,
-        message: 'User added to business successfully!',
-      };
-    } catch (error) {
-      throw error;
-    }
+    await this.businessService.addUser(id, user_uuid);
+    return {
+      ok: true,
+      message: 'User added to business successfully!',
+    };
   }
 
   @Post(':business_uuid/set-manager')
@@ -154,15 +119,11 @@ export class BusinessPanelController {
     business_uuid: string,
     @Body() payload: SetBusinessManagerDTO,
   ) {
-    try {
-      await this.businessService.setBusinessManager(business_uuid, payload);
-      return {
-        ok: true,
-        message: 'Business manager updated successfully!',
-      };
-    } catch (error) {
-      throw error;
-    }
+    await this.businessService.setBusinessManager(business_uuid, payload);
+    return {
+      ok: true,
+      message: 'Business manager updated successfully!',
+    };
   }
 
   @Get(':business_uuid/tables/:table_uuid')
@@ -173,18 +134,14 @@ export class BusinessPanelController {
     @Param('table_uuid', new UUIDChecker('Table UUID'))
     table_uuid: string,
   ) {
-    try {
-      const table = await this.businessService.getTable(
-        business_uuid,
-        table_uuid,
-      );
-      return {
-        ok: true,
-        data: table,
-      };
-    } catch (error) {
-      throw error;
-    }
+    const table = await this.businessService.getTable(
+      business_uuid,
+      table_uuid,
+    );
+    return {
+      ok: true,
+      data: table,
+    };
   }
 
   @Get(':business_uuid/tables')
@@ -194,18 +151,11 @@ export class BusinessPanelController {
     business_uuid: string,
     @Query() filters: TablesFiltersDTO,
   ) {
-    try {
-      const tables = await this.businessService.getTables(
-        business_uuid,
-        filters,
-      );
-      return {
-        ok: true,
-        data: tables,
-      };
-    } catch (error) {
-      throw error;
-    }
+    const tables = await this.businessService.getTables(business_uuid, filters);
+    return {
+      ok: true,
+      data: tables,
+    };
   }
 
   @Post(':business_uuid/tables')
@@ -215,15 +165,11 @@ export class BusinessPanelController {
     business_uuid: string,
     @Body() payload: CreateTableDTO,
   ) {
-    try {
-      await this.businessService.createTable(business_uuid, payload);
-      return {
-        ok: true,
-        message: 'Business table added successfully!',
-      };
-    } catch (error) {
-      throw error;
-    }
+    await this.businessService.createTable(business_uuid, payload);
+    return {
+      ok: true,
+      message: 'Business table added successfully!',
+    };
   }
 
   @Delete(':business_uuid/tables/:table_uuid')
@@ -232,15 +178,11 @@ export class BusinessPanelController {
     @Param('table_uuid', new UUIDChecker('Table UUID'))
     table_uuid: string,
   ) {
-    try {
-      await this.businessService.removeTable(table_uuid);
-      return {
-        ok: true,
-        message: 'Business table removed successfully!',
-      };
-    } catch (error) {
-      throw error;
-    }
+    await this.businessService.removeTable(table_uuid);
+    return {
+      ok: true,
+      message: 'Business table removed successfully!',
+    };
   }
 
   @Put(':business_uuid/tables/:table_uuid')
@@ -252,19 +194,11 @@ export class BusinessPanelController {
     table_uuid: string,
     @Body() payload: UpdateTableDTO,
   ) {
-    try {
-      await this.businessService.updateTable(
-        business_uuid,
-        table_uuid,
-        payload,
-      );
-      return {
-        ok: true,
-        message: 'Business table updated successfully!',
-      };
-    } catch (error) {
-      throw error;
-    }
+    await this.businessService.updateTable(business_uuid, table_uuid, payload);
+    return {
+      ok: true,
+      message: 'Business table updated successfully!',
+    };
   }
 
   @Get(':business_uuid/halls')
@@ -274,15 +208,11 @@ export class BusinessPanelController {
     business_uuid: string,
     @Query() filters: HallsFiltersDTO,
   ) {
-    try {
-      const halls = await this.businessService.getHalls(business_uuid, filters);
-      return {
-        ok: true,
-        data: halls,
-      };
-    } catch (error) {
-      throw error;
-    }
+    const halls = await this.businessService.getHalls(business_uuid, filters);
+    return {
+      ok: true,
+      data: halls,
+    };
   }
 
   @Post(':business_uuid/halls')
@@ -292,15 +222,11 @@ export class BusinessPanelController {
     business_uuid: string,
     @Body() payload: CreateHallDTO,
   ) {
-    try {
-      await this.businessService.createHall(business_uuid, payload);
-      return {
-        ok: true,
-        message: 'Business hall added successfully!',
-      };
-    } catch (error) {
-      throw error;
-    }
+    await this.businessService.createHall(business_uuid, payload);
+    return {
+      ok: true,
+      message: 'Business hall added successfully!',
+    };
   }
 
   @Delete(':business_uuid/halls/:hall_uuid')
@@ -309,15 +235,11 @@ export class BusinessPanelController {
     @Param('hall_uuid', new UUIDChecker('Hall UUID'))
     hall_uuid: string,
   ) {
-    try {
-      await this.businessService.removeHall(hall_uuid);
-      return {
-        ok: true,
-        message: 'Business hall removed successfully!',
-      };
-    } catch (error) {
-      throw error;
-    }
+    await this.businessService.removeHall(hall_uuid);
+    return {
+      ok: true,
+      message: 'Business hall removed successfully!',
+    };
   }
 
   @Put(':business_uuid/halls/:hall_uuid')
@@ -329,15 +251,11 @@ export class BusinessPanelController {
     hall_uuid: string,
     @Body() payload: UpdateHallDTO,
   ) {
-    try {
-      await this.businessService.updateHall(business_uuid, hall_uuid, payload);
-      return {
-        ok: true,
-        message: 'Business hall updated successfully!',
-      };
-    } catch (error) {
-      throw error;
-    }
+    await this.businessService.updateHall(business_uuid, hall_uuid, payload);
+    return {
+      ok: true,
+      message: 'Business hall updated successfully!',
+    };
   }
 
   @Get(':business_uuid/pager-requests')
