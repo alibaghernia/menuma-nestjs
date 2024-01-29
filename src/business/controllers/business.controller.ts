@@ -20,29 +20,20 @@ export class BusinessController {
 
   @Get()
   async getPublicBusinesses() {
-    try {
-      const businesses = await this.businessService.getPublicBusinesses();
-      return {
-        ok: true,
-        data: businesses,
-      };
-    } catch (error) {
-      throw error;
-    }
+    const businesses = await this.businessService.getPublicBusinesses();
+    return {
+      ok: true,
+      data: businesses,
+    };
   }
 
   @Get(':business_slug')
   async getBySlug(@Param('business_slug') business_slug: string) {
-    try {
-      const business = await this.businessService.findBySlug(business_slug);
-
-      return {
-        ok: true,
-        data: business,
-      };
-    } catch (error) {
-      throw error;
-    }
+    const business = await this.businessService.findBySlug(business_slug);
+    return {
+      ok: true,
+      data: business,
+    };
   }
   @Post(':business_uuid/pager-request')
   async pagerRequest(
@@ -78,17 +69,13 @@ export class BusinessController {
     @Param('business_uuid') business_uuid: string,
     @Param('table_code') table_code: string,
   ) {
-    try {
-      const table = await this.businessService.getTable(
-        business_uuid,
-        table_code,
-      );
-      return {
-        ok: true,
-        data: table,
-      };
-    } catch (error) {
-      throw error;
-    }
+    const table = await this.businessService.getTable(
+      business_uuid,
+      table_code,
+    );
+    return {
+      ok: true,
+      data: table,
+    };
   }
 }
