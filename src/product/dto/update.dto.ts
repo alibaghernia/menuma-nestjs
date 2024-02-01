@@ -8,8 +8,8 @@ import {
   // ValidateIf,
   ValidateNested,
 } from 'class-validator';
-import { ProductMetadata, ProductPrice } from '../entities/product.entity';
-import { Metadata, Price, Tag } from './create.dto';
+import { ProductPrice } from '../entities/product.entity';
+import { Price } from './create.dto';
 
 export class UpdateProductDTO {
   @IsOptional()
@@ -26,9 +26,11 @@ export class UpdateProductDTO {
 
   @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Metadata)
-  metadata: ProductMetadata[];
+  @IsString({ each: true })
+  // @ValidateNested({ each: true })
+  // @Type(() => Metadata)
+  // metadata: ProductMetadata[];
+  metadata: string[];
 
   @IsOptional()
   @IsArray()
@@ -38,14 +40,15 @@ export class UpdateProductDTO {
   prices: ProductPrice[];
 
   @IsOptional()
-  @IsString({ each: true })
-  categories: string[];
+  // @IsString({ each: true })
+  @IsString()
+  categories: string;
 
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Tag)
-  tags: Tag[];
+  // @IsOptional()
+  // @IsArray()
+  // @ValidateNested({ each: true })
+  // @Type(() => Tag)
+  // tags: Tag[];
 }
 
 // class Category {

@@ -6,57 +6,70 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
 } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDTO } from './dto/create.dto';
 import { UUIDChecker } from '../pipes/uuid_checker.pipe';
 import { IsPublic } from '../auth/decorators/is_public.decorator';
-import { toSequelizeFilter } from '../filter';
-import * as qs from 'qs';
-import { getFullUrlFromReq } from '../getFullUrlFromReq';
 import { Request } from 'express';
-import { toSequelizeOrder } from '../order';
+import { FiltersDTO } from './dto/filters.dto';
 
 @Controller('event')
 export class EventController {
   constructor(private eventService: EventService) {}
 
   @Post()
-  create(@Body() body: CreateEventDTO) {
-    return this.eventService.create(body);
+  async create(@Body() body: CreateEventDTO) {
+    await this.eventService.create(body);
+    return {
+      ok: true,
+      message: 'Event created successfully!',
+    };
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id', new UUIDChecker('Event UUID')) uuid: string,
     @Body() body: CreateEventDTO,
   ) {
-    return this.eventService.update(uuid, body);
+    await this.eventService.update(uuid, body);
+    return {
+      ok: true,
+      message: 'Event updated successfully!',
+    };
   }
 
   @Delete(':id')
-  delete(@Param('id', new UUIDChecker('Event UUID')) uuid: string) {
-    return this.eventService.delete(uuid);
+  async delete(@Param('id', new UUIDChecker('Event UUID')) uuid: string) {
+    await this.eventService.delete(uuid);
+    return {
+      ok: true,
+      message: 'Event deleted successfully!',
+    };
   }
 
   @Get(':id')
   @IsPublic()
-  getById(@Param('id', new UUIDChecker('Event UUID')) uuid: string) {
-    return this.eventService.getById(uuid);
+  async getById(@Param('id', new UUIDChecker('Event UUID')) uuid: string) {
+    const event = await this.eventService.getById(uuid);
+    return {
+      ok: true,
+      data: event,
+    };
   }
 
   @Get()
   @IsPublic()
-  getAll(@Req() req: Request) {
-    const { skip, limit, where, order } = qs.parse(
-      getFullUrlFromReq(req).search.replace('?', ''),
-    );
-    return this.eventService.getAll(
-      Number(skip ?? '0'),
-      Number(limit ?? '20'),
-      toSequelizeFilter(where ?? {}),
-      toSequelizeOrder(order ?? []),
-    );
+  async getAll(@Req() req: Request, @Query() queryParams: FiltersDTO) {
+    const [events, total] = await this.eventService.getAll(queryParams);
+    return {
+      ok: true,
+      data: {
+        events,
+        total,
+      },
+    };
   }
 }

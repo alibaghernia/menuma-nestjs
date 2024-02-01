@@ -6,7 +6,8 @@ import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
 import { doInTransaction } from '../transaction';
 import { CreateEventDTO } from './dto/create.dto';
-import { Order, WhereOptions } from 'sequelize/types/model';
+import { FiltersDTO } from './dto/filters.dto';
+import * as _ from 'lodash';
 
 @Injectable()
 export class EventService {
@@ -40,12 +41,23 @@ export class EventService {
   async getById(uuid: string) {
     return this.eventRepository.findOne({ where: { uuid } });
   }
-  async getAll(
-    skip: number,
-    limit: number,
-    where: WhereOptions<Event>,
-    order: Order,
-  ) {
-    return this.eventRepository.findAll({ offset: skip, limit, where, order });
+  async getAll(filters: FiltersDTO) {
+    const where = _.omitBy(
+      {
+        name: filters.name,
+      },
+      _.isUndefined,
+    );
+    const events = await this.eventRepository.findAll({
+      offset: filters.page ? filters.page * filters.limit : undefined,
+      limit: filters.page
+        ? filters.page * filters.limit + filters.limit
+        : undefined,
+      where,
+    });
+    const total = await this.eventRepository.count({
+      where,
+    });
+    return [events, total];
   }
 }

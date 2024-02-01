@@ -61,8 +61,10 @@ export class Product extends Model<Product> {
 
   @Column({
     type: DataType.JSON,
+    allowNull: true,
   })
-  metadata: ProductMetadata[];
+  metadata: string[];
+  // metadata: ProductMetadata[];
 
   @Column({
     type: DataType.JSON,

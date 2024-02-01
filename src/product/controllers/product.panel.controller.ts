@@ -156,40 +156,4 @@ export class ProductPanelController {
       throw error;
     }
   }
-
-  // @Post(':uuid/upload-photos')
-  // @UseInterceptors(FilesInterceptor('photos'))
-  // async uploadPhotos(
-  //   @UploadedFiles(
-  //     new ParseFilePipe({
-  //       validators: [
-  //         new ProductPhotoTypeValidator({
-  //           fileType: /image\/jpeg|image\/png|image\/jpg/,
-  //         }),
-  //         new ProductPhotoSizeValidator({ maxSize: 1024 * 1024 * 2 }),
-  //       ],
-  //     }),
-  //   )
-  //   photos: Express.Multer.File[],
-  //   @Param('business_uuid', new UUIDChecker('Business UUID'))
-  //   business_uuid: string,
-  //   @Param('uuid', new UUIDChecker('Product UUID')) product_uuid: string,
-  //   @Body('current_items') current_items: string[],
-  // ) {
-  //   try {
-  //     await this.productService.savePhotos(
-  //       business_uuid,
-  //       product_uuid,
-  //       photos,
-  //       (typeof current_items == 'string' ? [current_items] : current_items) ||
-  //         [],
-  //     );
-  //     return {
-  //       ok: true,
-  //       message: 'Store photos was successfully!',
-  //     };
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
 }

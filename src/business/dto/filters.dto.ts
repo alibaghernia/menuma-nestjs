@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class BusinessesFiltersDTO {
   @IsString()
@@ -37,8 +37,9 @@ export class PagerRequestsFiltersDTO {
   table: string;
 
   @IsOptional()
-  @IsEnum({ todo: 'TODO', doing: 'DOING', done: 'DONE' })
-  status: 'TODO' | 'DOING' | 'DONE';
+  @IsArray()
+  @IsEnum({ todo: 'TODO', doing: 'DOING', done: 'DONE' }, { each: true })
+  status: ('TODO' | 'DOING' | 'DONE')[];
 
   @IsOptional()
   @IsString()

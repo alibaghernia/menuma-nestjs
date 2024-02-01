@@ -10,7 +10,10 @@ import {
   // ValidateIf,
   ValidateNested,
 } from 'class-validator';
-import { ProductMetadata, ProductPrice } from '../entities/product.entity';
+import {
+  // ProductMetadata,
+  ProductPrice,
+} from '../entities/product.entity';
 
 export class CreateProductDTO {
   @IsNotEmpty()
@@ -21,10 +24,13 @@ export class CreateProductDTO {
   @IsString()
   description: string;
 
+  @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Metadata)
-  metadata: ProductMetadata[];
+  // @ValidateNested({ each: true })
+  // @Type(() => Metadata)
+  @IsString({ each: true })
+  metadata: string[];
+  // metadata: ProductMetadata[];
 
   @IsOptional()
   @IsString()
@@ -36,25 +42,26 @@ export class CreateProductDTO {
   @Type(() => Price)
   prices: ProductPrice[];
 
-  @IsArray()
-  @IsString({ each: true })
-  categories: string[];
-
-  @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => Tag)
-  tags: Tag[];
-}
-
-export class Metadata {
-  @IsNotEmpty()
+  // @IsArray()
+  // @IsString({ each: true })
   @IsString()
-  title: string;
+  categories: string;
 
-  @IsNotEmpty()
-  value: string | number;
+  // @IsOptional()
+  // @IsArray()
+  // @ValidateNested({ each: true })
+  // @Type(() => Tag)
+  // tags: Tag[];
 }
+
+// export class Metadata {
+//   @IsNotEmpty()
+//   @IsString()
+//   title: string;
+
+//   @IsNotEmpty()
+//   value: string | number;
+// }
 
 export class Price {
   @IsOptional()
