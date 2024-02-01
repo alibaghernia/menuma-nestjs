@@ -8,6 +8,7 @@ import {
   Put,
   Query,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { BusinessPanelService } from '../services/business.panel.service';
 import { CreateBusinessDTO, CreateHallDTO, CreateTableDTO } from '../dto';
@@ -31,9 +32,11 @@ import {
   PagerRequestsFiltersDTO,
   TablesFiltersDTO,
 } from '../dto/filters.dto';
+import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
 
 @Controller('panel/business')
 @UseGuards(CheckPermissionsGuard)
+@UsePipes(new UUIDCheckerController('Business UUID', 'business_uuid'))
 export class BusinessPanelController {
   constructor(private businessService: BusinessPanelService) {}
 
@@ -306,11 +309,16 @@ export class BusinessPanelController {
   }
   @Put(':business_uuid/pager-requests/:request_uuid')
   async updatePagerRequest(
+    @Param('business_uuid') business_uuid: string,
     @Param('request_uuid', new UUIDChecker('Request UUID'))
     request_uuid: string,
     @Body() payload: UpdatePagerRequestDTO,
   ) {
-    await this.businessService.updatePagerRequest(request_uuid, payload);
+    await this.businessService.updatePagerRequest(
+      business_uuid,
+      request_uuid,
+      payload,
+    );
 
     return {
       ok: true,

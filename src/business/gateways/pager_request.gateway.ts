@@ -43,10 +43,7 @@ export class PagerRequestgGateway
     const business_uuid = request.business_uuid;
     const clients = this.connectedClients[business_uuid] || [];
     for (const client of clients) {
-      client.emit('new-request', {
-        request_uuid: request.uuid,
-        table: request.table,
-      });
+      client.emit('new-request', request);
     }
   }
   async broadcastCancelPagerNotification(
@@ -55,7 +52,13 @@ export class PagerRequestgGateway
   ) {
     const clients = this.connectedClients[business_uuid] || [];
     for (const client of clients) {
-      client.emit('cancel-request', { request_uuid });
+      client.emit('cancel-request', request_uuid);
+    }
+  }
+  async broadcastUpdatePagerNotification(business_uuid: string) {
+    const clients = this.connectedClients[business_uuid] || [];
+    for (const client of clients) {
+      client.emit('update-requests');
     }
   }
 }

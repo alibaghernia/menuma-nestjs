@@ -39,6 +39,7 @@ import {
 import { PagerRequest } from '../entites/pager_request.entity';
 import { Role } from 'src/access_control/entities/role.entity';
 import { Hall } from '../entites/hall.entity';
+import { PagerRequestgGateway } from '../gateways/pager_request.gateway';
 
 @Injectable()
 export class BusinessPanelService {
@@ -60,6 +61,7 @@ export class BusinessPanelService {
     private pagerRequestRepository: typeof PagerRequest,
     private sequelize: Sequelize,
     @Inject(REQUEST) private request: Request,
+    private pagerRequestGateway: PagerRequestgGateway,
   ) {}
 
   async findAll(filters: BusinessesFiltersDTO) {
@@ -643,6 +645,7 @@ export class BusinessPanelService {
     return request;
   }
   async updatePagerRequest(
+    business_uuid: string,
     request_uuid: string,
     payload: UpdatePagerRequestDTO,
   ) {
@@ -651,5 +654,8 @@ export class BusinessPanelService {
         uuid: request_uuid,
       },
     });
+    await this.pagerRequestGateway.broadcastUpdatePagerNotification(
+      business_uuid,
+    );
   }
 }

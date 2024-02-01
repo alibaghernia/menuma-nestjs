@@ -13,10 +13,12 @@ import { VerionController } from './verion/verion.controller';
 import { FileModule } from './files/files.module';
 import { EventModule } from './event/event.module';
 import { PhotographyModule } from './photography/photography.module';
+import { WebPushModule } from './web_push/web_push.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, load: [typeormConfigs] }),
+    WebPushModule.register(),
     DatabaseModule,
     AuthModule,
     UsersModule,

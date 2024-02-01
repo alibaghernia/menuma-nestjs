@@ -100,6 +100,6 @@ export class UpdateHallDTO {
 
 export class UpdatePagerRequestDTO {
   @IsOptional()
-  @IsEnum({ todo: 'TODO', doing: 'DOING', done: 'DONE' })
+  @IsEnum({ todo: 'TODO', doing: 'DOING', done: 'DONE', canceled: 'CANCELED' })
   status: string;
 }

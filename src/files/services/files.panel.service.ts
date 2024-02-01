@@ -6,7 +6,7 @@ import { Client } from 'minio';
 
 @Injectable()
 export class FilesPanelService {
-  public minio;
+  public minio: Client;
   constructor(
     @InjectModel(File) private filesRepo: typeof File,
     private configService: ConfigService,
