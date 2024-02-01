@@ -12,6 +12,7 @@ import { AccessControlModule } from 'src/access_control/access_control.module';
 import { BusinessTable } from './entites/business_tables.entity';
 import { PagerRequest } from './entites/pager_request.entity';
 import { PagerRequestgGateway } from './gateways/pager_request.gateway';
+import { Hall } from './entites/hall.entity';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { PagerRequestgGateway } from './gateways/pager_request.gateway';
       BusinessUser,
       BusinessTable,
       PagerRequest,
+      Hall,
     ]),
     AccessControlModule,
   ],

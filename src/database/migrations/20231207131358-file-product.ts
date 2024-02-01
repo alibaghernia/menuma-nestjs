@@ -1,8 +1,7 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, QueryInterface } from 'sequelize';
 
-/** @type {import('sequelize-cli').Migration} */
-module.exports = {
-  async up(queryInterface) {
+export default {
+  async up(queryInterface: QueryInterface) {
     return queryInterface.createTable('file-product', {
       uuid: {
         type: DataTypes.UUID,
@@ -11,6 +10,8 @@ module.exports = {
       },
       file_uuid: {
         type: DataTypes.UUID,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
         references: {
           model: 'files',
           key: 'uuid',
@@ -18,6 +19,8 @@ module.exports = {
       },
       product_uuid: {
         type: DataTypes.UUID,
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
         references: {
           model: 'products',
           key: 'uuid',

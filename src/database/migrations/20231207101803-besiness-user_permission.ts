@@ -1,8 +1,7 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes, QueryInterface } from 'sequelize';
 
-/** @type {import('sequelize-cli').Migration} */
-module.exports = {
-  async up(queryInterface) {
+export default {
+  async up(queryInterface: QueryInterface) {
     return queryInterface.createTable('business_user-permission', {
       uuid: {
         type: DataTypes.UUID,
