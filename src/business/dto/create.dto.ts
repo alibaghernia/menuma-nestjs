@@ -21,8 +21,12 @@ export class CreateBusinessDTO {
   readonly slug: string;
 
   @IsOptional()
-  @IsBoolean()
-  readonly status?: boolean;
+  @IsString()
+  readonly domain: string;
+
+  @IsOptional()
+  @IsString()
+  readonly status?: string;
 
   @IsOptional()
   @IsString()
@@ -80,7 +84,11 @@ export class CreateBusinessDTO {
 
   @IsOptional()
   @IsBoolean()
-  readonly pager?: boolean;
+  readonly customer_club: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  readonly pager: boolean;
 
   @IsOptional()
   @IsUUID()

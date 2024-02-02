@@ -85,6 +85,7 @@ export class CategoryPanelService {
         where: {
           uuid: category_uuid,
         },
+        raw: true,
       });
     if (!category)
       throw new HttpException(
@@ -92,6 +93,9 @@ export class CategoryPanelService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     if (category.image) category.image_url = makeImageUrl(category.image);
+    console.log({
+      category,
+    });
     return category;
   }
   // TODO: add checking duplicate category creation
@@ -109,6 +113,7 @@ export class CategoryPanelService {
         title: payload.title,
         parent_uuid: payload.parent_uuid,
         slug: payload.slug,
+        image: payload.image,
       });
       await transaction.commit();
     } catch (error) {

@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  HttpException,
   HttpStatus,
   Param,
   ParseFilePipe,
@@ -26,13 +27,11 @@ export class FilesController {
   ) {}
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  async newFile(
-    @UploadedFile(pipe) file: Express.Multer.File,
-    @Res() res: Response,
-  ) {
+  async newFile(@UploadedFile(pipe) file: Express.Multer.File) {
     try {
       const uuid = (await this.fileRepo.create()).uuid;
       await this.filesPanelService.minio.putObject('files', uuid, file.buffer);
+      console.log('here');
       return {
         ok: true,
         data: {
@@ -40,7 +39,7 @@ export class FilesController {
         },
       };
     } catch (error) {
-      return this.exceptionHandler(error, res);
+      return this.exceptionHandler(error);
     }
   }
   @IsPublic()
@@ -54,26 +53,32 @@ export class FilesController {
       );
       return res.redirect(url, 301);
     } catch (error: any) {
-      return this.exceptionHandler(error, res);
+      return this.exceptionHandler(error);
     }
   }
 
-  private exceptionHandler(error, res) {
+  private exceptionHandler(error) {
     console.log({
       error,
     });
     switch (error.errno) {
       case -111: {
-        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-          ok: false,
-          message: "Couldn't connect to file server!",
-        });
+        throw new HttpException(
+          {
+            ok: false,
+            message: "Couldn't connect to file server!",
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
       default: {
-        return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
-          ok: false,
-          message: 'Unknown error!',
-        });
+        throw new HttpException(
+          {
+            ok: false,
+            message: 'Unknown error',
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
       }
     }
   }

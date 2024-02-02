@@ -51,7 +51,7 @@ export class BusinessPanelController {
   }
 
   @Get(':slugOrId')
-  // @CheckPermissions([business_permissions.readBusinesses.action])
+  @CheckPermissions([business_permissions.readBusinesses.action])
   async getBySlug(
     @Param('slugOrId', new NotEmptyPipe('Business Slug Or UUID'))
     slugOrId: string,
@@ -63,7 +63,7 @@ export class BusinessPanelController {
     };
   }
 
-  @Post('/create')
+  @Post()
   @CheckPermissions([business_permissions.createBusiness.action])
   @Roles(Role.Admin)
   async create(@Body() body: CreateBusinessDTO) {

@@ -85,6 +85,12 @@ export class Business extends Model<Business> {
   pager: boolean;
 
   @Column({ type: DataType.BOOLEAN })
+  customer_club: boolean;
+
+  @Column({ type: DataType.STRING, allowNull: true })
+  domain?: string;
+
+  @Column({ type: DataType.BOOLEAN })
   public: boolean;
 
   @BelongsToMany(() => User, {

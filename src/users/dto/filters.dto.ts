@@ -13,3 +13,9 @@ export class FiltersDTO {
   @IsString()
   readonly limit?: number;
 }
+
+export class GetManagersFiltersDTO {
+  @IsOptional()
+  @IsString()
+  readonly no_business?: string;
+}

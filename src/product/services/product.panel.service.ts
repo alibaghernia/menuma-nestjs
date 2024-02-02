@@ -11,13 +11,12 @@ import { Category } from 'src/category/entities/category.entity';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
 import { FindProductFiltersDTO } from '../dto/query.dto';
 import { Op, WhereOptions } from 'sequelize';
-import { ConfigService } from '@nestjs/config';
 import { Image } from 'src/database/entities/image.entity';
 import { Business } from 'src/business/entites/business.entity';
 import { FiltersDTO } from '../dto/filters.dto';
-import { FilesPanelService } from 'src/files/services/files.panel.service';
 import { File } from 'src/files/entities/file.entity';
 import { UpdateProductDTO } from '../dto/update.dto';
+import { makeImageUrl } from 'src/utils/images';
 
 @Injectable()
 export class ProductPanelService {
@@ -31,8 +30,6 @@ export class ProductPanelService {
     @InjectModel(BusinessCategory)
     private businessCategoryRepository: typeof BusinessCategory,
     @Inject(REQUEST) private request: Request,
-    private configService: ConfigService,
-    private filesService: FilesPanelService,
   ) {}
 
   async fetchAll(business_uuid: string, _filters: FiltersDTO) {
@@ -143,7 +140,7 @@ export class ProductPanelService {
       uuid,
     };
 
-    const result = (
+    const result: Product & { image_url?: string } = (
       await this.productRepository.findOne({
         where,
         attributes: {
@@ -160,6 +157,10 @@ export class ProductPanelService {
           },
           {
             model: File,
+            attributes: ['uuid'],
+            through: {
+              attributes: [],
+            },
           },
         ],
       })
@@ -172,6 +173,9 @@ export class ProductPanelService {
 
     (product as Product & { categories?: Category[] }).categories =
       businessCategories.map((besCat) => besCat.category);
+    if (product.images.length) {
+      product.image_url = makeImageUrl(product.images[0].uuid);
+    }
     return product;
   }
   async create(business_uuid: string, payload: CreateProductDTO) {

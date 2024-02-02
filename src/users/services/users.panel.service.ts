@@ -5,17 +5,21 @@ import { QueryError, WhereOptions } from 'sequelize';
 import { CreateUserDTO } from '../dto/create_user.dto';
 import * as bcrypt from 'bcrypt';
 import { UpdateUserDTO } from '../dto/update_user.dto';
-import { FiltersDTO } from '../dto/filters.dto';
+import { FiltersDTO, GetManagersFiltersDTO } from '../dto/filters.dto';
 import { Op } from 'sequelize';
 import { Business } from 'src/business/entites/business.entity';
 import { Sequelize } from 'sequelize-typescript';
 import { doInTransaction } from 'src/transaction';
+import { BusinessUser } from 'src/business/entites/business_user.entity';
+import { roles } from 'src/access_control/constants';
 
 @Injectable()
 export class UsersPanelService {
   constructor(
     @InjectModel(User) private userRepository: typeof User,
     @InjectModel(Business) private businessRepository: typeof Business,
+    @InjectModel(BusinessUser)
+    private businessUserRepository: typeof BusinessUser,
     private sequelize: Sequelize,
   ) {}
 
@@ -32,6 +36,9 @@ export class UsersPanelService {
           [Op.like]: `%${search}%`,
         },
       },
+      role: {
+        [Op.not]: 'admin',
+      },
     };
     const offset = filters.page
       ? +filters.page * +filters.limit - +filters.limit
@@ -44,6 +51,15 @@ export class UsersPanelService {
       attributes: {
         exclude: ['password'],
       },
+      include: [
+        {
+          model: Business,
+          attributes: ['uuid', 'name'],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
     });
     const count = await this.userRepository.count({
       where,
@@ -62,6 +78,15 @@ export class UsersPanelService {
       attributes: {
         exclude: ['password'],
       },
+      include: [
+        {
+          model: Business,
+          attributes: ['uuid', 'name'],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
     });
 
     if (!user) throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
@@ -77,15 +102,32 @@ export class UsersPanelService {
     });
   }
 
-  getAllManagers() {
-    return this.userRepository.findAll({
+  async getAllManagers(filters: GetManagersFiltersDTO) {
+    let users = await this.userRepository.findAll({
       where: {
         role: 'manager',
       },
       attributes: {
         exclude: ['password'],
       },
+      include: [
+        {
+          model: Business,
+          required: false,
+          attributes: ['uuid'],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+      subQuery: false,
     });
+
+    if (filters.no_business == 'true' || filters.no_business == '1') {
+      users = users.filter((user) => user.businesses.length == 0);
+    }
+
+    return users;
   }
 
   async createUser(payload: CreateUserDTO) {
@@ -93,11 +135,12 @@ export class UsersPanelService {
       const { password, business_uuid, ...userPayload } = payload;
       await doInTransaction(this.sequelize, async (transaction) => {
         if (
+          business_uuid &&
           !(await this.businessRepository.count({
             where: { uuid: business_uuid },
           }))
         )
-          throw new HttpException('Business bot found!', HttpStatus.NOT_FOUND);
+          throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
 
         const user = await this.userRepository.create(
           {
@@ -106,7 +149,24 @@ export class UsersPanelService {
           },
           { transaction },
         );
-        await user.setBusinesses([business_uuid], { transaction });
+        if (business_uuid) {
+          await user.setBusinesses([business_uuid], { transaction });
+          const businessUser = await this.businessUserRepository.findOne({
+            where: {
+              business_uuid,
+              user_uuid: user.uuid,
+            },
+          });
+          if (user.role == 'manager') {
+            await businessUser.addRole(roles.Business_Manager.uuid, {
+              transaction,
+            });
+          } else {
+            await businessUser.removeRole(roles.Business_Manager.uuid, {
+              transaction,
+            });
+          }
+        }
       });
     } catch (error) {
       if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {
@@ -125,15 +185,50 @@ export class UsersPanelService {
 
   async updateUser(user_uuid: string, payload: UpdateUserDTO) {
     try {
-      if (payload.password)
-        payload.password = bcrypt.hashSync(
-          payload.password,
-          bcrypt.genSaltSync(),
-        );
-      return await this.userRepository.update(payload, {
-        where: {
-          uuid: user_uuid,
-        },
+      const { business_uuid, ...userPayload } = payload;
+      return await doInTransaction(this.sequelize, async (transaction) => {
+        if (
+          business_uuid &&
+          !(await this.businessRepository.count({
+            where: { uuid: business_uuid },
+          }))
+        )
+          throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
+
+        const user = await this.userRepository.findOne({
+          where: {
+            uuid: user_uuid,
+          },
+        });
+        if (!user)
+          throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
+        if (userPayload.password)
+          userPayload.password = bcrypt.hashSync(
+            userPayload.password,
+            bcrypt.genSaltSync(),
+          );
+        user.update(userPayload, {
+          transaction,
+        });
+        if (business_uuid) {
+          if (!(await user.hasBusiness(business_uuid)))
+            await user.setBusinesses([business_uuid], { transaction });
+          const businessUser = await this.businessUserRepository.findOne({
+            where: {
+              business_uuid,
+              user_uuid: user.uuid,
+            },
+          });
+          if (user.role == 'manager') {
+            await businessUser.addRole(roles.Business_Manager.uuid, {
+              transaction,
+            });
+          } else {
+            await businessUser.removeRole(roles.Business_Manager.uuid, {
+              transaction,
+            });
+          }
+        }
       });
     } catch (error) {
       if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {

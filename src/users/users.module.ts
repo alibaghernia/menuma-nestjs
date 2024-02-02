@@ -7,9 +7,13 @@ import { UsersPanelController } from './controllers/users.panel.controller';
 import { UsersPanelService } from './services/users.panel.service';
 import { AccessControlModule } from 'src/access_control/access_control.module';
 import { Business } from 'src/business/entites/business.entity';
+import { BusinessUser } from 'src/business/entites/business_user.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([User, Business]), AccessControlModule],
+  imports: [
+    SequelizeModule.forFeature([User, Business, BusinessUser]),
+    AccessControlModule,
+  ],
   providers: [UsersService, UsersPanelService],
   controllers: [UsersController, UsersPanelController],
   exports: [UsersService, UsersPanelService],

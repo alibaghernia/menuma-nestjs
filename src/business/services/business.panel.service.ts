@@ -7,12 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Business } from '../entites/business.entity';
-import {
-  FindOptions,
-  HasManyAddAssociationsMixinOptions,
-  Op,
-  WhereOptions,
-} from 'sequelize';
+import { FindOptions, Op, WhereOptions } from 'sequelize';
 import { CreateBusinessDTO, CreateHallDTO, CreateTableDTO } from '../dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
@@ -40,6 +35,7 @@ import { PagerRequest } from '../entites/pager_request.entity';
 // import { Role } from 'src/access_control/entities/role.entity';
 import { Hall } from '../entites/hall.entity';
 import { PagerRequestgGateway } from '../gateways/pager_request.gateway';
+import { makeImageUrl } from 'src/utils/images';
 
 @Injectable()
 export class BusinessPanelService {
@@ -70,7 +66,10 @@ export class BusinessPanelService {
       ? +filters.page * +filters.limit - +filters.limit
       : undefined;
     const limit = filters.page ? offset + +filters.limit : undefined;
-    const businesses = await this.businessRepository.findAll({
+    let businesses: (Business & {
+      logo_url?: string;
+      banner_url?: string;
+    })[] = await this.businessRepository.findAll({
       include: [
         {
           model: Social,
@@ -82,6 +81,12 @@ export class BusinessPanelService {
       limit,
       offset,
     });
+    businesses = businesses.map((business) => {
+      business = business.get({ plain: true });
+      if (business.logo) business.logo_url = makeImageUrl(business.logo);
+      if (business.banner) business.banner_url = makeImageUrl(business.banner);
+      return business;
+    });
     const count = await this.businessRepository.count();
 
     return {
@@ -91,26 +96,45 @@ export class BusinessPanelService {
   }
 
   async findBySlugOrId(slugOrId: string) {
-    const business = await this.businessRepository.findOne({
-      where: {
-        [Op.or]: {
-          slug: slugOrId,
-          uuid: slugOrId,
-        },
-      },
-      include: [
-        {
-          model: Social,
-          attributes: {
-            exclude: ['uuid', 'socialable_type', 'socialable_uuid'],
+    const business: Business & { logo_url?: string; banner_url?: string } = (
+      await this.businessRepository.findOne({
+        where: {
+          [Op.or]: {
+            slug: slugOrId,
+            uuid: slugOrId,
           },
         },
-      ],
-    });
+        include: [
+          {
+            model: Social,
+            required: false,
+            attributes: {
+              exclude: ['uuid', 'socialable_type', 'socialable_uuid'],
+            },
+          },
+          {
+            model: User,
+            required: false,
+            attributes: ['uuid'],
+            where: {
+              role: 'manager',
+            },
+            through: {
+              attributes: [],
+            },
+          },
+        ],
+      })
+    )?.get({ plain: true });
 
     if (!business)
       throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
 
+    if (business.logo) business.logo_url = makeImageUrl(business.logo);
+    if (business.banner) business.banner_url = makeImageUrl(business.banner);
+    console.log({
+      business,
+    });
     return business;
   }
 
@@ -135,7 +159,7 @@ export class BusinessPanelService {
 
       const newCafeRes = await this.businessRepository.create({
         ...business,
-        status: status ? status : true,
+        status: status == 'active',
       });
 
       const socials: Partial<Social>[] = Object.entries({
@@ -152,10 +176,7 @@ export class BusinessPanelService {
           link: v,
         }));
       await this.socialRepository.bulkCreate(socials);
-      if (manager)
-        await newCafeRes.addUser(manager, {
-          through: { role: 'manager' },
-        } as HasManyAddAssociationsMixinOptions);
+      if (manager) await newCafeRes.addUser(manager);
       await transaction.commit();
 
       return newCafeRes;
@@ -179,12 +200,32 @@ export class BusinessPanelService {
         where: {
           uuid: business_uuid,
         },
+        include: [
+          {
+            model: User,
+            required: false,
+            where: {
+              role: 'manager',
+            },
+            attributes: ['uuid'],
+            through: {
+              attributes: [],
+            },
+          },
+        ],
       });
 
       if (!business)
         throw new HttpException('Business Not found!', HttpStatus.NOT_FOUND);
-      const { instagram, telegram, whatsapp, twitter_x, ...businessProps } =
-        _business;
+      const {
+        instagram,
+        telegram,
+        whatsapp,
+        twitter_x,
+        status,
+        manager,
+        ...businessProps
+      } = _business;
       const socials = Object.entries({
         instagram,
         telegram,
@@ -210,8 +251,16 @@ export class BusinessPanelService {
             link: socialLink,
           });
       }
-      await business.update(businessProps);
+      await business.update({
+        ...businessProps,
+        status: status == 'active',
+      });
 
+      if (manager) {
+        if (business.users.length)
+          await business.removeUser(business.users[0].uuid);
+        await business.addUser(manager);
+      }
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();

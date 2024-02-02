@@ -19,7 +19,7 @@ import { UpdateUserDTO, UpdateUserProfileDTO } from '../dto/update_user.dto';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
 import { Request } from 'express';
-import { FiltersDTO } from '../dto/filters.dto';
+import { FiltersDTO, GetManagersFiltersDTO } from '../dto/filters.dto';
 
 @Controller('/panel/users')
 @UseGuards(CheckPermissionsGuard)
@@ -39,6 +39,16 @@ export class UsersPanelController {
       },
     };
   }
+
+  @Get('managers')
+  @CheckPermissions([users_permissions.readUsers.action])
+  async getManagers(@Query() filters: GetManagersFiltersDTO) {
+    const managers = await this.usersService.getAllManagers(filters);
+    return {
+      ok: true,
+      data: managers,
+    };
+  }
   @Get(':user_uuid')
   @CheckPermissions([users_permissions.readUsers.action])
   async get(@Param('user_uuid') user_uuid: string) {
@@ -46,16 +56,6 @@ export class UsersPanelController {
     return {
       ok: true,
       data: user,
-    };
-  }
-
-  @Get('/managers')
-  @CheckPermissions([users_permissions.readUsers.action])
-  async getManagers() {
-    const managers = await this.usersService.getAllManagers();
-    return {
-      ok: true,
-      data: managers,
     };
   }
 

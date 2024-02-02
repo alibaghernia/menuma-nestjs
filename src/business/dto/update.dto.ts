@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 
 export class UpdateBusinessDTO {
@@ -18,8 +19,12 @@ export class UpdateBusinessDTO {
   readonly slug: string;
 
   @IsOptional()
-  @IsBoolean()
-  readonly status?: boolean;
+  @IsString()
+  readonly domain: string;
+
+  @IsOptional()
+  @IsString()
+  readonly status?: string;
 
   @IsOptional()
   @IsString()
@@ -74,8 +79,16 @@ export class UpdateBusinessDTO {
   readonly banner?: string;
 
   @IsOptional()
+  @IsUUID()
+  readonly manager: string;
+
+  @IsOptional()
   @IsBoolean()
-  readonly pager?: boolean;
+  readonly customer_club: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  readonly pager: boolean;
 }
 
 export class UpdateTableDTO {
