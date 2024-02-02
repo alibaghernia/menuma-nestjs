@@ -17,9 +17,6 @@ export class WebPushService {
   }
 
   subscribe(business_uuid: string, subs: any) {
-    console.log({
-      subs: Object.entries(subs)[0][0],
-    });
     if (!this.subscribers[business_uuid]) this.subscribers[business_uuid] = [];
     this.subscribers[business_uuid].push(
       JSON.parse(Object.entries(subs)[0][0]),
@@ -28,9 +25,6 @@ export class WebPushService {
 
   sendPushNotification(business_uuid: string, data: string) {
     if (!this.subscribers[business_uuid]) return;
-    console.log({
-      subs: this.subscribers,
-    });
     const notificationPayload = {
       title: 'New Notification',
       body: 'This is a new notification',

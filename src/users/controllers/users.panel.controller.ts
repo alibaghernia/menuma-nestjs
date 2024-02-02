@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -18,8 +19,9 @@ import { UpdateUserDTO, UpdateUserProfileDTO } from '../dto/update_user.dto';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
 import { Request } from 'express';
+import { FiltersDTO } from '../dto/filters.dto';
 
-@Controller('users')
+@Controller('/panel/users')
 @UseGuards(CheckPermissionsGuard)
 export class UsersPanelController {
   logger = new Logger(UsersPanelController.name);
@@ -27,8 +29,24 @@ export class UsersPanelController {
 
   @Get()
   @CheckPermissions([users_permissions.readUsers.action])
-  findAll() {
-    return this.usersService.fetchAll();
+  async findAll(@Query() filters: FiltersDTO) {
+    const [users, total] = await this.usersService.fetchAll(filters);
+    return {
+      ok: true,
+      data: {
+        users,
+        total,
+      },
+    };
+  }
+  @Get(':user_uuid')
+  @CheckPermissions([users_permissions.readUsers.action])
+  async get(@Param('user_uuid') user_uuid: string) {
+    const user = await this.usersService.get(user_uuid);
+    return {
+      ok: true,
+      data: user,
+    };
   }
 
   @Get('/managers')

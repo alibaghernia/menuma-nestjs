@@ -6,9 +6,10 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { UsersPanelController } from './controllers/users.panel.controller';
 import { UsersPanelService } from './services/users.panel.service';
 import { AccessControlModule } from 'src/access_control/access_control.module';
+import { Business } from 'src/business/entites/business.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([User]), AccessControlModule],
+  imports: [SequelizeModule.forFeature([User, Business]), AccessControlModule],
   providers: [UsersService, UsersPanelService],
   controllers: [UsersController, UsersPanelController],
   exports: [UsersService, UsersPanelService],

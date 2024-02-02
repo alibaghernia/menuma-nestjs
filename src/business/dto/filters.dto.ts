@@ -1,9 +1,11 @@
 import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
 
 export class BusinessesFiltersDTO {
+  @IsOptional()
   @IsString()
   page: number;
 
+  @IsOptional()
   @IsString()
   limit: number;
 }

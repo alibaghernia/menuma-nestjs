@@ -37,7 +37,7 @@ import {
   TablesFiltersDTO,
 } from '../dto/filters.dto';
 import { PagerRequest } from '../entites/pager_request.entity';
-import { Role } from 'src/access_control/entities/role.entity';
+// import { Role } from 'src/access_control/entities/role.entity';
 import { Hall } from '../entites/hall.entity';
 import { PagerRequestgGateway } from '../gateways/pager_request.gateway';
 
@@ -66,34 +66,12 @@ export class BusinessPanelService {
 
   async findAll(filters: BusinessesFiltersDTO) {
     this.logger.log('fetch all businesses');
-    const { page, limit } = filters;
+    const offset = filters.page
+      ? +filters.page * +filters.limit - +filters.limit
+      : undefined;
+    const limit = filters.page ? offset + +filters.limit : undefined;
     const businesses = await this.businessRepository.findAll({
       include: [
-        {
-          model: BusinessUser,
-          attributes: {
-            exclude: ['business_uuid', 'user_uuid', 'role'],
-          },
-          include: [
-            {
-              model: Role,
-              required: false,
-              attributes: {
-                exclude: ['business_uuid'],
-              },
-              where: {
-                uuid: roles.Business_Manager.uuid,
-              },
-              through: {
-                attributes: [],
-              },
-            },
-            {
-              model: User,
-              attributes: ['uuid', 'first_name', 'last_name'],
-            },
-          ],
-        },
         {
           model: Social,
           attributes: {
@@ -101,8 +79,8 @@ export class BusinessPanelService {
           },
         },
       ],
-      limit: page * limit,
-      offset: page * limit - limit,
+      limit,
+      offset,
     });
     const count = await this.businessRepository.count();
 

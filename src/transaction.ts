@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize';
 
 export const doInTransaction = async (
   seq: Sequelize,
-  func: (transaction) => unknown,
+  func: (transaction) => Promise<unknown>,
 ) => {
   const transaction = await seq.transaction();
   try {
