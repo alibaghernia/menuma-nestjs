@@ -24,6 +24,7 @@ import { BusinessCategoryProduct } from './business-category_product.entity';
 import { HasManyAddAssociationsMixin } from 'sequelize';
 import { FileProduct } from './file_product.entity';
 import { File } from 'src/files/entities/file.entity';
+import { makeImageUrl } from 'src/utils/images';
 
 export type ProductMetadata = {
   title: string;
@@ -114,7 +115,17 @@ export class Product extends Model<Product> {
     targetKey: 'uuid',
   })
   images: File[];
-
+  image?: string;
+  image_url?: string;
+  setImagesUrls() {
+    const images = this.getDataValue('images');
+    if (images?.length) {
+      this.setDataValue('image', images[0].uuid);
+      this.setDataValue('image_url', makeImageUrl(images[0].uuid));
+      this.setDataValue('images', undefined);
+    }
+    return this;
+  }
   setBusiness: BelongsToSetAssociationMixin<Business, Business['uuid']>;
   setBusinessCategories: BelongsToManySetAssociationsMixin<
     BusinessCategory,

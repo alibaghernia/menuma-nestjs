@@ -22,11 +22,11 @@ import { Request } from 'express';
 import { User } from 'src/users/entites/user.entity';
 import { SetBusinessManagerDTO } from '../dto/set_business_manager';
 import { BusinessUser } from '../entites/business_user.entity';
-import { roles } from 'src/access_control/constants';
+import { Business_Employee_role, roles } from 'src/access_control/constants';
 import { BusinessUserRole } from 'src/access_control/entities/business-user_role.entity';
 import { BusinessTable } from '../entites/business_tables.entity';
 import {
-  BusinessesFiltersDTO,
+  PanelBusinessesFiltersDTO,
   HallsFiltersDTO,
   PagerRequestsFiltersDTO,
   TablesFiltersDTO,
@@ -35,7 +35,6 @@ import { PagerRequest } from '../entites/pager_request.entity';
 // import { Role } from 'src/access_control/entities/role.entity';
 import { Hall } from '../entites/hall.entity';
 import { PagerRequestgGateway } from '../gateways/pager_request.gateway';
-import { makeImageUrl } from 'src/utils/images';
 
 @Injectable()
 export class BusinessPanelService {
@@ -60,7 +59,7 @@ export class BusinessPanelService {
     private pagerRequestGateway: PagerRequestgGateway,
   ) {}
 
-  async findAll({ name = '', ...filters }: BusinessesFiltersDTO) {
+  async findAll({ name = '', ...filters }: PanelBusinessesFiltersDTO) {
     this.logger.log('fetch all businesses');
 
     const offset = filters.page
@@ -74,27 +73,15 @@ export class BusinessPanelService {
       },
     };
 
-    let businesses: (Business & {
-      logo_url?: string;
-      banner_url?: string;
-    })[] = await this.businessRepository.findAll({
+    const businesses = await this.businessRepository.findAll({
       where,
       include: [
         {
           model: Social,
-          attributes: {
-            exclude: ['uuid', 'socialable_type', 'socialable_uuid'],
-          },
         },
       ],
       limit,
       offset,
-    });
-    businesses = businesses.map((business) => {
-      business = business.get({ plain: true });
-      if (business.logo) business.logo_url = makeImageUrl(business.logo);
-      if (business.banner) business.banner_url = makeImageUrl(business.banner);
-      return business;
     });
     const count = await this.businessRepository.count({
       where,
@@ -107,7 +94,7 @@ export class BusinessPanelService {
   }
 
   async findBySlugOrId(slugOrId: string) {
-    const business: Business & { logo_url?: string; banner_url?: string } = (
+    const business = (
       await this.businessRepository.findOne({
         where: {
           [Op.or]: {
@@ -127,11 +114,8 @@ export class BusinessPanelService {
             model: User,
             required: false,
             attributes: ['uuid'],
-            where: {
-              role: 'manager',
-            },
             through: {
-              attributes: [],
+              attributes: ['role', 'uuid'],
             },
           },
         ],
@@ -140,9 +124,6 @@ export class BusinessPanelService {
 
     if (!business)
       throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-
-    if (business.logo) business.logo_url = makeImageUrl(business.logo);
-    if (business.banner) business.banner_url = makeImageUrl(business.banner);
     return business;
   }
 
@@ -161,15 +142,12 @@ export class BusinessPanelService {
         telegram,
         twitter_x,
         status,
-        manager,
-        ...business
+        users,
+        ...businessPayload
       } = payload;
-      console.log({
-        business,
-      });
-      const newCafeRes = await this.businessRepository.create(
+      const business = await this.businessRepository.create(
         {
-          ...business,
+          ...businessPayload,
           status: status == 'active',
         },
         { transaction },
@@ -184,19 +162,46 @@ export class BusinessPanelService {
         .filter(([, v]) => !!v)
         .map(([k, v]) => ({
           socialable_type: 'business',
-          socialable_uuid: newCafeRes.uuid,
+          socialable_uuid: business.uuid,
           type: k,
           link: v,
         }));
       await this.socialRepository.bulkCreate(socials, { transaction });
-      if (manager)
-        await newCafeRes.setUsers([manager], {
+      if (users?.length) {
+        const usersUUIDs = users.map((user) => user.user_uuid);
+        await business.setUsers(usersUUIDs, {
           transaction,
-          through: { role: 'manager' },
         });
+        const businessUsers = await this.businessUserRepository.findAll({
+          where: {
+            business_uuid: business.uuid,
+            user_uuid: usersUUIDs,
+          },
+          transaction,
+        });
+        for (const businessUser of businessUsers) {
+          const newRole = users.find(
+            (bus) => bus.user_uuid == businessUser.user_uuid,
+          )?.role;
+          if (newRole && newRole != businessUser.role) {
+            await businessUser.update({ role: newRole }, { transaction });
+            if (newRole == 'manager') {
+              await businessUser.setRoles([roles.Business_Manager.uuid], {
+                transaction,
+              });
+            } else if (newRole == 'employee') {
+              await businessUser.setRoles([Business_Employee_role.uuid], {
+                transaction,
+              });
+            } else {
+              await businessUser.setRoles([], { transaction });
+            }
+          }
+        }
+      }
       await transaction.commit();
 
-      return newCafeRes;
+      return business;
     } catch (error) {
       await transaction.rollback();
       if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {
@@ -228,19 +233,6 @@ export class BusinessPanelService {
         where: {
           uuid: business_uuid,
         },
-        include: [
-          {
-            model: User,
-            required: false,
-            where: {
-              role: 'manager',
-            },
-            attributes: ['uuid'],
-            through: {
-              attributes: [],
-            },
-          },
-        ],
       });
 
       if (!business)
@@ -251,7 +243,7 @@ export class BusinessPanelService {
         whatsapp,
         twitter_x,
         status,
-        manager,
+        users,
         ...businessProps
       } = _business;
       const socials = Object.entries({
@@ -283,11 +275,48 @@ export class BusinessPanelService {
         ...businessProps,
         status: status == 'active',
       });
-
-      if (manager) {
-        if (business.users.length)
-          await business.removeUser(business.users[0].uuid);
-        await business.addUser(manager);
+      if (users?.length) {
+        const usersUUIDs = users.map((user) => user.user_uuid);
+        await business.setUsers(usersUUIDs, {
+          transaction,
+        });
+        const businessUsers = await this.businessUserRepository.findAll({
+          where: {
+            business_uuid,
+            user_uuid: usersUUIDs,
+          },
+          transaction,
+        });
+        console.log({
+          len: businessUsers.length,
+        });
+        for (const businessUser of businessUsers) {
+          const newRole = users.find(
+            (bus) => bus.user_uuid == businessUser.user_uuid,
+          )?.role;
+          console.log({
+            newRole,
+          });
+          if (newRole && newRole != businessUser.role) {
+            console.log({
+              newRole,
+            });
+            await businessUser.update({ role: newRole }, { transaction });
+            if (newRole == 'manager') {
+              await businessUser.setRoles([roles.Business_Manager.uuid], {
+                transaction,
+              });
+            } else if (newRole == 'employee') {
+              await businessUser.setRoles([Business_Employee_role.uuid], {
+                transaction,
+              });
+            } else {
+              await businessUser.setRoles([], { transaction });
+            }
+          }
+        }
+      } else {
+        await business.setUsers([]);
       }
       await transaction.commit();
     } catch (error) {

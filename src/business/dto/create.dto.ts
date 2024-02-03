@@ -86,8 +86,11 @@ export class CreateBusinessDTO {
   readonly pager: boolean;
 
   @IsOptional()
-  @IsUUID()
-  readonly manager: string;
+  @IsArray()
+  readonly users: {
+    user_uuid: string;
+    role: string;
+  }[];
 }
 
 export class CreateTableDTO {

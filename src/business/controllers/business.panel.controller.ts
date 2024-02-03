@@ -27,7 +27,7 @@ import { business_permissions } from 'src/access_control/constants';
 import { SetBusinessManagerDTO } from '../dto/set_business_manager';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
 import {
-  BusinessesFiltersDTO,
+  PanelBusinessesFiltersDTO,
   HallsFiltersDTO,
   PagerRequestsFiltersDTO,
   TablesFiltersDTO,
@@ -42,7 +42,7 @@ export class BusinessPanelController {
 
   @Get()
   @CheckPermissions([business_permissions.readBusinesses.action])
-  async getAll(@Query() filters: BusinessesFiltersDTO) {
+  async getAll(@Query() filters: PanelBusinessesFiltersDTO) {
     const businesses = await this.businessService.findAll(filters);
     return {
       ok: true,

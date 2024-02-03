@@ -6,7 +6,6 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  IsUUID,
 } from 'class-validator';
 
 export class UpdateBusinessDTO {
@@ -79,8 +78,11 @@ export class UpdateBusinessDTO {
   readonly banner?: string;
 
   @IsOptional()
-  @IsUUID()
-  readonly manager: string;
+  @IsArray()
+  readonly users: {
+    user_uuid: string;
+    role: string;
+  }[];
 
   @IsOptional()
   @IsBoolean()

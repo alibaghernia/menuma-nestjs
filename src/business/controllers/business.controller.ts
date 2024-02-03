@@ -5,12 +5,14 @@ import {
   Get,
   Param,
   Post,
+  Query,
   UsePipes,
 } from '@nestjs/common';
 import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
 import { NewPagerRequestDTO } from '../dto';
 import { BusinessService } from '../services/business.service';
 import { IsPublic } from 'src/auth/decorators/is_public.decorator';
+import { BusinessesFiltersDTO } from '../dto/filters.dto';
 
 @Controller('business')
 @UsePipes(UUIDCheckerController)
@@ -19,17 +21,29 @@ export class BusinessController {
   constructor(private businessService: BusinessService) {}
 
   @Get()
-  async getPublicBusinesses() {
-    const businesses = await this.businessService.getPublicBusinesses();
+  async getBusinesses(@Query() filters: BusinessesFiltersDTO) {
+    const [businesses, total] =
+      await this.businessService.getBusinesses(filters);
     return {
       ok: true,
-      data: businesses,
+      data: {
+        businesses,
+        total,
+      },
     };
   }
 
   @Get(':business_slug')
   async getBySlug(@Param('business_slug') business_slug: string) {
     const business = await this.businessService.findBySlug(business_slug);
+    return {
+      ok: true,
+      data: business,
+    };
+  }
+  @Get(':business_slug/menu')
+  async getMenu(@Param('business_slug') business_slug: string) {
+    const business = await this.businessService.getMenu(business_slug);
     return {
       ok: true,
       data: business,

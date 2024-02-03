@@ -31,6 +31,7 @@ import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
 import { BusinessTable } from './business_tables.entity';
 import { PagerRequest } from './pager_request.entity';
 import { Hall } from './hall.entity';
+import { makeImageUrl } from 'src/utils/images';
 
 @Table({
   underscored: true,
@@ -76,11 +77,28 @@ export class Business extends Model<Business> {
   @Column({ type: DataType.JSON })
   working_hours: unknown[];
 
-  @Column({ type: DataType.STRING })
+  @Column({
+    type: DataType.STRING,
+    get(this: Business) {
+      const logo = this.getDataValue('logo');
+      if (logo) this.setDataValue('logo_url', makeImageUrl(logo));
+      return logo;
+    },
+  })
   logo: string;
 
-  @Column({ type: DataType.STRING })
+  logo_url: string;
+
+  @Column({
+    type: DataType.STRING,
+    get(this: Business) {
+      const banner = this.getDataValue('banner');
+      if (banner) this.setDataValue('banner_url', makeImageUrl(banner));
+      return banner;
+    },
+  })
   banner: string;
+  banner_url: string;
 
   @Column({ type: DataType.BOOLEAN })
   pager: boolean;
@@ -91,8 +109,11 @@ export class Business extends Model<Business> {
   @Column({ type: DataType.STRING, allowNull: true })
   domain?: string;
 
-  @Column({ type: DataType.BOOLEAN, allowNull: true })
+  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: true })
   public: boolean;
+
+  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
+  pin: boolean;
 
   @BelongsToMany(() => User, {
     through: () => BusinessUser,

@@ -9,7 +9,6 @@ import { UpdateCategoryDTO } from '../dto/update.dto';
 import { BusinessCategoryProduct } from 'src/product/entities/business-category_product.entity';
 import { FiltersDTO } from '../dto/filters.dto';
 import { Op } from 'sequelize';
-import { makeImageUrl } from 'src/utils/images';
 
 @Injectable()
 export class CategoryPanelService {
@@ -59,7 +58,6 @@ export class CategoryPanelService {
     const categories = business.categories as (Category & {
       BusinessCategory: any;
       products_count: number;
-      image_url: string;
     })[];
 
     for (const category of categories) {
@@ -68,7 +66,6 @@ export class CategoryPanelService {
           business_category_uuid: category.BusinessCategory.uuid,
         },
       });
-      if (category.image) category.image_url = makeImageUrl(category.image);
       delete category.BusinessCategory;
     }
     return {
@@ -80,22 +77,17 @@ export class CategoryPanelService {
     };
   }
   async findOne(category_uuid: string) {
-    const category: Category & { image_url?: string } =
-      await this.categoryRep.findOne({
-        where: {
-          uuid: category_uuid,
-        },
-        raw: true,
-      });
+    const category = await this.categoryRep.findOne({
+      where: {
+        uuid: category_uuid,
+      },
+      raw: true,
+    });
     if (!category)
       throw new HttpException(
         'Category not found!',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
-    if (category.image) category.image_url = makeImageUrl(category.image);
-    console.log({
-      category,
-    });
     return category;
   }
   // TODO: add checking duplicate category creation

@@ -10,6 +10,7 @@ import {
 } from 'sequelize-typescript';
 import { Business } from 'src/business/entites/business.entity';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
+import { makeImageUrl } from 'src/utils/images';
 
 @Table({
   tableName: 'categories',
@@ -42,8 +43,14 @@ export class Category extends Model<Category> {
 
   @Column({
     type: DataType.STRING,
+    get(this: Category) {
+      const image = this.getDataValue('image');
+      if (image) this.setDataValue('image_url', makeImageUrl(image));
+      return image;
+    },
   })
   image: string;
+  image_url: string;
 
   @HasMany(() => Category, {
     as: 'childs',

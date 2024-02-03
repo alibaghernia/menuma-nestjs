@@ -126,9 +126,7 @@ export class ProductPanelService {
 
     if (!result)
       throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
-
     const { businessCategories, ...product } = result;
-
     (product as Product & { categories?: Category[] }).categories =
       businessCategories.map((besCat) => besCat.category);
 

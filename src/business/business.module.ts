@@ -13,6 +13,7 @@ import { BusinessTable } from './entites/business_tables.entity';
 import { PagerRequest } from './entites/pager_request.entity';
 import { PagerRequestgGateway } from './gateways/pager_request.gateway';
 import { Hall } from './entites/hall.entity';
+import { BusinessCategory } from './entites/business_category.entity';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { Hall } from './entites/hall.entity';
       Social,
       User,
       BusinessUser,
+      BusinessCategory,
       BusinessTable,
       PagerRequest,
       Hall,
