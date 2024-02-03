@@ -16,7 +16,9 @@ import { Role } from 'src/access_control/entities/role.entity';
 import { Permission } from 'src/access_control/entities/permission.entity';
 import {
   BelongsToManyAddAssociationMixin,
+  BelongsToManyHasAssociationMixin,
   BelongsToManyRemoveAssociationMixin,
+  BelongsToManySetAssociationsMixin,
 } from 'sequelize';
 
 @Table({
@@ -38,7 +40,7 @@ export class BusinessUser extends Model<BusinessUser> {
   user_uuid: string;
 
   @Column({
-    type: DataType.ENUM('manager', 'employee'),
+    type: DataType.ENUM('user', 'manager', 'employee'),
     defaultValue: 'employee',
     allowNull: false,
   })
@@ -94,4 +96,6 @@ export class BusinessUser extends Model<BusinessUser> {
 
   removeRole: BelongsToManyRemoveAssociationMixin<Role, Role['uuid']>;
   addRole: BelongsToManyAddAssociationMixin<Role, Role['uuid']>;
+  hasRole: BelongsToManyHasAssociationMixin<Role, Role['uuid']>;
+  setRoles: BelongsToManySetAssociationsMixin<Role, Role['uuid']>;
 }

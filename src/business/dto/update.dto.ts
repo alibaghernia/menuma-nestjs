@@ -68,7 +68,7 @@ export class UpdateBusinessDTO {
 
   @IsOptional()
   @IsArray()
-  readonly working_hours?: object[];
+  readonly working_hours?: unknown[];
 
   @IsOptional()
   @IsString()

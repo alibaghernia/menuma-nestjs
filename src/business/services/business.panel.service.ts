@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Business } from '../entites/business.entity';
-import { FindOptions, Op, WhereOptions } from 'sequelize';
+import { FindOptions, Op, QueryError, WhereOptions } from 'sequelize';
 import { CreateBusinessDTO, CreateHallDTO, CreateTableDTO } from '../dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
@@ -60,16 +60,25 @@ export class BusinessPanelService {
     private pagerRequestGateway: PagerRequestgGateway,
   ) {}
 
-  async findAll(filters: BusinessesFiltersDTO) {
+  async findAll({ name = '', ...filters }: BusinessesFiltersDTO) {
     this.logger.log('fetch all businesses');
+
     const offset = filters.page
       ? +filters.page * +filters.limit - +filters.limit
       : undefined;
     const limit = filters.page ? offset + +filters.limit : undefined;
+
+    const where = {
+      name: {
+        [Op.like]: `%${name}%`,
+      },
+    };
+
     let businesses: (Business & {
       logo_url?: string;
       banner_url?: string;
     })[] = await this.businessRepository.findAll({
+      where,
       include: [
         {
           model: Social,
@@ -87,7 +96,9 @@ export class BusinessPanelService {
       if (business.banner) business.banner_url = makeImageUrl(business.banner);
       return business;
     });
-    const count = await this.businessRepository.count();
+    const count = await this.businessRepository.count({
+      where,
+    });
 
     return {
       businesses,
@@ -132,9 +143,6 @@ export class BusinessPanelService {
 
     if (business.logo) business.logo_url = makeImageUrl(business.logo);
     if (business.banner) business.banner_url = makeImageUrl(business.banner);
-    console.log({
-      business,
-    });
     return business;
   }
 
@@ -156,11 +164,16 @@ export class BusinessPanelService {
         manager,
         ...business
       } = payload;
-
-      const newCafeRes = await this.businessRepository.create({
-        ...business,
-        status: status == 'active',
+      console.log({
+        business,
       });
+      const newCafeRes = await this.businessRepository.create(
+        {
+          ...business,
+          status: status == 'active',
+        },
+        { transaction },
+      );
 
       const socials: Partial<Social>[] = Object.entries({
         instagram,
@@ -175,13 +188,28 @@ export class BusinessPanelService {
           type: k,
           link: v,
         }));
-      await this.socialRepository.bulkCreate(socials);
-      if (manager) await newCafeRes.addUser(manager);
+      await this.socialRepository.bulkCreate(socials, { transaction });
+      if (manager)
+        await newCafeRes.setUsers([manager], {
+          transaction,
+          through: { role: 'manager' },
+        });
       await transaction.commit();
 
       return newCafeRes;
     } catch (error) {
       await transaction.rollback();
+      if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {
+        // duplicate entry
+        throw new HttpException(
+          {
+            code: 1,
+            message: `some fields are duplicate!`,
+            fields: Object.keys(error.fields),
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       throw error;
     }
   }
@@ -264,6 +292,17 @@ export class BusinessPanelService {
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
+      if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {
+        // duplicate entry
+        throw new HttpException(
+          {
+            code: 1,
+            message: `some fields are duplicate!`,
+            fields: Object.keys(error.fields),
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       throw error;
     }
   }

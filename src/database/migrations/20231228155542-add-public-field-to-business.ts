@@ -4,8 +4,8 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.addColumn('businesses', 'public', {
       type: Sequelize.BOOLEAN,
-      allowNull: false,
-      defaultValue: false, // Set the default value if needed
+      allowNull: true,
+      defaultValue: true, // Set the default value if needed
     });
   },
 

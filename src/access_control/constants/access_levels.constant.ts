@@ -191,3 +191,16 @@ export const roles = {
       .map((item) => item.uuid),
   },
 };
+export const Business_Employee_role = {
+  uuid: '2e4dfd6c-49f2-4ee5-b758-0823dacbd6eb',
+  business_uuid: '',
+  title: 'Business Employee',
+  permissions: all_permissions
+    .filter(
+      (item) =>
+        !administratorAccessPermissions
+          .map((item) => item.action)
+          .includes(item.action),
+    )
+    .map((item) => item.uuid),
+};

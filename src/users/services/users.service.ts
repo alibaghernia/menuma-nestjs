@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { User } from '../entites/user.entity';
 import { InjectModel } from '@nestjs/sequelize';
 import { Business } from 'src/business/entites/business.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class UsersService {
@@ -21,6 +22,11 @@ export class UsersService {
           attributes: ['uuid', 'name', 'slug'],
           through: {
             attributes: [],
+            where: {
+              role: {
+                [Op.or]: ['manager', 'employee'],
+              },
+            },
           },
         },
       ],

@@ -44,6 +44,7 @@ export class QrCodePanelService {
         // duplicate entry
         throw new HttpException(
           {
+            code: 1,
             message: `some fields are duplicate!`,
             fields: Object.keys(error.fields),
           },

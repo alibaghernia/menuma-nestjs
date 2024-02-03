@@ -1,11 +1,4 @@
-import {
-  Equals,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  IsUUID,
-} from 'class-validator';
+import { Equals, IsArray, IsOptional, IsString } from 'class-validator';
 
 export class UpdateUserDTO {
   @IsOptional()
@@ -20,18 +13,16 @@ export class UpdateUserDTO {
   @IsString()
   mobile?: string;
 
-  @IsNotEmpty()
-  @IsEnum({ user: 'user', manager: 'manager' })
-  @IsString()
-  role: string;
+  @IsOptional()
+  @IsArray()
+  businesses?: {
+    business_uuid: string;
+    role: string;
+  }[];
 
   @IsOptional()
   @IsString()
   email?: string;
-
-  @IsOptional()
-  @IsUUID()
-  business_uuid: string;
 
   @IsOptional()
   @IsString()

@@ -1,9 +1,8 @@
 import {
-  IsEnum,
+  IsArray,
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUUID,
   ValidateIf,
 } from 'class-validator';
 
@@ -24,18 +23,16 @@ export class CreateUserDTO {
   @IsString()
   mobile: string;
 
-  @IsNotEmpty()
-  @IsEnum({ user: 'user', manager: 'manager' })
-  @IsString()
-  role: string;
-
   @ValidateIf((e) => !e.mobile && !e.username)
   @IsString()
   email: string;
 
   @IsOptional()
-  @IsUUID()
-  business_uuid: string;
+  @IsArray()
+  businesses?: {
+    business_uuid: string;
+    role: string;
+  }[];
 
   @IsString()
   @IsNotEmpty()

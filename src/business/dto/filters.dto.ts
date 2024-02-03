@@ -8,6 +8,10 @@ export class BusinessesFiltersDTO {
   @IsOptional()
   @IsString()
   limit: number;
+
+  @IsOptional()
+  @IsString()
+  name: string;
 }
 export class TablesFiltersDTO {
   @IsOptional()

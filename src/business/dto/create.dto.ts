@@ -1,4 +1,3 @@
-import { Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -6,9 +5,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  isString,
   IsUUID,
-  ValidateNested,
 } from 'class-validator';
 
 export class CreateBusinessDTO {
@@ -70,9 +67,7 @@ export class CreateBusinessDTO {
 
   @IsOptional()
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => isString)
-  readonly working_hours?: object[];
+  readonly working_hours?: unknown[];
 
   @IsOptional()
   @IsString()

@@ -18,6 +18,7 @@ import {
   BelongsToManyHasAssociationMixin,
   BelongsToManyHasAssociationsMixin,
   BelongsToManyRemoveAssociationMixin,
+  BelongsToManySetAssociationsMixin,
   HasManyAddAssociationMixin,
   HasManyCountAssociationsMixin,
   HasManyCreateAssociationMixin,
@@ -73,7 +74,7 @@ export class Business extends Model<Business> {
   email: string;
 
   @Column({ type: DataType.JSON })
-  working_hours: object[];
+  working_hours: unknown[];
 
   @Column({ type: DataType.STRING })
   logo: string;
@@ -90,7 +91,7 @@ export class Business extends Model<Business> {
   @Column({ type: DataType.STRING, allowNull: true })
   domain?: string;
 
-  @Column({ type: DataType.BOOLEAN })
+  @Column({ type: DataType.BOOLEAN, allowNull: true })
   public: boolean;
 
   @BelongsToMany(() => User, {
@@ -168,6 +169,7 @@ export class Business extends Model<Business> {
   count: HasManyCountAssociationsMixin;
 
   addUser: HasManyAddAssociationMixin<User, User['uuid']>;
+  setUsers: BelongsToManySetAssociationsMixin<User, User['uuid']>;
   removeUser: HasManyRemoveAssociationMixin<User, User['uuid']>;
   hasUser: HasManyHasAssociationMixin<User, User['uuid']>;
   createUser: HasManyCreateAssociationMixin<User>;

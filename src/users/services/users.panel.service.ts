@@ -11,7 +11,7 @@ import { Business } from 'src/business/entites/business.entity';
 import { Sequelize } from 'sequelize-typescript';
 import { doInTransaction } from 'src/transaction';
 import { BusinessUser } from 'src/business/entites/business_user.entity';
-import { roles } from 'src/access_control/constants';
+import { Business_Employee_role, roles } from 'src/access_control/constants';
 
 @Injectable()
 export class UsersPanelService {
@@ -54,9 +54,10 @@ export class UsersPanelService {
       include: [
         {
           model: Business,
+          required: false,
           attributes: ['uuid', 'name'],
           through: {
-            attributes: [],
+            attributes: ['role'],
           },
         },
       ],
@@ -64,7 +65,14 @@ export class UsersPanelService {
     const count = await this.userRepository.count({
       where,
     });
-    return [users, count];
+
+    return [
+      users.map((user) => ({
+        ...user.get({ plain: true }),
+        role: user.businesses?.[0]?.BusinessUser.role,
+      })),
+      count,
+    ];
   }
 
   fetchOne(where: WhereOptions<User>) {
@@ -81,17 +89,21 @@ export class UsersPanelService {
       include: [
         {
           model: Business,
+          required: false,
           attributes: ['uuid', 'name'],
           through: {
-            attributes: [],
+            attributes: ['role'],
           },
         },
       ],
+      plain: true,
     });
-
     if (!user) throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
 
-    return user;
+    return {
+      ...user.get({ plain: true }),
+      role: user.businesses?.[0]?.BusinessUser.role,
+    };
   }
 
   findByMobile(mobile: string) {
@@ -104,9 +116,6 @@ export class UsersPanelService {
 
   async getAllManagers(filters: GetManagersFiltersDTO) {
     let users = await this.userRepository.findAll({
-      where: {
-        role: 'manager',
-      },
       attributes: {
         exclude: ['password'],
       },
@@ -116,6 +125,9 @@ export class UsersPanelService {
           required: false,
           attributes: ['uuid'],
           through: {
+            where: {
+              role: 'manager',
+            },
             attributes: [],
           },
         },
@@ -132,16 +144,8 @@ export class UsersPanelService {
 
   async createUser(payload: CreateUserDTO) {
     try {
-      const { password, business_uuid, ...userPayload } = payload;
+      const { password, businesses, ...userPayload } = payload;
       await doInTransaction(this.sequelize, async (transaction) => {
-        if (
-          business_uuid &&
-          !(await this.businessRepository.count({
-            where: { uuid: business_uuid },
-          }))
-        )
-          throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-
         const user = await this.userRepository.create(
           {
             password: bcrypt.hashSync(password, bcrypt.genSaltSync()),
@@ -149,22 +153,36 @@ export class UsersPanelService {
           },
           { transaction },
         );
-        if (business_uuid) {
-          await user.setBusinesses([business_uuid], { transaction });
-          const businessUser = await this.businessUserRepository.findOne({
+        if (businesses?.length) {
+          const businessUUIDs = businesses.map((bus) => bus.business_uuid);
+          await user.setBusinesses(businessUUIDs, {
+            transaction,
+          });
+          const businessUsers = await this.businessUserRepository.findAll({
             where: {
-              business_uuid,
+              business_uuid: businessUUIDs,
               user_uuid: user.uuid,
             },
+            transaction,
           });
-          if (user.role == 'manager') {
-            await businessUser.addRole(roles.Business_Manager.uuid, {
-              transaction,
-            });
-          } else {
-            await businessUser.removeRole(roles.Business_Manager.uuid, {
-              transaction,
-            });
+          for (const businessUser of businessUsers) {
+            const newRole = businesses.find(
+              (bus) => bus.business_uuid == businessUser.business_uuid,
+            )?.role;
+            if (newRole && newRole != businessUser.role) {
+              await businessUser.update({ role: newRole }, { transaction });
+              if (newRole == 'manager') {
+                await businessUser.setRoles([roles.Business_Manager.uuid], {
+                  transaction,
+                });
+              } else if (newRole == 'employee') {
+                await businessUser.setRoles([Business_Employee_role.uuid], {
+                  transaction,
+                });
+              } else {
+                await businessUser.setRoles([], { transaction });
+              }
+            }
           }
         }
       });
@@ -173,6 +191,7 @@ export class UsersPanelService {
         // duplicate entry
         throw new HttpException(
           {
+            code: 1,
             message: `some fields are duplicate!`,
             fields: Object.keys(error.fields),
           },
@@ -185,16 +204,8 @@ export class UsersPanelService {
 
   async updateUser(user_uuid: string, payload: UpdateUserDTO) {
     try {
-      const { business_uuid, ...userPayload } = payload;
+      const { businesses, ...userPayload } = payload;
       return await doInTransaction(this.sequelize, async (transaction) => {
-        if (
-          business_uuid &&
-          !(await this.businessRepository.count({
-            where: { uuid: business_uuid },
-          }))
-        )
-          throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-
         const user = await this.userRepository.findOne({
           where: {
             uuid: user_uuid,
@@ -210,24 +221,39 @@ export class UsersPanelService {
         user.update(userPayload, {
           transaction,
         });
-        if (business_uuid) {
-          if (!(await user.hasBusiness(business_uuid)))
-            await user.setBusinesses([business_uuid], { transaction });
-          const businessUser = await this.businessUserRepository.findOne({
+        if (businesses?.length) {
+          const businessUUIDs = businesses.map((bus) => bus.business_uuid);
+          await user.setBusinesses(businessUUIDs, {
+            transaction,
+          });
+          const businessUsers = await this.businessUserRepository.findAll({
             where: {
-              business_uuid,
+              business_uuid: businessUUIDs,
               user_uuid: user.uuid,
             },
+            transaction,
           });
-          if (user.role == 'manager') {
-            await businessUser.addRole(roles.Business_Manager.uuid, {
-              transaction,
-            });
-          } else {
-            await businessUser.removeRole(roles.Business_Manager.uuid, {
-              transaction,
-            });
+          for (const businessUser of businessUsers) {
+            const newRole = businesses.find(
+              (bus) => bus.business_uuid == businessUser.business_uuid,
+            )?.role;
+            if (newRole && newRole != businessUser.role) {
+              await businessUser.update({ role: newRole }, { transaction });
+              if (newRole == 'manager') {
+                await businessUser.setRoles([roles.Business_Manager.uuid], {
+                  transaction,
+                });
+              } else if (newRole == 'employee') {
+                await businessUser.setRoles([Business_Employee_role.uuid], {
+                  transaction,
+                });
+              } else {
+                await businessUser.setRoles([], { transaction });
+              }
+            }
           }
+        } else {
+          await user.setBusinesses([]);
         }
       });
     } catch (error) {
@@ -235,6 +261,7 @@ export class UsersPanelService {
         // duplicate entry
         throw new HttpException(
           {
+            code: 1,
             message: `some fields are duplicate!`,
             fields: Object.keys(error.fields),
           },
