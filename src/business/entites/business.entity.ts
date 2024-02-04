@@ -28,9 +28,9 @@ import {
 } from 'sequelize';
 import { Role } from 'src/access_control/entities/role.entity';
 import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
-import { BusinessTable } from './business_tables.entity';
+import { BusinessTable } from '../sub_modules/table/entitile/business_tables.entity';
 import { PagerRequest } from './pager_request.entity';
-import { BusinessHall } from './business_hall.entity';
+import { BusinessHall } from '../sub_modules/hall/entities/business_hall.entity';
 import { makeImageUrl } from 'src/utils/images';
 
 @Table({

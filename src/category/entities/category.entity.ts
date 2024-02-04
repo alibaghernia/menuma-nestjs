@@ -43,13 +43,13 @@ export class Category extends Model<Category> {
 
   @Column({
     type: DataType.STRING,
-    get(this: Category) {
-      const image = this.getDataValue('image');
-      if (image) this.setDataValue('image_url', makeImageUrl(image));
-      return image;
-    },
   })
   image: string;
+  setImageUrl() {
+    const image = this.getDataValue('image');
+    if (image) this.setDataValue('image_url', makeImageUrl(image));
+    return this;
+  }
   image_url: string;
 
   @HasMany(() => Category, {

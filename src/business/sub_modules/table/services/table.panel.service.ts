@@ -1,12 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { TablesFiltersDTO } from 'src/business/dto/filters.dto';
 import { Business } from 'src/business/entites/business.entity';
-import { BusinessTable } from 'src/business/entites/business_tables.entity';
 import { CreateTableDTO } from '../dto';
 import { UpdateTableDTO } from '../dto/update.dto';
+import { BusinessTable } from '../entitile/business_tables.entity';
 
 @Injectable()
 export class TablePanelService {
@@ -18,19 +18,28 @@ export class TablePanelService {
     private sequelize: Sequelize,
   ) {}
 
-  async getTables(business_uuid: string, filters: TablesFiltersDTO) {
-    const { page, limit, ...whereFilters } = filters;
+  async getTables(
+    business_uuid: string,
+    { code = '', ...filters }: TablesFiltersDTO,
+  ) {
+    const offset = filters.page
+      ? +filters.page * +filters.limit - +filters.limit
+      : undefined;
+    const limit = filters.page ? offset + +filters.limit : undefined;
 
-    const tables = await this.businessTableRepository.findAll({
-      where: {
-        business_uuid,
-        ...whereFilters,
+    const where: WhereOptions<BusinessTable> = {
+      business_uuid,
+      code: {
+        [Op.like]: `%${code}%`,
       },
+    };
+    const tables = await this.businessTableRepository.findAll({
+      where,
       attributes: {
         exclude: ['business_uuid'],
       },
-      limit: page * limit,
-      offset: page * limit - limit,
+      limit,
+      offset,
     });
     const count = await this.businessTableRepository.count({
       where: {
@@ -38,7 +47,7 @@ export class TablePanelService {
       },
     });
     return {
-      tables,
+      tables: tables.map((table) => table.setImageUrl()),
       total: count,
     };
   }
@@ -52,7 +61,7 @@ export class TablePanelService {
         exclude: ['business_uuid'],
       },
     });
-    return table;
+    return table.setImageUrl();
   }
   async createTable(business_uuid: string, payload: CreateTableDTO) {
     const transaction = await this.sequelize.transaction();
@@ -73,7 +82,8 @@ export class TablePanelService {
         throw new HttpException(
           {
             ok: false,
-            code: 4001,
+            code: 1,
+            fields: ['code'],
             message: 'Table is already exists!',
           },
           HttpStatus.BAD_REQUEST,
@@ -129,6 +139,7 @@ export class TablePanelService {
           },
           HttpStatus.BAD_REQUEST,
         );
+      if (!payload.hall_uuid) payload.hall_uuid = '';
       await this.businessTableRepository.update(payload, {
         where: {
           uuid: table_uuid,

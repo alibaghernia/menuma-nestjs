@@ -31,22 +31,20 @@ export class CategoryPanelService {
           Object.entries(filters).map(([k, v]) => [k, { [Op.like]: `%${v}%` }]),
         )
       : {};
-    const business = (
-      await this.businessRep.findOne({
-        where: {
-          uuid: business_uuid,
-        },
-        include: [
-          {
-            model: Category,
-            where: categoriesFilters,
-            through: {
-              // attributes: [],
-            },
+    const business = await this.businessRep.findOne({
+      where: {
+        uuid: business_uuid,
+      },
+      include: [
+        {
+          model: Category,
+          where: categoriesFilters,
+          through: {
+            // attributes: [],
           },
-        ],
-      })
-    )?.get({ plain: true });
+        },
+      ],
+    });
     if (filters && !business)
       return {
         categories: [],
@@ -61,6 +59,7 @@ export class CategoryPanelService {
     })[];
 
     for (const category of categories) {
+      category.setImageUrl();
       category.products_count = await this.businessCategoryProductRep.count({
         where: {
           business_category_uuid: category.BusinessCategory.uuid,
@@ -81,14 +80,13 @@ export class CategoryPanelService {
       where: {
         uuid: category_uuid,
       },
-      raw: true,
     });
     if (!category)
       throw new HttpException(
         'Category not found!',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
-    return category;
+    return category.setImageUrl();
   }
   // TODO: add checking duplicate category creation
   async create(business_uuid: string, payload: CreateCategoryDTO) {

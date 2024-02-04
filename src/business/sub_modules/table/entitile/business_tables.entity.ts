@@ -7,9 +7,9 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Business } from './business.entity';
-import { PagerRequest } from './pager_request.entity';
-import { BusinessHall } from './business_hall.entity';
+import { Business } from '../../../entites/business.entity';
+import { PagerRequest } from '../../../entites/pager_request.entity';
+import { BusinessHall } from '../../hall/entities/business_hall.entity';
 import { makeImageUrl } from 'src/utils/images';
 
 @Table({
@@ -73,14 +73,14 @@ export class BusinessTable extends Model<BusinessTable> {
   @Column({
     type: DataType.STRING,
     allowNull: true,
-    get(this) {
-      const image = this.getDataValue('image');
-      if (image) this.setDataValue('image_url', makeImageUrl(image));
-      return image;
-    },
   })
   image?: string;
-  image_url?: string;
+  setImageUrl() {
+    const image = this.getDataValue('image');
+    if (image) this.setDataValue('image_url', makeImageUrl(image));
+    return this;
+  }
+  image_url: string;
 
   @ForeignKey(() => BusinessHall)
   @Column({

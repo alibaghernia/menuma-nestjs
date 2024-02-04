@@ -169,19 +169,17 @@ export class UsersPanelService {
             const newRole = businesses.find(
               (bus) => bus.business_uuid == businessUser.business_uuid,
             )?.role;
-            if (newRole && newRole != businessUser.role) {
-              await businessUser.update({ role: newRole }, { transaction });
-              if (newRole == 'manager') {
-                await businessUser.setRoles([roles.Business_Manager.uuid], {
-                  transaction,
-                });
-              } else if (newRole == 'employee') {
-                await businessUser.setRoles([Business_Employee_role.uuid], {
-                  transaction,
-                });
-              } else {
-                await businessUser.setRoles([], { transaction });
-              }
+            await businessUser.update({ role: newRole }, { transaction });
+            if (newRole == 'manager') {
+              await businessUser.setRoles([roles.Business_Manager.uuid], {
+                transaction,
+              });
+            } else if (newRole == 'employee') {
+              await businessUser.setRoles([Business_Employee_role.uuid], {
+                transaction,
+              });
+            } else {
+              await businessUser.setRoles([], { transaction });
             }
           }
         }
@@ -237,19 +235,20 @@ export class UsersPanelService {
             const newRole = businesses.find(
               (bus) => bus.business_uuid == businessUser.business_uuid,
             )?.role;
-            if (newRole && newRole != businessUser.role) {
-              await businessUser.update({ role: newRole }, { transaction });
-              if (newRole == 'manager') {
-                await businessUser.setRoles([roles.Business_Manager.uuid], {
-                  transaction,
-                });
-              } else if (newRole == 'employee') {
-                await businessUser.setRoles([Business_Employee_role.uuid], {
-                  transaction,
-                });
-              } else {
-                await businessUser.setRoles([], { transaction });
-              }
+            console.log({
+              newRole,
+            });
+            await businessUser.update({ role: newRole }, { transaction });
+            if (newRole == 'manager') {
+              await businessUser.setRoles([roles.Business_Manager.uuid], {
+                transaction,
+              });
+            } else if (newRole == 'employee') {
+              await businessUser.setRoles([Business_Employee_role.uuid], {
+                transaction,
+              });
+            } else {
+              await businessUser.setRoles([], { transaction });
             }
           }
         } else {

@@ -7,7 +7,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { Business } from './business.entity';
-import { BusinessTable } from './business_tables.entity';
+import { BusinessTable } from '../sub_modules/table/entitile/business_tables.entity';
 
 @Table({
   tableName: 'pager-requests',

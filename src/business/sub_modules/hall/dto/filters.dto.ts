@@ -3,11 +3,13 @@ import { IsOptional, IsString } from 'class-validator';
 export class HallsFiltersDTO {
   @IsOptional()
   @IsString()
-  code: string;
+  code?: string;
 
+  @IsOptional()
   @IsString()
-  page: number;
+  page?: number;
 
+  @IsOptional()
   @IsString()
-  limit: number;
+  limit?: number;
 }

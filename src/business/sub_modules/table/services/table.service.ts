@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Business } from 'src/business/entites/business.entity';
-import { BusinessTable } from 'src/business/entites/business_tables.entity';
+import { BusinessTable } from '../entitile/business_tables.entity';
 
 @Injectable()
 export class TableService {
@@ -35,7 +35,7 @@ export class TableService {
       });
       if (!table)
         throw new HttpException('Table not found!', HttpStatus.NOT_FOUND);
-      return table;
+      return table.setImageUrl();
     } catch (error) {
       throw error;
     }

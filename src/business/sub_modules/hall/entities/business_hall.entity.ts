@@ -5,7 +5,7 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Business } from './business.entity';
+import { Business } from '../../../entites/business.entity';
 import { makeImageUrl } from 'src/utils/images';
 
 @Table({
@@ -49,14 +49,14 @@ export class BusinessHall extends Model<BusinessHall> {
   @Column({
     type: DataType.STRING,
     allowNull: true,
-    get(this) {
-      const image = this.getDataValue('image');
-      if (image) this.setDataValue('image_url', makeImageUrl(image));
-      return image;
-    },
   })
   image?: string;
-  image_url?: string;
+  setImageUrl() {
+    const image = this.getDataValue('image');
+    if (image) this.setDataValue('image_url', makeImageUrl(image));
+    return this;
+  }
+  image_url: string;
 
   @Column({
     type: DataType.STRING,

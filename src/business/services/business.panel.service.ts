@@ -19,14 +19,12 @@ import { SetBusinessManagerDTO } from '../dto/set_business_manager';
 import { BusinessUser } from '../entites/business_user.entity';
 import { Business_Employee_role, roles } from 'src/access_control/constants';
 import { BusinessUserRole } from 'src/access_control/entities/business-user_role.entity';
-import { BusinessTable } from '../entites/business_tables.entity';
+import { BusinessTable } from '../sub_modules/table/entitile/business_tables.entity';
 import {
   PanelBusinessesFiltersDTO,
   PagerRequestsFiltersDTO,
 } from '../dto/filters.dto';
 import { PagerRequest } from '../entites/pager_request.entity';
-// import { Role } from 'src/access_control/entities/role.entity';
-import { BusinessHall } from '../entites/business_hall.entity';
 import { PagerRequestgGateway } from '../gateways/pager_request.gateway';
 
 @Injectable()
@@ -41,8 +39,6 @@ export class BusinessPanelService {
     private socialRepository: typeof Social,
     @InjectModel(BusinessUser)
     private businessUserRepository: typeof BusinessUser,
-    @InjectModel(BusinessHall)
-    private HallRepository: typeof BusinessHall,
     @InjectModel(PagerRequest)
     private pagerRequestRepository: typeof PagerRequest,
     private sequelize: Sequelize,

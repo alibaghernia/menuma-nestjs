@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Business } from 'src/business/entites/business.entity';
-import { BusinessHall } from 'src/business/entites/business_hall.entity';
+import { BusinessHall } from '../entities/business_hall.entity';
 
 @Injectable()
 export class HallService {
@@ -35,7 +35,7 @@ export class HallService {
       });
       if (!hall)
         throw new HttpException('Hall not found!', HttpStatus.NOT_FOUND);
-      return hall;
+      return hall.setImageUrl();
     } catch (error) {
       throw error;
     }

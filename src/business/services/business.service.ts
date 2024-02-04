@@ -6,7 +6,7 @@ import { NewPagerRequestDTO } from '../dto';
 import { PagerRequest } from '../entites/pager_request.entity';
 import { STATUS } from '../constants/pager_request.cons';
 import { PagerRequestgGateway } from '../gateways/pager_request.gateway';
-import { BusinessTable } from '../entites/business_tables.entity';
+import { BusinessTable } from '../sub_modules/table/entitile/business_tables.entity';
 import { BusinessesFiltersDTO } from '../dto/filters.dto';
 import { FindAttributeOptions, FindOptions, WhereOptions } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';

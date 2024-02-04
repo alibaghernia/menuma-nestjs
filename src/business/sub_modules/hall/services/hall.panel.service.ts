@@ -2,11 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateHallDTO } from '../dto';
 import { HallsFiltersDTO } from '../dto/filters.dto';
 import { UpdateHallDTO } from '../dto/update.dto';
-import { Op } from 'sequelize';
+import { Op, WhereOptions } from 'sequelize';
 import { InjectModel } from '@nestjs/sequelize';
-import { BusinessHall } from 'src/business/entites/business_hall.entity';
 import { Business } from 'src/business/entites/business.entity';
 import { Sequelize } from 'sequelize-typescript';
+import { BusinessHall } from '../entities/business_hall.entity';
 
 @Injectable()
 export class HallPanelService {
@@ -17,19 +17,29 @@ export class HallPanelService {
     private businessRepository: typeof Business,
     private sequelize: Sequelize,
   ) {}
-  async getHalls(business_uuid: string, filters: HallsFiltersDTO) {
-    const { page, limit, ...whereFilters } = filters;
+  async getHalls(
+    business_uuid: string,
+    { code = '', ...filters }: HallsFiltersDTO,
+  ) {
+    const offset = filters.page
+      ? +filters.page * +filters.limit - +filters.limit
+      : undefined;
+    const limit = filters.page ? offset + +filters.limit : undefined;
+
+    const where: WhereOptions<BusinessHall> = {
+      business_uuid,
+      code: {
+        [Op.like]: `%${code}%`,
+      },
+    };
 
     const halls = await this.businessHallRepository.findAll({
-      where: {
-        business_uuid,
-        ...whereFilters,
-      },
+      where,
       attributes: {
         exclude: ['business_uuid'],
       },
-      limit: page * limit,
-      offset: page * limit - limit,
+      limit,
+      offset,
     });
     const count = await this.businessHallRepository.count({
       where: {
@@ -37,7 +47,7 @@ export class HallPanelService {
       },
     });
     return {
-      halls,
+      halls: halls.map((hall) => hall.setImageUrl()),
       total: count,
     };
   }
@@ -51,7 +61,7 @@ export class HallPanelService {
         exclude: ['business_uuid'],
       },
     });
-    return hall;
+    return hall.setImageUrl();
   }
   async createHall(business_uuid: string, payload: CreateHallDTO) {
     const transaction = await this.sequelize.transaction();
@@ -67,7 +77,8 @@ export class HallPanelService {
         throw new HttpException(
           {
             ok: false,
-            code: 4001,
+            code: 1,
+            fields: ['code'],
             message: 'Hall is already exists!',
           },
           HttpStatus.BAD_REQUEST,
