@@ -10,11 +10,11 @@ import {
 } from '@nestjs/common';
 import { business_permissions } from 'src/access_control/constants';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
-import { CreateHallDTO } from 'src/business/dto';
 import { HallsFiltersDTO } from 'src/business/dto/filters.dto';
-import { UpdateHallDTO } from 'src/business/dto/update.dto';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { HallPanelService } from '../services/hall.panel.service';
+import { CreateHallDTO } from '../dto';
+import { UpdateHallDTO } from '../dto/update.dto';
 
 @Controller('panel/business/:business_uuid/halls')
 export class HallPanelController {

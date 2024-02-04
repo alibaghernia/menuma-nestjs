@@ -37,7 +37,19 @@ export class BusinessHall extends Model<BusinessHall> {
     type: DataType.INTEGER,
     allowNull: false,
   })
-  limit: number;
+  capacity: number;
+
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  max_capacity: number;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  image: string;
 
   @Column({
     type: DataType.STRING,

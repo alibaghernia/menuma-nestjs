@@ -3,12 +3,20 @@ import { CreateHallDTO } from '../dto';
 import { HallsFiltersDTO } from '../dto/filters.dto';
 import { UpdateHallDTO } from '../dto/update.dto';
 import { Op } from 'sequelize';
+import { InjectModel } from '@nestjs/sequelize';
+import { BusinessHall } from 'src/business/entites/business_hall.entity';
+import { Business } from 'src/business/entites/business.entity';
+import { Sequelize } from 'sequelize-typescript';
 
 @Injectable()
 export class HallPanelService {
-  businessHallRepository: any;
-  sequelize: any;
-  businessRepository: any;
+  constructor(
+    @InjectModel(BusinessHall)
+    private businessHallRepository: typeof BusinessHall,
+    @InjectModel(Business)
+    private businessRepository: typeof Business,
+    private sequelize: Sequelize,
+  ) {}
   async getHalls(business_uuid: string, filters: HallsFiltersDTO) {
     const { page, limit, ...whereFilters } = filters;
 
@@ -64,14 +72,9 @@ export class HallPanelService {
           },
           HttpStatus.BAD_REQUEST,
         );
-      await business.createHall(
-        {
-          code: payload.code,
-        },
-        {
-          transaction,
-        },
-      );
+      await business.createHall(payload, {
+        transaction,
+      });
 
       await transaction.commit();
     } catch (error) {

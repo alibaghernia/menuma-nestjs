@@ -10,11 +10,11 @@ import {
 } from '@nestjs/common';
 import { business_permissions } from 'src/access_control/constants';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
-import { CreateTableDTO } from 'src/business/dto';
 import { TablesFiltersDTO } from 'src/business/dto/filters.dto';
-import { UpdateTableDTO } from 'src/business/dto/update.dto';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { TablePanelService } from '../services/table.panel.service';
+import { CreateTableDTO } from '../dto';
+import { UpdateTableDTO } from '../dto/update.dto';
 
 @Controller('panel/business/:business_uuid/tables')
 export class TablePanelController {

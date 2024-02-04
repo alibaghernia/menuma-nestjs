@@ -2,7 +2,6 @@ import {
   IsArray,
   IsBoolean,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -91,24 +90,6 @@ export class CreateBusinessDTO {
     user_uuid: string;
     role: string;
   }[];
-}
-
-export class CreateTableDTO {
-  @IsString()
-  code: string;
-}
-export class CreateHallDTO {
-  @IsNotEmpty()
-  @IsString()
-  code: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  limit: number;
-
-  @IsOptional()
-  @IsString()
-  description: string;
 }
 
 export class NewPagerRequestDTO {

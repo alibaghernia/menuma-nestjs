@@ -229,7 +229,7 @@ export class Business extends Model<Business> {
     });
     return !!table;
   }
-  async hasHall(where: WhereOptions<BusinessTable>) {
+  async hasHall(where: WhereOptions<BusinessHall>) {
     const hall = await BusinessHall.count({
       where: {
         business_uuid: this.uuid,
@@ -239,8 +239,10 @@ export class Business extends Model<Business> {
     return !!hall;
   }
   createTable: HasManyCreateAssociationMixin<BusinessTable>;
+  createHall: HasManyCreateAssociationMixin<BusinessHall>;
   removeTable: HasManyRemoveAssociationMixin<
     BusinessTable,
     BusinessTable['uuid']
   >;
+  removeHall: HasManyRemoveAssociationMixin<BusinessHall, BusinessHall['uuid']>;
 }

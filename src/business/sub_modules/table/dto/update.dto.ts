@@ -1,7 +1,3 @@
-import { IsOptional, IsString } from 'class-validator';
+import { CreateTableDTO } from './create.dto';
 
-export class UpdateTableDTO {
-  @IsOptional()
-  @IsString()
-  code: string;
-}
+export class UpdateTableDTO extends CreateTableDTO {}

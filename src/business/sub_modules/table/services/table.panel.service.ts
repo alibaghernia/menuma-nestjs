@@ -2,11 +2,11 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { CreateTableDTO } from 'src/business/dto';
 import { TablesFiltersDTO } from 'src/business/dto/filters.dto';
-import { UpdateTableDTO } from 'src/business/dto/update.dto';
 import { Business } from 'src/business/entites/business.entity';
 import { BusinessTable } from 'src/business/entites/business_tables.entity';
+import { CreateTableDTO } from '../dto';
+import { UpdateTableDTO } from '../dto/update.dto';
 
 @Injectable()
 export class TablePanelService {
@@ -64,6 +64,11 @@ export class TablePanelService {
       });
       if (!business)
         throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
+      if (
+        payload.hall_uuid &&
+        !(await business.hasHall({ uuid: payload.hall_uuid }))
+      )
+        throw new HttpException('Hall not found!', HttpStatus.NOT_FOUND);
       if (await business.hasTable({ code: payload.code }))
         throw new HttpException(
           {
@@ -73,14 +78,9 @@ export class TablePanelService {
           },
           HttpStatus.BAD_REQUEST,
         );
-      await business.createTable(
-        {
-          code: payload.code,
-        },
-        {
-          transaction,
-        },
-      );
+      await business.createTable(payload, {
+        transaction,
+      });
 
       await transaction.commit();
     } catch (error) {

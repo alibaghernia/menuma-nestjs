@@ -1,15 +1,3 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { CreateHallDTO } from './create.dto';
 
-export class UpdateHallDTO {
-  @IsNotEmpty()
-  @IsString()
-  code: string;
-
-  @IsNotEmpty()
-  @IsNumber()
-  limit: number;
-
-  @IsOptional()
-  @IsString()
-  description: string;
-}
+export class UpdateHallDTO extends CreateHallDTO {}

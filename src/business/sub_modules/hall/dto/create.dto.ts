@@ -7,9 +7,17 @@ export class CreateHallDTO {
 
   @IsNotEmpty()
   @IsNumber()
-  limit: number;
+  capacity: number;
+
+  @IsOptional()
+  @IsNumber()
+  max_capacity: number;
 
   @IsOptional()
   @IsString()
   description: string;
+
+  @IsOptional()
+  @IsString()
+  image: string;
 }
