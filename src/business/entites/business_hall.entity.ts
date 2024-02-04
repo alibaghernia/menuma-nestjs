@@ -12,7 +12,7 @@ import { Business } from './business.entity';
   timestamps: true,
   underscored: true,
 })
-export class Hall extends Model<Hall> {
+export class BusinessHall extends Model<BusinessHall> {
   @Column({
     primaryKey: true,
     type: DataType.UUID,

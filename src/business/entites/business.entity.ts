@@ -30,7 +30,7 @@ import { Role } from 'src/access_control/entities/role.entity';
 import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
 import { BusinessTable } from './business_tables.entity';
 import { PagerRequest } from './pager_request.entity';
-import { Hall } from './hall.entity';
+import { BusinessHall } from './business_hall.entity';
 import { makeImageUrl } from 'src/utils/images';
 
 @Table({
@@ -180,6 +180,13 @@ export class Business extends Model<Business> {
   })
   tables: BusinessTable[];
 
+  @HasMany(() => BusinessHall, {
+    as: 'halls',
+    foreignKey: 'business_uuid',
+    sourceKey: 'uuid',
+  })
+  halls: BusinessHall[];
+
   @HasMany(() => PagerRequest, {
     as: 'pagerRequests',
     foreignKey: 'business_uuid',
@@ -223,7 +230,7 @@ export class Business extends Model<Business> {
     return !!table;
   }
   async hasHall(where: WhereOptions<BusinessTable>) {
-    const hall = await Hall.count({
+    const hall = await BusinessHall.count({
       where: {
         business_uuid: this.uuid,
         ...where,

@@ -48,12 +48,18 @@ export class ProductService {
             },
           ],
         },
+        {
+          model: File,
+          through: {
+            attributes: [],
+          },
+        },
       ].filter(Boolean),
     });
     let result;
     if (with_categories) {
       result = products.map((_prod) => {
-        const prod = _prod.get({ plain: true });
+        const prod = _prod.setImagesUrls().get({ plain: true });
         const product = {
           ...prod,
           categories: prod.businessCategories.map((bCat) => bCat.category),
@@ -101,7 +107,9 @@ export class ProductService {
           },
         ].filter(Boolean),
       })
-    )?.get({ plain: true });
+    )
+      ?.setImagesUrls()
+      .get({ plain: true });
     if (!product)
       throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
     let result;
@@ -114,8 +122,6 @@ export class ProductService {
     } else {
       result = product;
     }
-    // reform images
-    result.images = result.images.map((img) => img.uuid);
 
     return result || product;
   }

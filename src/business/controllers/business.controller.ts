@@ -49,13 +49,13 @@ export class BusinessController {
       data: business,
     };
   }
-  @Post(':business_uuid/pager-request')
+  @Post(':business_slug/pager-request')
   async pagerRequest(
-    @Param('business_uuid') business_uuid: string,
+    @Param('business_slug') business_slug: string,
     @Body() payload: NewPagerRequestDTO,
   ) {
     const request = await this.businessService.createPagerRequest(
-      business_uuid,
+      business_slug,
       payload,
     );
     return {
@@ -66,30 +66,15 @@ export class BusinessController {
       message: 'pager request established successfully!',
     };
   }
-  @Delete(':business_uuid/pager-request/:request_uuid')
+  @Delete(':business_slug/pager-request/:request_uuid')
   async cencelPagerRequest(
-    @Param('business_uuid') business_uuid: string,
+    @Param('business_slug') business_slug: string,
     @Param('request_uuid') request_uuid: string,
   ) {
-    await this.businessService.cancelPagerRequest(business_uuid, request_uuid);
+    await this.businessService.cancelPagerRequest(business_slug, request_uuid);
     return {
       ok: true,
       message: 'pager request canceled successfully!',
-    };
-  }
-
-  @Get(':business_uuid/get-table/:table_code')
-  async getTable(
-    @Param('business_uuid') business_uuid: string,
-    @Param('table_code') table_code: string,
-  ) {
-    const table = await this.businessService.getTable(
-      business_uuid,
-      table_code,
-    );
-    return {
-      ok: true,
-      data: table,
     };
   }
 }

@@ -23,8 +23,6 @@ export class BusinessService {
     private businessRepository: typeof Business,
     @InjectModel(PagerRequest)
     private pagerRequestRepository: typeof PagerRequest,
-    @InjectModel(BusinessTable)
-    private businessTableRepository: typeof BusinessTable,
     @InjectModel(BusinessCategory)
     private businessCategoryRepository: typeof BusinessCategory,
     private pagerRequestGateway: PagerRequestgGateway,
@@ -163,10 +161,20 @@ export class BusinessService {
       };
     });
   }
-  async createPagerRequest(business_uuid: string, payload: NewPagerRequestDTO) {
+  async createPagerRequest(business_slug: string, payload: NewPagerRequestDTO) {
     try {
+      const business = await this.businessRepository.findOne({
+        where: {
+          slug: business_slug,
+        },
+        attributes: ['uuid'],
+      });
+
+      if (!business)
+        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
+
       const request = await this.pagerRequestRepository.create({
-        business_uuid,
+        business_uuid: business.uuid,
         table_uuid: payload.table_uuid,
         status: STATUS.todo,
       });
@@ -183,35 +191,27 @@ export class BusinessService {
       throw error;
     }
   }
-  async cancelPagerRequest(business_uuid: string, request_uuid: string) {
+  async cancelPagerRequest(business_slug: string, request_uuid: string) {
     try {
+      const business = await this.businessRepository.findOne({
+        where: {
+          slug: business_slug,
+        },
+        attributes: ['uuid'],
+      });
+
+      if (!business)
+        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
+
       await this.pagerRequestRepository.destroy({
         where: {
           uuid: request_uuid,
         },
       });
       await this.pagerRequestGateway.broadcastCancelPagerNotification(
-        business_uuid,
+        business.uuid,
         request_uuid,
       );
-    } catch (error) {
-      throw error;
-    }
-  }
-  async getTable(business_uuid: string, table_code: string) {
-    try {
-      const table = await this.businessTableRepository.findOne({
-        where: {
-          business_uuid,
-          code: table_code,
-        },
-        attributes: {
-          exclude: ['business_uuid'],
-        },
-      });
-      if (!table)
-        throw new HttpException('Table not found!', HttpStatus.NOT_FOUND);
-      return table;
     } catch (error) {
       throw error;
     }

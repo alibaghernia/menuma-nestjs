@@ -9,7 +9,7 @@ import {
 } from 'sequelize-typescript';
 import { Business } from './business.entity';
 import { PagerRequest } from './pager_request.entity';
-import { Hall } from './hall.entity';
+import { BusinessHall } from './business_hall.entity';
 
 @Table({
   tableName: 'business-tables',
@@ -63,7 +63,7 @@ export class BusinessTable extends Model<BusinessTable> {
   })
   description: string;
 
-  @ForeignKey(() => Hall)
+  @ForeignKey(() => BusinessHall)
   @Column({
     type: DataType.UUID,
     allowNull: false,

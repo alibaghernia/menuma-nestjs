@@ -8,14 +8,13 @@ import {
 import { InjectModel } from '@nestjs/sequelize';
 import { Business } from '../entites/business.entity';
 import { FindOptions, Op, QueryError, WhereOptions } from 'sequelize';
-import { CreateBusinessDTO, CreateHallDTO, CreateTableDTO } from '../dto';
+import { CreateBusinessDTO, CreateHallDTO } from '../dto';
 import { Sequelize } from 'sequelize-typescript';
 import { Social } from 'src/database/entities/social.entity';
 import {
   UpdateBusinessDTO,
   UpdateHallDTO,
   UpdatePagerRequestDTO,
-  UpdateTableDTO,
 } from '../dto/update.dto';
 import { REQUEST } from '@nestjs/core';
 import { Request } from 'express';
@@ -29,11 +28,10 @@ import {
   PanelBusinessesFiltersDTO,
   HallsFiltersDTO,
   PagerRequestsFiltersDTO,
-  TablesFiltersDTO,
 } from '../dto/filters.dto';
 import { PagerRequest } from '../entites/pager_request.entity';
 // import { Role } from 'src/access_control/entities/role.entity';
-import { Hall } from '../entites/hall.entity';
+import { BusinessHall } from '../entites/business_hall.entity';
 import { PagerRequestgGateway } from '../gateways/pager_request.gateway';
 
 @Injectable()
@@ -48,10 +46,8 @@ export class BusinessPanelService {
     private socialRepository: typeof Social,
     @InjectModel(BusinessUser)
     private businessUserRepository: typeof BusinessUser,
-    @InjectModel(BusinessTable)
-    private businessTableRepository: typeof BusinessTable,
-    @InjectModel(Hall)
-    private HallRepository: typeof Hall,
+    @InjectModel(BusinessHall)
+    private HallRepository: typeof BusinessHall,
     @InjectModel(PagerRequest)
     private pagerRequestRepository: typeof PagerRequest,
     private sequelize: Sequelize,
@@ -439,130 +435,6 @@ export class BusinessPanelService {
       console.log({
         error,
       });
-      await transaction.rollback();
-      throw error;
-    }
-  }
-  async getTables(business_uuid: string, filters: TablesFiltersDTO) {
-    const { page, limit, ...whereFilters } = filters;
-
-    const tables = await this.businessTableRepository.findAll({
-      where: {
-        business_uuid,
-        ...whereFilters,
-      },
-      attributes: {
-        exclude: ['business_uuid'],
-      },
-      limit: page * limit,
-      offset: page * limit - limit,
-    });
-    const count = await this.businessTableRepository.count({
-      where: {
-        business_uuid,
-      },
-    });
-    return {
-      tables,
-      total: count,
-    };
-  }
-  async getTable(business_uuid: string, table_uuid: string) {
-    const table = await this.businessTableRepository.findOne({
-      where: {
-        business_uuid,
-        uuid: table_uuid,
-      },
-      attributes: {
-        exclude: ['business_uuid'],
-      },
-    });
-    return table;
-  }
-  async createTable(business_uuid: string, payload: CreateTableDTO) {
-    const transaction = await this.sequelize.transaction();
-    try {
-      const business = await this.businessRepository.findOne({
-        where: {
-          uuid: business_uuid,
-        },
-      });
-      if (!business)
-        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-      if (await business.hasTable({ code: payload.code }))
-        throw new HttpException(
-          {
-            ok: false,
-            code: 4001,
-            message: 'Table is already exists!',
-          },
-          HttpStatus.BAD_REQUEST,
-        );
-      await business.createTable(
-        {
-          code: payload.code,
-        },
-        {
-          transaction,
-        },
-      );
-
-      await transaction.commit();
-    } catch (error) {
-      await transaction.rollback();
-      throw error;
-    }
-  }
-  async removeTable(table_uuid: string) {
-    const transaction = await this.sequelize.transaction();
-    try {
-      await this.businessTableRepository.destroy({
-        where: {
-          uuid: table_uuid,
-        },
-      });
-
-      await transaction.commit();
-    } catch (error) {
-      await transaction.rollback();
-      throw error;
-    }
-  }
-  async updateTable(
-    business_uuid: string,
-    table_uuid: string,
-    payload: UpdateTableDTO,
-  ) {
-    const transaction = await this.sequelize.transaction();
-    try {
-      if (
-        await this.businessTableRepository.count({
-          where: {
-            business_uuid,
-            code: payload.code,
-            [Op.not]: {
-              uuid: table_uuid,
-            },
-          },
-        })
-      )
-        throw new HttpException(
-          {
-            ok: false,
-            code: 4001,
-            message: 'Table is already exists!',
-          },
-          HttpStatus.BAD_REQUEST,
-        );
-      await this.businessTableRepository.update(payload, {
-        where: {
-          uuid: table_uuid,
-        },
-        transaction,
-      });
-
-      await transaction.commit();
-    } catch (error) {
       await transaction.rollback();
       throw error;
     }

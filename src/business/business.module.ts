@@ -12,8 +12,10 @@ import { AccessControlModule } from 'src/access_control/access_control.module';
 import { BusinessTable } from './entites/business_tables.entity';
 import { PagerRequest } from './entites/pager_request.entity';
 import { PagerRequestgGateway } from './gateways/pager_request.gateway';
-import { Hall } from './entites/hall.entity';
+import { BusinessHall } from './entites/business_hall.entity';
 import { BusinessCategory } from './entites/business_category.entity';
+import { TableModule } from './sub_modules/table/table.module';
+import { HallModule } from './sub_modules/hall/hall.module';
 
 @Module({
   imports: [
@@ -25,9 +27,11 @@ import { BusinessCategory } from './entites/business_category.entity';
       BusinessCategory,
       BusinessTable,
       PagerRequest,
-      Hall,
+      BusinessHall,
     ]),
     AccessControlModule,
+    TableModule,
+    HallModule,
   ],
   providers: [BusinessPanelService, BusinessService, PagerRequestgGateway],
   controllers: [BusinessController, BusinessPanelController],
