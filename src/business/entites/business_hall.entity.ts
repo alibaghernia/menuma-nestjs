@@ -6,6 +6,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import { Business } from './business.entity';
+import { makeImageUrl } from 'src/utils/images';
 
 @Table({
   tableName: 'business-halls',
@@ -48,8 +49,14 @@ export class BusinessHall extends Model<BusinessHall> {
   @Column({
     type: DataType.STRING,
     allowNull: true,
+    get(this) {
+      const image = this.getDataValue('image');
+      if (image) this.setDataValue('image_url', makeImageUrl(image));
+      return image;
+    },
   })
-  image: string;
+  image?: string;
+  image_url?: string;
 
   @Column({
     type: DataType.STRING,

@@ -10,6 +10,7 @@ import {
 import { Business } from './business.entity';
 import { PagerRequest } from './pager_request.entity';
 import { BusinessHall } from './business_hall.entity';
+import { makeImageUrl } from 'src/utils/images';
 
 @Table({
   tableName: 'business-tables',
@@ -72,8 +73,14 @@ export class BusinessTable extends Model<BusinessTable> {
   @Column({
     type: DataType.STRING,
     allowNull: true,
+    get(this) {
+      const image = this.getDataValue('image');
+      if (image) this.setDataValue('image_url', makeImageUrl(image));
+      return image;
+    },
   })
-  image: string;
+  image?: string;
+  image_url?: string;
 
   @ForeignKey(() => BusinessHall)
   @Column({
