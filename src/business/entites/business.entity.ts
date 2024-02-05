@@ -32,6 +32,7 @@ import { BusinessTable } from '../sub_modules/table/entitile/business_tables.ent
 import { PagerRequest } from './pager_request.entity';
 import { BusinessHall } from '../sub_modules/hall/entities/business_hall.entity';
 import { makeImageUrl } from 'src/utils/images';
+import { Event } from 'src/event/entities/event.entity';
 
 @Table({
   underscored: true,
@@ -130,6 +131,16 @@ export class Business extends Model<Business> {
     },
   })
   socials: Social[];
+
+  @HasMany(() => Event, {
+    as: 'events',
+    foreignKey: 'organizer_uuid',
+    sourceKey: 'uuid',
+    scope: {
+      organizer_type: 'business',
+    },
+  })
+  events: Event[];
 
   @BelongsToMany(() => Category, {
     through: () => BusinessCategory,

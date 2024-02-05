@@ -7,11 +7,13 @@ import {
   BelongsToMany,
   Column,
   DataType,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
 import { Business } from 'src/business/entites/business.entity';
 import { BusinessUser } from 'src/business/entites/business_user.entity';
+import { Event } from 'src/event/entities/event.entity';
 
 @Table({
   timestamps: true,
@@ -59,6 +61,16 @@ export class User extends Model<User> {
     targetKey: 'uuid',
   })
   businesses: Business[];
+
+  @HasMany(() => Event, {
+    as: 'events',
+    foreignKey: 'organizer_uuid',
+    sourceKey: 'uuid',
+    scope: {
+      organizer_type: 'user',
+    },
+  })
+  events: Event[];
 
   hasBusiness: BelongsToManyHasAssociationMixin<Business, Business['uuid']>;
   getBusinesses: BelongsToManyGetAssociationsMixin<Business>;

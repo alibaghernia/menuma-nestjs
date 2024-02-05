@@ -5,12 +5,8 @@ import {
   IsUUID,
   IsDateString,
   IsNumber,
-  ValidateNested,
-  IsArray,
   IsEnum,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { File } from '../../files/entities/file.entity';
 
 export enum organizerEnum {
   USER = 'USER',
@@ -19,6 +15,7 @@ export enum organizerEnum {
 
 export enum cycleEnum {
   ONETIME = 'ONETIME',
+  DAYLY = 'DAYLY',
   WEEKLY = 'WEEKLY',
   MONTHLY = 'MONTHLY',
 }
@@ -26,15 +23,15 @@ export enum cycleEnum {
 export class CreateEventDTO {
   @IsNotEmpty()
   @IsString()
-  readonly name: string;
+  readonly title: string;
 
   @IsNotEmpty()
-  @IsDateString()
-  readonly startAt: string;
+  @IsString()
+  readonly start_at: string;
 
   @IsOptional()
-  @IsDateString()
-  readonly endAt: string;
+  @IsString()
+  readonly end_at: string;
 
   @IsOptional()
   @IsNumber()
@@ -42,15 +39,15 @@ export class CreateEventDTO {
 
   @IsOptional()
   @IsUUID()
-  readonly bannerId: string;
+  readonly banner_uuid: string;
 
   @IsOptional()
   @IsString()
-  readonly shortDescription: string;
+  readonly short_description: string;
 
   @IsOptional()
   @IsString()
-  readonly longDescription: string;
+  readonly long_description: string;
 
   @IsNotEmpty()
   @IsEnum(organizerEnum)
@@ -64,13 +61,11 @@ export class CreateEventDTO {
   @IsEnum(cycleEnum)
   readonly cycle: string;
 
+  @IsOptional()
   @IsNumber()
-  @IsNotEmpty()
   readonly price: number;
 
   @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => File)
-  readonly images: File[];
+  @IsUUID()
+  readonly image: string;
 }

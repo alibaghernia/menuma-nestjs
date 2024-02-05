@@ -1,9 +1,13 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsBooleanString, IsOptional, IsString } from 'class-validator';
 
 export class FiltersDTO {
   @IsOptional()
   @IsString()
-  readonly name?: string;
+  readonly title?: string;
+
+  @IsOptional()
+  @IsBooleanString()
+  readonly pin?: boolean;
 
   @IsOptional()
   @IsString()

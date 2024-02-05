@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   BelongsToMany,
   Column,
   DataType,
@@ -7,12 +8,17 @@ import {
 } from 'sequelize-typescript';
 import { File } from '../../files/entities/file.entity';
 import { EventImage } from './event_image.entity';
+import { Business } from 'src/business/entites/business.entity';
+import { User } from 'src/users/entites/user.entity';
+import { makeImageUrl } from 'src/utils/images';
 
 @Table({
-  underscored: true,
   timestamps: true,
   tableName: 'events',
   paranoid: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+  deletedAt: 'deleted_at',
 })
 export class Event extends Model<Event> {
   @Column({
@@ -23,25 +29,25 @@ export class Event extends Model<Event> {
   uuid: string;
 
   @Column({ type: DataType.STRING(100), allowNull: false })
-  name: string;
+  title: string;
 
   @Column({ type: DataType.STRING(100), allowNull: false })
-  startAt: string;
+  start_at: string;
 
   @Column({ type: DataType.STRING(100) })
-  endAt: string;
+  end_at: string;
 
   @Column({ type: DataType.INTEGER() })
   limit: number;
 
   @Column({ type: DataType.UUID })
-  bannerId: string;
+  banner_uuid: string;
 
   @Column({ type: DataType.STRING(100) })
-  shortDescription: string;
+  short_description: string;
 
   @Column({ type: DataType.STRING(100) })
-  longDescription: string;
+  long_description: string;
 
   @Column({ type: DataType.STRING(100), allowNull: false })
   organizer_type: string;
@@ -52,8 +58,11 @@ export class Event extends Model<Event> {
   @Column({ type: DataType.STRING(100), allowNull: false })
   cycle: string;
 
-  @Column({ type: DataType.INTEGER(), allowNull: false })
+  @Column({ type: DataType.INTEGER(), allowNull: true })
   price: number;
+
+  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
+  pin: boolean;
 
   @BelongsToMany(() => File, {
     through: () => EventImage,
@@ -64,4 +73,29 @@ export class Event extends Model<Event> {
     targetKey: 'uuid',
   })
   images: File[];
+
+  @BelongsTo(() => Business, {
+    as: 'business',
+    foreignKey: 'organizer_uuid',
+    targetKey: 'uuid',
+  })
+  business: Business;
+
+  @BelongsTo(() => User, {
+    as: 'user',
+    foreignKey: 'organizer_uuid',
+    targetKey: 'uuid',
+  })
+  user: User;
+
+  setImages(this) {
+    const images: EventImage[] = this.getDataValue('images');
+    const banner = this.getDataValue('banner_uuid');
+    if (images?.length)
+      this.setDataValue('image_url', makeImageUrl(images[0].file_uuid));
+    if (banner) this.setDataValue('banner_url', makeImageUrl(banner));
+    return this;
+  }
+  banner_url?: string;
+  image_url?: string;
 }

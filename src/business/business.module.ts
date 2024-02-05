@@ -14,6 +14,8 @@ import { PagerRequestgGateway } from './gateways/pager_request.gateway';
 import { BusinessCategory } from './entites/business_category.entity';
 import { TableModule } from './sub_modules/table/table.module';
 import { HallModule } from './sub_modules/hall/hall.module';
+import { EventPanelController } from './controllers/events/event.panel.controller';
+import { EventModule } from 'src/event/event.module';
 
 @Module({
   imports: [
@@ -25,11 +27,16 @@ import { HallModule } from './sub_modules/hall/hall.module';
       BusinessCategory,
       PagerRequest,
     ]),
+    EventModule,
     AccessControlModule,
     TableModule,
     HallModule,
   ],
   providers: [BusinessPanelService, BusinessService, PagerRequestgGateway],
-  controllers: [BusinessController, BusinessPanelController],
+  controllers: [
+    BusinessController,
+    BusinessPanelController,
+    EventPanelController,
+  ],
 })
 export class BusinessModule {}
