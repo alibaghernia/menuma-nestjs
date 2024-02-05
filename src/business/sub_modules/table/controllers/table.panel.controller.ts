@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Query,
+  UsePipes,
 } from '@nestjs/common';
 import { business_permissions } from 'src/access_control/constants';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
@@ -15,8 +16,10 @@ import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { TablePanelService } from '../services/table.panel.service';
 import { CreateTableDTO } from '../dto';
 import { UpdateTableDTO } from '../dto/update.dto';
+import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
 
 @Controller('panel/business/:business_uuid/tables')
+@UsePipes(new UUIDCheckerController('Business UUID', 'business_uuid'))
 export class TablePanelController {
   constructor(private tablePanelService: TablePanelService) {}
 
@@ -66,6 +69,25 @@ export class TablePanelController {
     return {
       ok: true,
       message: 'Business table added successfully!',
+    };
+  }
+
+  @Post(':table_uuid/generate-qrcode')
+  @CheckPermissions([business_permissions.manageBusinessTables.action])
+  async generateQRCode(
+    @Param('business_uuid')
+    business_uuid: string,
+    @Param('table_uuid', new UUIDChecker('Table UUID'))
+    table_uuid: string,
+  ) {
+    const qrcode_url = await this.tablePanelService.generateQRCode(
+      business_uuid,
+      table_uuid,
+    );
+    return {
+      ok: true,
+      data: qrcode_url,
+      message: 'Qr code generated successfully!',
     };
   }
 

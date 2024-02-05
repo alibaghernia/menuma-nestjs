@@ -1,7 +1,9 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { HallService } from '../services/hall.service';
+import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 
 @Controller('business/:business_slug/halls')
+@IsPublic()
 export class HallController {
   constructor(private hallService: HallService) {}
 

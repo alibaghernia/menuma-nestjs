@@ -1,7 +1,9 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { TableService } from '../services/table.service';
+import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 
 @Controller('business/:business_slug/tables')
+@IsPublic()
 export class TableController {
   constructor(private tableService: TableService) {}
 

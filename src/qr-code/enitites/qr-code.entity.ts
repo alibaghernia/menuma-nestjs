@@ -25,6 +25,7 @@ export class QrCode extends Model<QrCode> {
 
   @Column({
     type: DataType.STRING,
+    unique: true,
     allowNull: false,
   })
   slug: string;

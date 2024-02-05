@@ -6,9 +6,10 @@ import { TablePanelController } from './controllers/table.panel.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Business } from 'src/business/entites/business.entity';
 import { BusinessTable } from './entitile/business_tables.entity';
+import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
 
 @Module({
-  imports: [SequelizeModule.forFeature([BusinessTable, Business])],
+  imports: [SequelizeModule.forFeature([BusinessTable, Business, QrCode])],
   providers: [TablePanelService, TableService],
   controllers: [TableController, TablePanelController],
 })

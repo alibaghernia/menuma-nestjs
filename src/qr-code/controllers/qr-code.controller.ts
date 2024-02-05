@@ -40,7 +40,7 @@ export class QrCodeController {
         }
         return res
           .setHeader('Cache-Control', 'no-store')
-          .redirect(HttpStatus.PERMANENT_REDIRECT, dest);
+          .redirect(HttpStatus.TEMPORARY_REDIRECT, dest);
         break;
       }
     }
