@@ -2,11 +2,11 @@ import { Controller, Get } from '@nestjs/common';
 import * as fs from 'fs/promises';
 import { IsPublic } from '../auth/decorators/is_public.decorator';
 
-@Controller('verion')
-export class VerionController {
+@Controller('version')
+export class VersionController {
   @Get()
   @IsPublic()
-  async vertion() {
+  async verstion() {
     const getGitId = async () => {
       const gitId = await fs.readFile('.git/HEAD', 'utf8');
       if (gitId.indexOf(':') === -1) {

@@ -79,26 +79,22 @@ export class Business extends Model<Business> {
 
   @Column({
     type: DataType.STRING,
-    get(this: Business) {
-      const logo = this.getDataValue('logo');
-      if (logo) this.setDataValue('logo_url', makeImageUrl(logo));
-      return logo;
-    },
   })
   logo: string;
-
+  setImages(this: Business) {
+    const logo = this.getDataValue('logo');
+    const banner = this.getDataValue('banner');
+    if (logo) this.setDataValue('logo_url', makeImageUrl(logo));
+    if (banner) this.setDataValue('banner_url', makeImageUrl(banner));
+    return this;
+  }
   logo_url: string;
+  banner_url: string;
 
   @Column({
     type: DataType.STRING,
-    get(this: Business) {
-      const banner = this.getDataValue('banner');
-      if (banner) this.setDataValue('banner_url', makeImageUrl(banner));
-      return banner;
-    },
   })
   banner: string;
-  banner_url: string;
 
   @Column({ type: DataType.BOOLEAN })
   pager: boolean;

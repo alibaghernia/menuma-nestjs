@@ -8,8 +8,8 @@ import { Op } from 'sequelize';
 export class UsersService {
   constructor(@InjectModel(User) private userRepository: typeof User) {}
 
-  getMe(uuid: string) {
-    return this.userRepository.findOne({
+  async getMe(uuid: string) {
+    const user = await this.userRepository.findOne({
       where: {
         uuid,
       },
@@ -19,9 +19,8 @@ export class UsersService {
       include: [
         {
           model: Business,
-          attributes: ['uuid', 'name', 'slug'],
+          attributes: ['uuid', 'name', 'slug', 'logo', 'banner'],
           through: {
-            attributes: [],
             where: {
               role: {
                 [Op.or]: ['manager', 'employee'],
@@ -31,5 +30,9 @@ export class UsersService {
         },
       ],
     });
+
+    user.businesses.forEach((bus) => bus.setImages());
+
+    return user;
   }
 }

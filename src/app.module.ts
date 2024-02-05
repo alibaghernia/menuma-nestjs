@@ -9,11 +9,11 @@ import { ProductModule } from './product/product.module';
 import typeormConfigs from 'src/database/config';
 import { AccessControlModule } from './access_control/access_control.module';
 import { QrCodeModule } from './qr-code/qr-code.module';
-import { VerionController } from './verion/verion.controller';
 import { FileModule } from './files/files.module';
 import { EventModule } from './event/event.module';
 import { PhotographyModule } from './photography/photography.module';
 import { WebPushModule } from './web_push/web_push.module';
+import { VersionController } from './version/version.controller';
 
 @Module({
   imports: [
@@ -31,6 +31,6 @@ import { WebPushModule } from './web_push/web_push.module';
     EventModule,
     PhotographyModule,
   ],
-  controllers: [VerionController],
+  controllers: [VersionController],
 })
 export class AppModule {}
