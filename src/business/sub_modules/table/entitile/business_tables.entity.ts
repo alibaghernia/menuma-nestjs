@@ -85,7 +85,7 @@ export class BusinessTable extends Model<BusinessTable> {
   @ForeignKey(() => BusinessHall)
   @Column({
     type: DataType.UUID,
-    allowNull: false,
+    allowNull: true,
   })
   hall_uuid: string;
 }

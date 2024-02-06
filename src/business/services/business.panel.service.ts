@@ -75,43 +75,41 @@ export class BusinessPanelService {
     });
 
     return {
-      businesses,
+      businesses: businesses.map((bus) => bus.setImages()),
       total: count,
     };
   }
 
   async findBySlugOrId(slugOrId: string) {
-    const business = (
-      await this.businessRepository.findOne({
-        where: {
-          [Op.or]: {
-            slug: slugOrId,
-            uuid: slugOrId,
+    const business = await this.businessRepository.findOne({
+      where: {
+        [Op.or]: {
+          slug: slugOrId,
+          uuid: slugOrId,
+        },
+      },
+      include: [
+        {
+          model: Social,
+          required: false,
+          attributes: {
+            exclude: ['uuid', 'socialable_type', 'socialable_uuid'],
           },
         },
-        include: [
-          {
-            model: Social,
-            required: false,
-            attributes: {
-              exclude: ['uuid', 'socialable_type', 'socialable_uuid'],
-            },
+        {
+          model: User,
+          required: false,
+          attributes: ['uuid'],
+          through: {
+            attributes: ['role', 'uuid'],
           },
-          {
-            model: User,
-            required: false,
-            attributes: ['uuid'],
-            through: {
-              attributes: ['role', 'uuid'],
-            },
-          },
-        ],
-      })
-    )?.get({ plain: true });
+        },
+      ],
+    });
 
     if (!business)
       throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-    return business;
+    return business.setImages();
   }
 
   findOne(where: WhereOptions<Business>) {
