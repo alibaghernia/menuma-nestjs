@@ -14,6 +14,7 @@ import { EventModule } from './event/event.module';
 import { PhotographyModule } from './photography/photography.module';
 import { WebPushModule } from './web_push/web_push.module';
 import { VersionController } from './version/version.controller';
+import { CustomersModule } from './customers/customers.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { VersionController } from './version/version.controller';
     FileModule,
     EventModule,
     PhotographyModule,
+    CustomersModule,
   ],
   controllers: [VersionController],
 })
