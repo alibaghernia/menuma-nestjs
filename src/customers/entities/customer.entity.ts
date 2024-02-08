@@ -8,10 +8,8 @@ import {
 import { Business } from '../../business/entites/business.entity';
 
 @Table({
-  underscored: true,
   timestamps: true,
   tableName: 'customers',
-  paranoid: true,
 })
 export class Customer extends Model<Customer> {
   @Column({
@@ -22,10 +20,10 @@ export class Customer extends Model<Customer> {
   uuid: string;
 
   @Column({ type: DataType.STRING(100), allowNull: false })
-  name: string;
+  first_name: string;
 
   @Column({ type: DataType.STRING(100), allowNull: false })
-  sur_name: string;
+  last_name: string;
 
   @Column({ type: DataType.STRING(100), allowNull: false })
   gender: string;
@@ -34,7 +32,7 @@ export class Customer extends Model<Customer> {
   mobile: string;
 
   @Column({ type: DataType.STRING(100), allowNull: false })
-  birthday: string;
+  birth_date: string;
 
   @ForeignKey(() => Business)
   @Column({

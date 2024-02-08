@@ -1,5 +1,4 @@
 import { DataTypes } from 'sequelize';
-import { DataType } from 'sequelize-typescript';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -9,16 +8,16 @@ module.exports = {
       {
         uuid: {
           primaryKey: true,
-          type: DataType.UUID,
-          defaultValue: DataType.UUIDV4,
+          type: DataTypes.UUID,
+          defaultValue: DataTypes.UUIDV4,
         },
-        name: { type: DataType.STRING(100), allowNull: false },
-        sur_name: { type: DataType.STRING(100), allowNull: false },
-        birthday: { type: DataType.STRING(100), allowNull: false },
-        gender: { type: DataType.STRING(100), allowNull: false },
-        mobile: { type: DataType.STRING(100), allowNull: false },
+        name: { type: DataTypes.STRING(100), allowNull: false },
+        sur_name: { type: DataTypes.STRING(100), allowNull: false },
+        birthday: { type: DataTypes.STRING(100), allowNull: false },
+        gender: { type: DataTypes.STRING(100), allowNull: false },
+        mobile: { type: DataTypes.STRING(100), allowNull: false },
         business_uuid: {
-          type: DataType.UUID,
+          type: DataTypes.UUID,
           allowNull: false,
         },
         created_at: DataTypes.DATE,

@@ -1,13 +1,13 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { InjectModel } from '@nestjs/sequelize';
-import { doInTransaction } from 'src/transaction';
 import { CreateEventDTO } from '../dto/create.dto';
 import { FiltersDTO } from '../dto/filters.dto';
 import { Event } from '../entities/event.entity';
 import { Sequelize } from 'sequelize-typescript';
 import { WhereOptions } from 'sequelize';
 import { Op } from 'sequelize';
+import { doInTransaction } from 'src/utils/transaction';
 
 @Injectable()
 export class EventPanelService {

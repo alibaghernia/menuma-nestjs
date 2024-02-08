@@ -1,4 +1,5 @@
 import { Op } from 'sequelize';
+import { PaginationDto } from 'src/misc/dto/filters.dto';
 
 export function _toSequelizeFilter(obj: any) {
   for (const key in obj) {
@@ -32,3 +33,14 @@ export function toSequelizeFilter(filter: any) {
   _toSequelizeFilter(clonedFilter);
   return clonedFilter;
 }
+
+export const getPagination = (filters: PaginationDto) => {
+  const offset = filters.page
+    ? +filters.page * +filters.limit - filters.limit
+    : undefined;
+  const limit = offset ? offset + filters.limit : undefined;
+  return {
+    offset,
+    limit,
+  };
+};

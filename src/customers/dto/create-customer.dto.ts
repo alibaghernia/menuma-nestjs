@@ -1,17 +1,17 @@
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateCustomerDto {
   @IsNotEmpty()
   @IsString()
-  name: string;
+  first_name: string;
 
   @IsNotEmpty()
   @IsString()
-  sur_name: string;
+  last_name: string;
 
-  @IsNotEmpty()
-  @IsNotEmpty()
-  birthday: string;
+  @IsOptional()
+  @IsString()
+  birth_date: string;
 
   @IsNotEmpty()
   @IsString()
@@ -23,5 +23,21 @@ export class CreateCustomerDto {
 
   @IsNotEmpty()
   @IsUUID()
+  business_uuid: string;
+}
+export class UpdateCustomerDto extends CreateCustomerDto {
+  @IsOptional()
+  first_name: string;
+
+  @IsOptional()
+  last_name: string;
+
+  @IsOptional()
+  gender: string;
+
+  @IsOptional()
+  mobile: string;
+
+  @IsOptional()
   business_uuid: string;
 }

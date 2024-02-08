@@ -16,6 +16,9 @@ import { TableModule } from './sub_modules/table/table.module';
 import { HallModule } from './sub_modules/hall/hall.module';
 import { EventPanelController } from './controllers/events/event.panel.controller';
 import { EventModule } from 'src/event/event.module';
+import { CustomersModule } from 'src/customers/customers.module';
+import { CustomersController } from './controllers/customer_club/customers/customers.controller';
+import { CustomersPanelController } from './controllers/customer_club/customers/customers.panel.controller';
 
 @Module({
   imports: [
@@ -28,6 +31,7 @@ import { EventModule } from 'src/event/event.module';
       PagerRequest,
     ]),
     EventModule,
+    CustomersModule,
     AccessControlModule,
     TableModule,
     HallModule,
@@ -37,6 +41,8 @@ import { EventModule } from 'src/event/event.module';
     BusinessController,
     BusinessPanelController,
     EventPanelController,
+    CustomersController,
+    CustomersPanelController,
   ],
 })
 export class BusinessModule {}

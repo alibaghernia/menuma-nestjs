@@ -5,7 +5,9 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  IsEmpty,
 } from 'class-validator';
+import { CreateCustomerDto } from 'src/customers/dto/create-customer.dto';
 
 export class CreateBusinessDTO {
   @IsNotEmpty()
@@ -96,4 +98,9 @@ export class NewPagerRequestDTO {
   @IsNotEmpty()
   @IsUUID()
   table_uuid: string;
+}
+
+export class CustomerClubCreateDTO extends CreateCustomerDto {
+  @IsEmpty()
+  business_uuid;
 }

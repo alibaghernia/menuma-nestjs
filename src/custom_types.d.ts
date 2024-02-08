@@ -7,5 +7,8 @@ declare module 'express' {
       uuid: string;
       role: string;
     };
+    business_guard?: {
+      uuid: string;
+    };
   }
 }

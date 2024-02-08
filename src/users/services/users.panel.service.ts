@@ -9,9 +9,9 @@ import { FiltersDTO, GetManagersFiltersDTO } from '../dto/filters.dto';
 import { Op } from 'sequelize';
 import { Business } from 'src/business/entites/business.entity';
 import { Sequelize } from 'sequelize-typescript';
-import { doInTransaction } from 'src/transaction';
 import { BusinessUser } from 'src/business/entites/business_user.entity';
 import { Business_Employee_role, roles } from 'src/access_control/constants';
+import { doInTransaction } from 'src/utils/transaction';
 
 @Injectable()
 export class UsersPanelService {

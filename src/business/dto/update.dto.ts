@@ -1,12 +1,14 @@
 import {
   IsArray,
   IsBoolean,
+  IsEmpty,
   IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
+import { UpdateCustomerDto } from 'src/customers/dto/create-customer.dto';
 
 export class UpdateBusinessDTO {
   @IsOptional()
@@ -117,4 +119,9 @@ export class UpdatePagerRequestDTO {
   @IsOptional()
   @IsEnum({ todo: 'TODO', doing: 'DOING', done: 'DONE', canceled: 'CANCELED' })
   status: string;
+}
+
+export class CustomerClubUpdateDTO extends UpdateCustomerDto {
+  @IsEmpty()
+  business_uuid;
 }
