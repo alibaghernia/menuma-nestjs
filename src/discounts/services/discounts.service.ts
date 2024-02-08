@@ -60,4 +60,44 @@ export class DiscountsService {
     }
     return [discounts, count];
   }
+  async get(uuid: string, business_uuid_slug: string) {
+    const where: WhereOptions<Discount> = { uuid };
+    const include: FindOptions<Discount>['include'] = [];
+    if (business_uuid_slug)
+      include.push({
+        model: Business,
+        attributes: [],
+        where: {
+          [Op.or]: {
+            uuid: business_uuid_slug,
+            slug: business_uuid_slug,
+          },
+        },
+      });
+    if (!business_uuid_slug) {
+      include.push({
+        model: Business,
+        where: {
+          public: true,
+        },
+        attributes: {
+          exclude: [
+            'status',
+            'location_lat',
+            'location_long',
+            'working_hours',
+            'pager',
+            'customer_club',
+            'public',
+            'pin',
+          ],
+        },
+      });
+    }
+    const discount = await this.discountRepository.findOne({
+      where,
+      include,
+    });
+    return discount;
+  }
 }

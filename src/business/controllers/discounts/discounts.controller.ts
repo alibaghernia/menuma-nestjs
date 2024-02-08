@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 import { CheckBusinessExistsGuard } from 'src/business/guards/exists.guard';
@@ -23,6 +23,17 @@ export class DiscountsController {
         items: discounts,
         total,
       },
+    };
+  }
+  @Get(':uuid')
+  async get(@Req() req: Request, @Param('uuid') uuid: string) {
+    const discount = await this.discountsService.get(
+      uuid,
+      req.business_guard.uuid,
+    );
+    return {
+      ok: true,
+      data: discount,
     };
   }
 }

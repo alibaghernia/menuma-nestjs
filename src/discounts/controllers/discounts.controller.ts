@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 import { PublicFiltersDTO } from '../dto';
 import { DiscountsService } from '../services/discounts.service';
@@ -17,6 +17,21 @@ export class DiscountsController {
         items: discounts,
         total,
       },
+    };
+  }
+  @Get(':uuid')
+  async get(
+    @Param('uuid') uuid: string,
+    @Query('business_slug') business_slug: string,
+    @Query('business_uuid') business_uuid: string,
+  ) {
+    const discount = await this.discountsService.get(
+      uuid,
+      business_slug || business_uuid,
+    );
+    return {
+      ok: true,
+      data: discount,
     };
   }
 }
