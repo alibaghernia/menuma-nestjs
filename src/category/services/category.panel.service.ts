@@ -55,16 +55,18 @@ export class CategoryPanelService {
 
     const categories = business.categories as (Category & {
       BusinessCategory: any;
-      products_count: number;
     })[];
 
     for (const category of categories) {
       category.setImageUrl();
-      category.products_count = await this.businessCategoryProductRep.count({
-        where: {
-          business_category_uuid: category.BusinessCategory.uuid,
-        },
-      });
+      category.setDataValue(
+        'products_count',
+        await this.businessCategoryProductRep.count({
+          where: {
+            business_category_uuid: category.BusinessCategory.uuid,
+          },
+        }),
+      );
       delete category.BusinessCategory;
     }
     return {

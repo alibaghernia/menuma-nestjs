@@ -19,6 +19,9 @@ import { EventModule } from 'src/event/event.module';
 import { CustomersModule } from 'src/customers/customers.module';
 import { CustomersController } from './controllers/customer_club/customers/customers.controller';
 import { CustomersPanelController } from './controllers/customer_club/customers/customers.panel.controller';
+import { DiscountsPanelController } from './controllers/discounts/discounts.panel.controller';
+import { DiscountsController } from './controllers/discounts/discounts.controller';
+import { DiscountsModule } from 'src/discounts/discounts.module';
 
 @Module({
   imports: [
@@ -35,6 +38,7 @@ import { CustomersPanelController } from './controllers/customer_club/customers/
     AccessControlModule,
     TableModule,
     HallModule,
+    DiscountsModule,
   ],
   providers: [BusinessPanelService, BusinessService, PagerRequestgGateway],
   controllers: [
@@ -43,6 +47,8 @@ import { CustomersPanelController } from './controllers/customer_club/customers/
     EventPanelController,
     CustomersController,
     CustomersPanelController,
+    DiscountsPanelController,
+    DiscountsController,
   ],
 })
 export class BusinessModule {}

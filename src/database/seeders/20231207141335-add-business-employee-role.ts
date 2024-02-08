@@ -1,4 +1,5 @@
 import { Business_Employee_role } from 'src/access_control/constants';
+import { QueryInterface } from 'sequelize';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { v4 as UUIDv4 } from 'uuid';
 
@@ -37,5 +38,20 @@ module.exports = {
     }
   },
 
-  async down(queryInterface) {},
+  async down(queryInterface: QueryInterface) {
+    await queryInterface.bulkDelete(
+      'roles',
+      roles.map(({ permissions, ...item }) => item),
+    );
+    for (const role of roles) {
+      await queryInterface.bulkDelete(
+        'role-permission',
+        role.permissions.map((permission) => ({
+          uuid: UUIDv4(),
+          role_uuid: role.uuid,
+          permission_uuid: permission,
+        })),
+      );
+    }
+  },
 };

@@ -33,6 +33,7 @@ import { PagerRequest } from './pager_request.entity';
 import { BusinessHall } from '../sub_modules/hall/entities/business_hall.entity';
 import { makeImageUrl } from 'src/utils/images';
 import { Event } from 'src/event/entities/event.entity';
+import { Discount } from 'src/discounts/entities/discount.entity';
 
 @Table({
   underscored: true,
@@ -193,6 +194,13 @@ export class Business extends Model<Business> {
     sourceKey: 'uuid',
   })
   halls: BusinessHall[];
+
+  @HasMany(() => Discount, {
+    as: 'discounts',
+    foreignKey: 'business_uuid',
+    sourceKey: 'uuid',
+  })
+  discounts: Discount[];
 
   @HasMany(() => PagerRequest, {
     as: 'pagerRequests',

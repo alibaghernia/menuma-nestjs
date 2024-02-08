@@ -15,6 +15,7 @@ import { PhotographyModule } from './photography/photography.module';
 import { WebPushModule } from './web_push/web_push.module';
 import { VersionController } from './version/version.controller';
 import { CustomersModule } from './customers/customers.module';
+import { DiscountsModule } from './discounts/discounts.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { CustomersModule } from './customers/customers.module';
     EventModule,
     PhotographyModule,
     CustomersModule,
+    DiscountsModule,
   ],
   controllers: [VersionController],
 })

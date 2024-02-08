@@ -51,6 +51,11 @@ export const business_permissions = {
     title: 'Manage Business Halls',
     action: 'manage-business-halls',
   },
+  manageBusinessDiscounts: {
+    uuid: '2e8d4737-37c4-4177-a190-ab575c4b1cbf',
+    title: 'Manage Business Discounts',
+    action: 'manage-business-discounts',
+  },
   updateBusinessInfo: {
     uuid: '6ccd3769-75e3-4a4e-8abb-a03a7121df90',
     title: 'Update Business Info',
@@ -131,6 +136,28 @@ export const category_permissions = {
     action: 'delete-category',
   },
 };
+export const discount_permissions = {
+  read: {
+    uuid: '233698cd-6ed7-40b9-b991-86e164b15da9',
+    title: 'Read discount',
+    action: 'read-discount',
+  },
+  create: {
+    uuid: '3aaa887a-41e5-4b30-88a9-cba0f12219dc',
+    title: 'Create new discount',
+    action: 'create-discount',
+  },
+  update: {
+    uuid: 'd87f42d3-ff4f-4c3b-bab7-e3f39917c855',
+    title: 'Update discount',
+    action: 'update-discount',
+  },
+  delete: {
+    uuid: '12342bad-27d7-496d-ae57-99f8a00147f9',
+    title: 'Delete discount',
+    action: 'delete-discount',
+  },
+};
 export const users_permissions = {
   readUsers: {
     uuid: '17a5eb1b-4221-429a-ac7d-fe8d1ba2897c',
@@ -168,6 +195,7 @@ export const all_permissions = Object.values(business_permissions).concat(
   Object.values(access_control),
   Object.values(product_permissions),
   Object.values(category_permissions),
+  Object.values(discount_permissions),
   Object.values(users_permissions),
 );
 export const roles = {
@@ -193,7 +221,6 @@ export const roles = {
 };
 export const Business_Employee_role = {
   uuid: '2e4dfd6c-49f2-4ee5-b758-0823dacbd6eb',
-  business_uuid: '',
   title: 'Business Employee',
   permissions: all_permissions
     .filter(

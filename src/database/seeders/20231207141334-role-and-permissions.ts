@@ -10,26 +10,39 @@ const roles = Object.values(accessControlRoles);
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    await queryInterface.bulkInsert('permissions', all_permissions);
+    try {
+      await queryInterface.bulkInsert('permissions', all_permissions);
+    } catch (error) {
+      console.log('error while inserting permissions', {
+        error,
+      });
+    }
     try {
       await queryInterface.removeConstraint('roles', 'roles_ibfk_1');
     } catch (error) {
       console.log('constraints remove error!');
     }
-    await queryInterface.bulkInsert(
-      'roles',
-      roles.map(({ permissions, ...item }) => item),
-    );
-
-    for (const role of roles) {
+    try {
       await queryInterface.bulkInsert(
-        'role-permission',
-        role.permissions.map((permission) => ({
-          uuid: UUIDv4(),
-          role_uuid: role.uuid,
-          permission_uuid: permission,
-        })),
+        'roles',
+        roles.map(({ permissions, ...item }) => item),
       );
+
+      for (const role of roles) {
+        await queryInterface.bulkInsert(
+          'role-permission',
+          role.permissions.map((permission) => ({
+            uuid: UUIDv4(),
+            role_uuid: role.uuid,
+            permission_uuid: permission,
+          })),
+        );
+      }
+    } catch (error) {
+      console.log({
+        error,
+      });
+      console.log('error while inserting permissions');
     }
   },
 

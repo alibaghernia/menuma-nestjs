@@ -82,4 +82,6 @@ export class Category extends Model<Category> {
     targetKey: 'uuid',
   })
   businesses: Business[];
+
+  products_count?: number;
 }
