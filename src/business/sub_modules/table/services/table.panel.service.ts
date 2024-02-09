@@ -9,6 +9,7 @@ import { UpdateTableDTO } from '../dto/update.dto';
 import { BusinessTable } from '../entitile/business_tables.entity';
 import { QrCode } from 'src/qr-code/enitites/qr-code.entity';
 import { ConfigService } from '@nestjs/config';
+import { getPagination } from 'src/utils/filter';
 
 @Injectable()
 export class TablePanelService {
@@ -27,10 +28,7 @@ export class TablePanelService {
     business_uuid: string,
     { code = '', ...filters }: TablesFiltersDTO,
   ) {
-    const offset = filters.page
-      ? +filters.page * +filters.limit - +filters.limit
-      : undefined;
-    const limit = filters.page ? offset + +filters.limit : undefined;
+    const { offset, limit } = getPagination(filters);
 
     const where: WhereOptions<BusinessTable> = {
       business_uuid,

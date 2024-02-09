@@ -8,6 +8,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { WhereOptions } from 'sequelize';
 import { Op } from 'sequelize';
 import { doInTransaction } from 'src/utils/transaction';
+import { getPagination } from 'src/utils/filter';
 
 @Injectable()
 export class EventPanelService {
@@ -34,10 +35,7 @@ export class EventPanelService {
       },
     };
 
-    const offset = filters.page
-      ? +filters.page * +filters.limit - +filters.limit
-      : undefined;
-    const limit = filters.page ? offset + +filters.limit : undefined;
+    const { offset, limit } = getPagination(filters);
 
     const events = await this.eventRepository.findAll({
       offset,

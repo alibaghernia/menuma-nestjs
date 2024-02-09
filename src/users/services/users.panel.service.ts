@@ -12,6 +12,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { BusinessUser } from 'src/business/entites/business_user.entity';
 import { Business_Employee_role, roles } from 'src/access_control/constants';
 import { doInTransaction } from 'src/utils/transaction';
+import { getPagination } from 'src/utils/filter';
 
 @Injectable()
 export class UsersPanelService {
@@ -40,10 +41,7 @@ export class UsersPanelService {
         [Op.not]: 'admin',
       },
     };
-    const offset = filters.page
-      ? +filters.page * +filters.limit - +filters.limit
-      : undefined;
-    const limit = filters.page ? offset + +filters.limit : undefined;
+    const { offset, limit } = getPagination(filters);
     const users = await this.userRepository.findAll({
       where,
       offset,

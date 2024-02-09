@@ -7,11 +7,11 @@ export class FiltersDTO {
 
   @IsOptional()
   @IsString()
-  readonly page?: number;
+  readonly page: number;
 
   @IsOptional()
   @IsString()
-  readonly limit?: number;
+  readonly limit: number;
 }
 
 export class GetManagersFiltersDTO {

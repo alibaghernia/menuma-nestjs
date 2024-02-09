@@ -7,9 +7,9 @@ export class HallsFiltersDTO {
 
   @IsOptional()
   @IsString()
-  page?: number;
+  page: number;
 
   @IsOptional()
   @IsString()
-  limit?: number;
+  limit: number;
 }

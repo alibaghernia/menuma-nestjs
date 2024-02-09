@@ -26,6 +26,7 @@ import {
 } from '../dto/filters.dto';
 import { PagerRequest } from '../entites/pager_request.entity';
 import { PagerRequestgGateway } from '../gateways/pager_request.gateway';
+import { getPagination } from 'src/utils/filter';
 
 @Injectable()
 export class BusinessPanelService {
@@ -49,10 +50,7 @@ export class BusinessPanelService {
   async findAll({ name = '', ...filters }: PanelBusinessesFiltersDTO) {
     this.logger.log('fetch all businesses');
 
-    const offset = filters.page
-      ? +filters.page * +filters.limit - +filters.limit
-      : undefined;
-    const limit = filters.page ? offset + +filters.limit : undefined;
+    const { offset, limit } = getPagination(filters);
 
     const where = {
       name: {

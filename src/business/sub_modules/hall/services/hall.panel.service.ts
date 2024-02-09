@@ -7,6 +7,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Business } from 'src/business/entites/business.entity';
 import { Sequelize } from 'sequelize-typescript';
 import { BusinessHall } from '../entities/business_hall.entity';
+import { getPagination } from 'src/utils/filter';
 
 @Injectable()
 export class HallPanelService {
@@ -21,10 +22,7 @@ export class HallPanelService {
     business_uuid: string,
     { code = '', ...filters }: HallsFiltersDTO,
   ) {
-    const offset = filters.page
-      ? +filters.page * +filters.limit - +filters.limit
-      : undefined;
-    const limit = filters.page ? offset + +filters.limit : undefined;
+    const { offset, limit } = getPagination(filters);
 
     const where: WhereOptions<BusinessHall> = {
       business_uuid,
