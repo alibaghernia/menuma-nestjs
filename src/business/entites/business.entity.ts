@@ -250,7 +250,7 @@ export class Business extends Model<Business> {
   BusinessUser: BusinessUser;
 
   hasEvent: HasManyHasAssociationsMixin<Event, Event['uuid']>;
-  checkHasEvent() {
+  checkHasEvent(this) {
     const event = Event.findOne({
       attributes: ['uuid'],
       where: {

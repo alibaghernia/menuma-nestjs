@@ -25,7 +25,7 @@ export class EventService {
     };
     const include: FindOptions<Event>['include'] = [];
     if (filters.pin) where.pin = true;
-    if (filters.organizer_uuid) where.organizer_uuid = filters.organizer_uuid;
+    if (!!filters.organizer_uuid) where.organizer_uuid = filters.organizer_uuid;
     if (filters.from)
       where.start_at = {
         [Op.gte]: filters.from,

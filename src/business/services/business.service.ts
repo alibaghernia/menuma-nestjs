@@ -69,6 +69,7 @@ export class BusinessService {
     let having: FindOptions<Business>['having'];
     let order: FindOptions<Business>['order'];
     const attributes: FindAttributeOptions = {
+      include: ['uuid'],
       exclude: ['uuid', 'socialable_type', 'socialable_uuid'],
     };
 
@@ -82,7 +83,6 @@ export class BusinessService {
         `distance <= ${+filters.distance} && distance > 0`,
       );
     }
-
     const businesses = await this.businessRepository.findAll({
       attributes,
       where,
@@ -153,7 +153,14 @@ export class BusinessService {
         },
       ],
     });
-    return businessCategories;
+    return businessCategories.map((bc) => {
+      return {
+        ...bc.getDataValue('category').setImageUrl().toJSON(),
+        products: bc
+          .getDataValue('products')
+          .map((prod) => prod.setImagesUrls()),
+      };
+    });
   }
   async createPagerRequest(business_slug: string, payload: NewPagerRequestDTO) {
     try {

@@ -102,10 +102,6 @@ export class Event extends Model<Event> {
   setImages() {
     const images = this.getDataValue('images');
     const banner = this.getDataValue('banner_uuid');
-    console.log({
-      images,
-      banner,
-    });
     if (images?.length)
       this.setDataValue('image_url', makeImageUrl(images[0].uuid));
     if (banner) this.setDataValue('banner_url', makeImageUrl(banner));
