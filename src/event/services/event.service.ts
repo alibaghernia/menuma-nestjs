@@ -26,6 +26,14 @@ export class EventService {
     const include: FindOptions<Event>['include'] = [];
     if (filters.pin) where.pin = true;
     if (filters.organizer_uuid) where.organizer_uuid = filters.organizer_uuid;
+    if (filters.from)
+      where.start_at = {
+        [Op.gte]: filters.from,
+      };
+    if (filters.to)
+      where.start_at = {
+        [Op.lte]: filters.to,
+      };
     else {
       include.push({
         model: Business,

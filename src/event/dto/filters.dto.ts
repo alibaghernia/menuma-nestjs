@@ -1,4 +1,10 @@
-import { IsBooleanString, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsBooleanString,
+  IsDateString,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 import { PaginationDto } from 'src/misc/dto/filters.dto';
 
 export class FiltersDTO extends PaginationDto {
@@ -21,4 +27,12 @@ export class FiltersPublicDTO extends FiltersDTO {
   @IsOptional()
   @IsUUID()
   readonly organizer_uuid?: string;
+
+  @IsOptional()
+  @IsDateString()
+  readonly from: string;
+
+  @IsOptional()
+  @IsDateString()
+  readonly to: string;
 }
