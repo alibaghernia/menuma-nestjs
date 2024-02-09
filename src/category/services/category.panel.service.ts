@@ -58,7 +58,6 @@ export class CategoryPanelService {
     })[];
 
     for (const category of categories) {
-      category.setImageUrl();
       category.setDataValue(
         'products_count',
         await this.businessCategoryProductRep.count({
@@ -88,7 +87,7 @@ export class CategoryPanelService {
         'Category not found!',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
-    return category.setImageUrl();
+    return category;
   }
   // TODO: add checking duplicate category creation
   async create(business_uuid: string, payload: CreateCategoryDTO) {

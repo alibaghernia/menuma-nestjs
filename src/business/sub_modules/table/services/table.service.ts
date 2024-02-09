@@ -35,7 +35,7 @@ export class TableService {
       });
       if (!table)
         throw new HttpException('Table not found!', HttpStatus.NOT_FOUND);
-      return table.setImageUrl();
+      return table;
     } catch (error) {
       throw error;
     }

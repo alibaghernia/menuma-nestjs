@@ -45,7 +45,7 @@ export class HallPanelService {
       },
     });
     return {
-      halls: halls.map((hall) => hall.setImageUrl()),
+      halls,
       total: count,
     };
   }
@@ -59,7 +59,7 @@ export class HallPanelService {
         exclude: ['business_uuid'],
       },
     });
-    return hall.setImageUrl();
+    return hall;
   }
   async createHall(business_uuid: string, payload: CreateHallDTO) {
     const transaction = await this.sequelize.transaction();

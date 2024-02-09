@@ -35,7 +35,7 @@ export class HallService {
       });
       if (!hall)
         throw new HttpException('Hall not found!', HttpStatus.NOT_FOUND);
-      return hall.setImageUrl();
+      return hall;
     } catch (error) {
       throw error;
     }

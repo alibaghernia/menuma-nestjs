@@ -15,6 +15,18 @@ import { makeImageUrl } from 'src/utils/images';
 @Table({
   tableName: 'categories',
   timestamps: false,
+
+  hooks: {
+    afterFind(model: any) {
+      const task = (mo) => {
+        mo.setImageUrl?.();
+      };
+      if (model?.length) model.forEach(task);
+      else {
+        task(model);
+      }
+    },
+  },
 })
 export class Category extends Model<Category> {
   @Column({

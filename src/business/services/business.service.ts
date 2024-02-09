@@ -153,13 +153,7 @@ export class BusinessService {
         },
       ],
     });
-    return businessCategories.map((bc) => {
-      const bussCat = bc.toJSON();
-      return {
-        ...bussCat.category,
-        products: bc.products.map((prod) => prod.setImagesUrls()),
-      };
-    });
+    return businessCategories;
   }
   async createPagerRequest(business_slug: string, payload: NewPagerRequestDTO) {
     try {

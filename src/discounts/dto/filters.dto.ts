@@ -1,10 +1,10 @@
 import {
   IsBooleanString,
-  IsEmpty,
   IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 import { PaginationDto } from 'src/misc/dto/filters.dto';
 import { discountTypes } from './create.dto';
@@ -33,7 +33,8 @@ export class PublicFiltersDTO extends PaginationDto {
   @IsString()
   search?: string;
 
-  @IsEmpty()
+  @IsOptional()
+  @IsUUID()
   business_uuid?: string;
 
   @IsNotEmpty()

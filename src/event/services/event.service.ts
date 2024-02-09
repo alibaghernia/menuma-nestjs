@@ -70,9 +70,6 @@ export class EventService {
       where,
     });
 
-    if (!filters.organizer_uuid) {
-      events.forEach((dis) => dis.business.setImages());
-    }
     return [events, count];
   }
 

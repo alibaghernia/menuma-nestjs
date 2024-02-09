@@ -16,6 +16,17 @@ import { makeImageUrl } from 'src/utils/images';
   tableName: 'business-tables',
   timestamps: true,
   underscored: true,
+  hooks: {
+    afterFind(model: any) {
+      const task = (mo) => {
+        mo.setImageUrl?.();
+      };
+      if (model?.length) model.forEach(task);
+      else {
+        task(model);
+      }
+    },
+  },
 })
 export class BusinessTable extends Model<BusinessTable> {
   @Column({

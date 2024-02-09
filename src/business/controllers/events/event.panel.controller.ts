@@ -64,7 +64,7 @@ export class EventPanelController {
     const event = await this.eventPanelService.getById(uuid);
     return {
       ok: true,
-      data: event.setImages(),
+      data: event,
     };
   }
 
@@ -81,7 +81,7 @@ export class EventPanelController {
     return {
       ok: true,
       data: {
-        events: events.map((eve) => eve.setImages()),
+        events,
         total,
       },
     };

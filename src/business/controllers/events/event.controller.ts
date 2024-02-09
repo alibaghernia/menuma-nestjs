@@ -20,13 +20,13 @@ export class EventController {
     const event = await this.eventService.get(uuid, req.business_guard.uuid);
     return {
       ok: true,
-      data: event.setImages(),
+      data: event,
     };
   }
 
   @Get()
   async getAll(@Req() req: Request, @Query() filters: FiltersPublicDTO) {
-    const [events, total] = await this.eventService.getAll({
+    const [items, total] = await this.eventService.getAll({
       organizer_uuid: req.business_guard.uuid,
       ...filters,
     });
@@ -34,7 +34,7 @@ export class EventController {
     return {
       ok: true,
       data: {
-        events: events.map((eve) => eve.setImages()),
+        items,
         total,
       },
     };

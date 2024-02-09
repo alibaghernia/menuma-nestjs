@@ -50,7 +50,7 @@ export class TablePanelService {
       },
     });
     return {
-      tables: tables.map((table) => table.setImageUrl()),
+      tables,
       total: count,
     };
   }
@@ -64,7 +64,7 @@ export class TablePanelService {
         exclude: ['business_uuid'],
       },
     });
-    return table.setImageUrl();
+    return table;
   }
   async createTable(business_uuid: string, payload: CreateTableDTO) {
     const transaction = await this.sequelize.transaction();

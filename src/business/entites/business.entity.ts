@@ -23,6 +23,7 @@ import {
   HasManyCountAssociationsMixin,
   HasManyCreateAssociationMixin,
   HasManyHasAssociationMixin,
+  HasManyHasAssociationsMixin,
   HasManyRemoveAssociationMixin,
   WhereOptions,
 } from 'sequelize';
@@ -40,6 +41,19 @@ import { Discount } from 'src/discounts/entities/discount.entity';
   timestamps: true,
   tableName: 'businesses',
   paranoid: true,
+  hooks: {
+    afterFind(model: any) {
+      const task = (mo) => {
+        mo.setImages?.();
+        mo.checkHasEvent?.();
+        mo.checkHasDiscount?.();
+      };
+      if (model?.length) model.forEach(task);
+      else {
+        task(model);
+      }
+    },
+  },
 })
 export class Business extends Model<Business> {
   @Column({
@@ -83,7 +97,7 @@ export class Business extends Model<Business> {
     type: DataType.STRING,
   })
   logo: string;
-  setImages(this: Business) {
+  setImages() {
     const logo = this.getDataValue('logo');
     const banner = this.getDataValue('banner');
     if (logo) this.setDataValue('logo_url', makeImageUrl(logo));
@@ -112,6 +126,9 @@ export class Business extends Model<Business> {
 
   @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
   pin: boolean;
+
+  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
+  customer_club_enabled: boolean;
 
   @BelongsToMany(() => User, {
     through: () => BusinessUser,
@@ -231,6 +248,30 @@ export class Business extends Model<Business> {
   hasCategory: BelongsToManyHasAssociationMixin<Category, Category['uuid']>;
   hasCategories: BelongsToManyHasAssociationsMixin<Category, Category['uuid']>;
   BusinessUser: BusinessUser;
+
+  hasEvent: HasManyHasAssociationsMixin<Event, Event['uuid']>;
+  checkHasEvent() {
+    const event = Event.findOne({
+      attributes: ['uuid'],
+      where: {
+        organizer_uuid: this.uuid,
+      },
+    });
+    this.setDataValue('has_event', !!event);
+    return this;
+  }
+  has_event?: boolean;
+  checkHasDiscount() {
+    const discount = Discount.findOne({
+      attributes: ['uuid'],
+      where: {
+        business_uuid: this.uuid,
+      },
+    });
+    this.setDataValue('has_discount', !!discount);
+    return this;
+  }
+  has_discount?: boolean;
 
   addSocial: HasManyAddAssociationMixin<Social, Social['uuid']>;
   createSocial: HasManyCreateAssociationMixin<Social>;

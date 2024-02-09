@@ -19,6 +19,17 @@ import { makeImageUrl } from 'src/utils/images';
   createdAt: 'created_at',
   updatedAt: 'updated_at',
   deletedAt: 'deleted_at',
+  hooks: {
+    afterFind(model: any) {
+      const task = (mo) => {
+        mo?.setImages?.();
+      };
+      if (model?.length) model.forEach(task);
+      else {
+        task(model);
+      }
+    },
+  },
 })
 export class Event extends Model<Event> {
   @Column({
@@ -88,11 +99,15 @@ export class Event extends Model<Event> {
   })
   user: User;
 
-  setImages(this) {
-    const images: EventImage[] = this.getDataValue('images');
+  setImages() {
+    const images = this.getDataValue('images');
     const banner = this.getDataValue('banner_uuid');
+    console.log({
+      images,
+      banner,
+    });
     if (images?.length)
-      this.setDataValue('image_url', makeImageUrl(images[0].file_uuid));
+      this.setDataValue('image_url', makeImageUrl(images[0].uuid));
     if (banner) this.setDataValue('banner_url', makeImageUrl(banner));
     return this;
   }

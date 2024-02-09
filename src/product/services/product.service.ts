@@ -59,7 +59,7 @@ export class ProductService {
     let result;
     if (with_categories) {
       result = products.map((_prod) => {
-        const prod = _prod.setImagesUrls().get({ plain: true });
+        const prod = _prod.get({ plain: true });
         const product = {
           ...prod,
           categories: prod.businessCategories.map((bCat) => bCat.category),
@@ -107,9 +107,7 @@ export class ProductService {
           },
         ].filter(Boolean),
       })
-    )
-      ?.setImagesUrls()
-      .get({ plain: true });
+    ).get({ plain: true });
     if (!product)
       throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
     let result;

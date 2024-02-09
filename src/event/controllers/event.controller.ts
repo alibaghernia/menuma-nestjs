@@ -30,7 +30,7 @@ export class EventController {
     const event = await this.eventService.get(uuid, organizer_uuid);
     return {
       ok: true,
-      data: event?.setImages() || null,
+      data: event,
     };
   }
 }

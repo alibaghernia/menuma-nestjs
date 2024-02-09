@@ -40,6 +40,17 @@ export type ProductPrice = {
   timestamps: true,
   underscored: true,
   paranoid: false,
+  hooks: {
+    afterFind(model: any) {
+      const task = (mo) => {
+        mo.setImagesUrls?.();
+      };
+      if (model?.length) model.forEach(task);
+      else {
+        task(model);
+      }
+    },
+  },
 })
 export class Product extends Model<Product> {
   @Column({

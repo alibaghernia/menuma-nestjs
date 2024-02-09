@@ -73,7 +73,7 @@ export class BusinessPanelService {
     });
 
     return {
-      businesses: businesses.map((bus) => bus.setImages()),
+      businesses,
       total: count,
     };
   }
@@ -107,7 +107,7 @@ export class BusinessPanelService {
 
     if (!business)
       throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-    return business.setImages();
+    return business;
   }
 
   findOne(where: WhereOptions<Business>) {
