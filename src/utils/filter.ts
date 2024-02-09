@@ -36,9 +36,9 @@ export function toSequelizeFilter(filter: any) {
 
 export const getPagination = (filters: PaginationDto) => {
   const offset = filters.page
-    ? +filters.page * +filters.limit - filters.limit
+    ? +filters.page * +filters.limit - +filters.limit
     : 0;
-  const limit = filters.limit ? offset + filters.limit : undefined;
+  const limit = filters.limit ? offset + +filters.limit : undefined;
   return {
     offset,
     limit,
