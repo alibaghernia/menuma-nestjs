@@ -1,19 +1,24 @@
-import { IsBooleanString, IsOptional, IsString } from 'class-validator';
+import { IsBooleanString, IsOptional, IsString, IsUUID } from 'class-validator';
+import { PaginationDto } from 'src/misc/dto/filters.dto';
 
-export class FiltersDTO {
+export class FiltersDTO extends PaginationDto {
   @IsOptional()
   @IsString()
   readonly title?: string;
 
   @IsOptional()
+  readonly page: number;
+
+  @IsOptional()
+  readonly limit: number;
+}
+
+export class FiltersPublicDTO extends FiltersDTO {
+  @IsOptional()
   @IsBooleanString()
   readonly pin?: boolean;
 
   @IsOptional()
-  @IsString()
-  readonly page?: number;
-
-  @IsOptional()
-  @IsString()
-  readonly limit?: number;
+  @IsUUID()
+  readonly organizer_uuid?: string;
 }

@@ -33,9 +33,6 @@ export class EventPanelService {
         [Op.like]: `%${title}%`,
       },
     };
-    if (filters.pin) {
-      where.pin = true;
-    }
 
     const offset = filters.page
       ? +filters.page * +filters.limit - +filters.limit

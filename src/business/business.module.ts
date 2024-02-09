@@ -22,6 +22,7 @@ import { CustomersPanelController } from './controllers/customer_club/customers/
 import { DiscountsPanelController } from './controllers/discounts/discounts.panel.controller';
 import { DiscountsController } from './controllers/discounts/discounts.controller';
 import { DiscountsModule } from 'src/discounts/discounts.module';
+import { EventController } from './controllers/events/event.controller';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { DiscountsModule } from 'src/discounts/discounts.module';
     BusinessController,
     BusinessPanelController,
     EventPanelController,
+    EventController,
     CustomersController,
     CustomersPanelController,
     DiscountsPanelController,

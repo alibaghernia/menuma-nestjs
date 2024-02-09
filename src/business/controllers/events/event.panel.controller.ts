@@ -14,10 +14,10 @@ import { CheckBusinessAccessGuard } from 'src/access_control/guards/check_buisne
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
 import { CheckBusinessExistsGuard } from 'src/business/guards/exists.guard';
 import { CreateEventDTO } from 'src/event/dto/create.dto';
+import { FiltersDTO } from 'src/event/dto/filters.dto';
 import { EventPanelService } from 'src/event/services/event.panel.service';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
-import { FiltersDTO } from 'src/users/dto/filters.dto';
 
 @Controller('panel/business/:business_uuid/events')
 @UsePipes(new UUIDCheckerController('Business UUID', 'business_uuid'))

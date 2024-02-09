@@ -24,7 +24,6 @@ export class CheckBusinessExistsGuard implements CanActivate {
     const business_slug = (
       (request.params.business_slug as string) || ''
     ).replace(':business_slug', '');
-
     if (!business_slug && !business_uuid)
       throw new HttpException(
         'You must provide business uuid or business slug based on your action!',
