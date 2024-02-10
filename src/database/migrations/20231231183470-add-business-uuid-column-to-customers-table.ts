@@ -7,10 +7,6 @@ module.exports = {
     await queryInterface.addColumn('customers', 'business_uuid', {
       type: DataTypes.UUID,
       allowNull: false,
-      references: {
-        model: 'businesses',
-        key: 'uuid',
-      },
     });
   },
 
