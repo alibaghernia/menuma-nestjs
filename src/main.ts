@@ -3,37 +3,14 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import * as express from 'express';
 import * as morgan from 'morgan';
-import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { SocketIoAdapter } from './adapters/socket_io.adapter';
-import * as dotenv from 'dotenv';
-import { readFileSync } from 'fs';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
-  dotenv.config();
-  const webUrl = process.env.WEB_DOMAIN || 'http://127.0.0.1';
-  const url = new URL(webUrl);
-  let httpsOptions: NestApplicationOptions['httpsOptions'];
-  if (url.protocol.startsWith('https')) {
-    if (!process.env.SSL_KEY || !process.env.SSL_CERT) {
-      console.error('Check cert and key paths');
-      process.exit(1);
-    }
-    const key = readFileSync(process.env.SSL_KEY);
-    const cert = readFileSync(process.env.SSL_CERT);
-    console.log({
-      key,
-      cert,
-    });
-    httpsOptions = {
-      key,
-      cert,
-    };
-  }
   const app = await NestFactory.create(AppModule, {
     cors: true,
-    httpsOptions,
   });
 
   const configService = app.get<ConfigService>(ConfigService);
@@ -53,7 +30,7 @@ async function bootstrap() {
       forbidUnknownValues: true,
     }),
   );
-  app.useWebSocketAdapter(new SocketIoAdapter(app, configService));
+  app.useWebSocketAdapter(new IoAdapter(app));
 
   const config = new DocumentBuilder()
     .setTitle('menuma api docs')
