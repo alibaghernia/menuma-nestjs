@@ -20,9 +20,15 @@ async function bootstrap() {
       console.error('Check cert and key paths');
       process.exit(1);
     }
+    const key = readFileSync(process.env.SSL_KEY);
+    const cert = readFileSync(process.env.SSL_CERT);
+    console.log({
+      key,
+      cert,
+    });
     httpsOptions = {
-      key: readFileSync(process.env.SSL_KEY),
-      cert: readFileSync(process.env.SSL_CERT),
+      key,
+      cert,
     };
   }
   const app = await NestFactory.create(AppModule, {
