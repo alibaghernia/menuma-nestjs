@@ -3,14 +3,25 @@ import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import * as express from 'express';
 import * as morgan from 'morgan';
-import { ValidationPipe } from '@nestjs/common';
+import { NestApplicationOptions, ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { SocketIoAdapter } from './adapters/socket_io.adapter';
+import * as dotenv from 'dotenv';
 
 async function bootstrap() {
+  dotenv.config();
+  const webUrl = process.env.WEB_DOMAIN || 'http://127.0.0.1';
+  const url = new URL(webUrl);
+  let httpsOptions: NestApplicationOptions['httpsOptions'];
+  if (url.protocol.startsWith('https'))
+    httpsOptions = {
+      key: process.env.SSL_KEY,
+      cert: process.env.SSL_CERT,
+    };
   const app = await NestFactory.create(AppModule, {
     cors: true,
+    httpsOptions,
   });
 
   const configService = app.get<ConfigService>(ConfigService);
