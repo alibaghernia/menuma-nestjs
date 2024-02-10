@@ -8,6 +8,9 @@ import { PagerRequest } from '../entites/pager_request.entity';
 
 @WebSocketGateway({
   namespace: 'pager_requests',
+  cors: {
+    origin: '*',
+  },
 })
 export class PagerRequestgGateway
   implements OnGatewayConnection, OnGatewayDisconnect
