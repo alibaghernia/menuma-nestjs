@@ -16,10 +16,6 @@ module.exports = {
         birthday: { type: DataTypes.STRING(100), allowNull: false },
         gender: { type: DataTypes.STRING(100), allowNull: false },
         mobile: { type: DataTypes.STRING(100), allowNull: false },
-        business_uuid: {
-          type: DataTypes.UUID,
-          allowNull: false,
-        },
         created_at: DataTypes.DATE,
         updated_at: DataTypes.DATE,
         deleted_at: DataTypes.DATE,
