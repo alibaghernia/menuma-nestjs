@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { QueryError, WhereOptions } from 'sequelize';
 import { CreateUserDTO } from '../dto/create_user.dto';
 import * as bcrypt from 'bcrypt';
-import { UpdateUserDTO } from '../dto/update_user.dto';
+import { UpdateUserDTO, UpdateUserProfileDTO } from '../dto/update_user.dto';
 import { FiltersDTO, GetManagersFiltersDTO } from '../dto/filters.dto';
 import { Op } from 'sequelize';
 import { Business } from 'src/business/entites/business.entity';
@@ -252,6 +252,42 @@ export class UsersPanelService {
         } else {
           await user.setBusinesses([]);
         }
+      });
+    } catch (error) {
+      if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {
+        // duplicate entry
+        throw new HttpException(
+          {
+            code: 1,
+            message: `some fields are duplicate!`,
+            fields: Object.keys(error.fields),
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      throw error;
+    }
+  }
+
+  async updateUserProfile(user_uuid: string, payload: UpdateUserProfileDTO) {
+    try {
+      const { businesses, ...userPayload } = payload;
+      return await doInTransaction(this.sequelize, async (transaction) => {
+        const user = await this.userRepository.findOne({
+          where: {
+            uuid: user_uuid,
+          },
+        });
+        if (!user)
+          throw new HttpException('User not found!', HttpStatus.NOT_FOUND);
+        if (userPayload.password)
+          userPayload.password = bcrypt.hashSync(
+            userPayload.password,
+            bcrypt.genSaltSync(),
+          );
+        user.update(userPayload, {
+          transaction,
+        });
       });
     } catch (error) {
       if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {

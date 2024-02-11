@@ -1,4 +1,10 @@
-import { Equals, IsArray, IsOptional, IsString } from 'class-validator';
+import {
+  Equals,
+  IsArray,
+  IsEmpty,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class UpdateUserDTO {
   @IsOptional()
@@ -32,4 +38,7 @@ export class UpdateUserDTO {
 export class UpdateUserProfileDTO extends UpdateUserDTO {
   @Equals(undefined)
   mobile: string;
+
+  @IsEmpty()
+  businesses?: { business_uuid: string; role: string }[];
 }

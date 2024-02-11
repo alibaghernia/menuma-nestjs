@@ -107,7 +107,7 @@ export class UsersPanelController {
   ) {
     this.logger.log('Update user profile');
     try {
-      await this.usersService.updateUser(request.user.uuid, payload);
+      await this.usersService.updateUserProfile(request.user.uuid, payload);
       return {
         ok: true,
         message: 'User profile updated successfully!',
