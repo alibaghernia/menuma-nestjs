@@ -2,8 +2,10 @@ import { Controller, Get, Param, Query } from '@nestjs/common';
 import { CatalogsService } from '../services/catalogs.service';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { FiltersDTO } from '../dto/filters.dto';
+import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 
 @Controller('catalogs')
+@IsPublic()
 export class CatalogsController {
   constructor(private catalogsService: CatalogsService) {}
 
