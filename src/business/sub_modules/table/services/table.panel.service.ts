@@ -164,7 +164,7 @@ export class TablePanelService {
         });
       }
       await transaction.commit();
-      return `${appDomain}/q/${qrCode.slug}`;
+      return `https://q.menuma.online/${qrCode.slug}`;
     } catch (error) {
       await transaction.rollback();
       throw error;
