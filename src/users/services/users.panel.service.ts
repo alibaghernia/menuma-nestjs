@@ -214,6 +214,7 @@ export class UsersPanelService {
             userPayload.password,
             bcrypt.genSaltSync(),
           );
+        else delete payload.password;
         user.update(userPayload, {
           transaction,
         });
@@ -286,6 +287,7 @@ export class UsersPanelService {
             userPayload.password,
             bcrypt.genSaltSync(),
           );
+        else delete payload.password;
         user.update(userPayload, {
           transaction,
         });
