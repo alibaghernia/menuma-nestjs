@@ -18,12 +18,13 @@ export class DiscountsPanelService {
     const { limit, offset } = getPagination(filters);
     const where: WhereOptions<Discount> = {
       business_uuid,
-      type: filters.type,
       title: {
         [Op.like]: `%${search}%`,
       },
     };
-
+    if (filters.type != 'ALL') {
+      where.type = filters.type;
+    }
     const items = await this.discountRepository.findAll({
       where,
       attributes: {

@@ -17,11 +17,13 @@ export class DiscountsService {
     const { offset, limit } = getPagination(filters);
 
     const where: WhereOptions<Discount> = {
-      type: filters.type,
       title: {
         [Op.like]: `%${search}%`,
       },
     };
+    if (filters.type != 'ALL') {
+      where.type = filters.type;
+    }
     const include: FindOptions<Discount>['include'] = [];
     if (filters.pin) where.pin = true;
     if (filters.business_uuid) where.business_uuid = filters.business_uuid;

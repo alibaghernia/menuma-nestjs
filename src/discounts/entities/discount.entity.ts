@@ -20,24 +20,24 @@ export class Discount extends Model<Discount> {
     type: DataType.UUID,
     defaultValue: DataType.UUIDV4,
   })
-  readonly uuid: string;
+  uuid: string;
 
   @Column({
     type: DataType.UUID,
     allowNull: false,
   })
-  readonly title: string;
+  title: string;
 
   @Column({
     type: DataType.NUMBER({ length: 3 }),
     allowNull: false,
   })
-  readonly discount: number;
+  discount: number;
 
   @Column({
     type: DataType.STRING,
   })
-  readonly description: string;
+  description: string;
 
   @Column({
     type: DataType.BOOLEAN,
@@ -51,7 +51,7 @@ export class Discount extends Model<Discount> {
     allowNull: false,
     defaultValue: discountTypes.NORMAL,
   })
-  readonly type: string;
+  type: string;
 
   @ForeignKey(() => Business)
   business_uuid: string;
@@ -61,5 +61,5 @@ export class Discount extends Model<Discount> {
     foreignKey: 'business_uuid',
     targetKey: 'uuid',
   })
-  readonly business: Business;
+  business: Business;
 }

@@ -11,6 +11,7 @@ import {
 export enum discountTypes {
   CONDITIONAL = 'CONDITIONAL',
   NORMAL = 'NORMAL',
+  ALL = 'ALL',
 }
 
 export class CreateDTO {
