@@ -42,16 +42,16 @@ import { Discount } from 'src/discounts/entities/discount.entity';
   tableName: 'businesses',
   paranoid: true,
   hooks: {
-    afterFind(model: any) {
-      const task = (mo) => {
-        mo.setImages?.();
-        mo.checkHasMenu?.();
-        mo.checkHasEvent?.();
-        mo.checkHasDiscount?.();
+    async afterFind(model: any) {
+      const task = async (mo) => {
+        await mo.setImages?.();
+        await mo.checkHasMenu?.();
+        await mo.checkHasEvent?.();
+        await mo.checkHasDiscount?.();
       };
       if (model?.length) model.forEach(task);
       else {
-        task(model);
+        await task(model);
       }
     },
   },
