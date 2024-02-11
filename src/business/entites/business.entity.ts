@@ -45,6 +45,7 @@ import { Discount } from 'src/discounts/entities/discount.entity';
     afterFind(model: any) {
       const task = (mo) => {
         mo.setImages?.();
+        mo.checkHasMenu?.();
         mo.checkHasEvent?.();
         mo.checkHasDiscount?.();
       };
@@ -250,8 +251,8 @@ export class Business extends Model<Business> {
   BusinessUser: BusinessUser;
 
   hasEvent: HasManyHasAssociationsMixin<Event, Event['uuid']>;
-  checkHasEvent(this) {
-    const event = Event.findOne({
+  async checkHasEvent(this) {
+    const event = await Event.findOne({
       attributes: ['uuid'],
       where: {
         organizer_uuid: this.uuid,
@@ -261,8 +262,8 @@ export class Business extends Model<Business> {
     return this;
   }
   has_event?: boolean;
-  checkHasDiscount() {
-    const discount = Discount.findOne({
+  async checkHasDiscount() {
+    const discount = await Discount.findOne({
       attributes: ['uuid'],
       where: {
         business_uuid: this.uuid,
@@ -272,6 +273,17 @@ export class Business extends Model<Business> {
     return this;
   }
   has_discount?: boolean;
+  async checkHasMenu() {
+    const discount = await Product.count({
+      attributes: ['uuid'],
+      where: {
+        business_uuid: this.uuid,
+      },
+    });
+    this.setDataValue('has_menu', !!discount);
+    return this;
+  }
+  has_menu?: boolean;
 
   addSocial: HasManyAddAssociationMixin<Social, Social['uuid']>;
   createSocial: HasManyCreateAssociationMixin<Social>;
