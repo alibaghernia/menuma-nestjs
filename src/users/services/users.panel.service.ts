@@ -271,6 +271,7 @@ export class UsersPanelService {
 
   async updateUserProfile(user_uuid: string, payload: UpdateUserProfileDTO) {
     try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { businesses, ...userPayload } = payload;
       return await doInTransaction(this.sequelize, async (transaction) => {
         const user = await this.userRepository.findOne({
