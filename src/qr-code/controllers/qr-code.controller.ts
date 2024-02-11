@@ -3,8 +3,10 @@ import { QrCodeService } from '../services/qr-code.service';
 import { Response } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { NotEmptyPipe } from 'src/pipes/not_empty.pipe';
+import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 
 @Controller('q')
+@IsPublic()
 export class QrCodeController {
   constructor(
     private qrCodeService: QrCodeService,
