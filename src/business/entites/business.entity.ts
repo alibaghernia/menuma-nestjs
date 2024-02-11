@@ -44,10 +44,10 @@ import { Discount } from 'src/discounts/entities/discount.entity';
   hooks: {
     async afterFind(model: any) {
       const task = async (mo) => {
-        await mo.setImages?.();
-        await mo.checkHasMenu?.();
-        await mo.checkHasEvent?.();
-        await mo.checkHasDiscount?.();
+        await mo?.setImages?.();
+        await mo?.checkHasMenu?.();
+        await mo?.checkHasEvent?.();
+        await mo?.checkHasDiscount?.();
       };
       if (model?.length) model.forEach(task);
       else {
