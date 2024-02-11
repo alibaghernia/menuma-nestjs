@@ -80,7 +80,7 @@ export class ProductService {
     };
   }
 
-  async fetchOne(product_uuid: string, with_categories: boolean) {
+  async fetchOne(product_uuid: string, with_categories: boolean = false) {
     const product = (
       await this.productRepository.findOne({
         where: {
@@ -122,6 +122,31 @@ export class ProductService {
     }
 
     return result || product;
+  }
+
+  async offers() {
+    const where = this.sequelize.fn(
+      'JSON_CONTAINS',
+      this.sequelize.col('metadata'),
+      '"offer"',
+    );
+    const items = await this.productRepository.findAll({
+      where,
+      include: [
+        {
+          model: File,
+          required: false,
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+    });
+
+    const count = await this.productRepository.count({
+      where,
+    });
+    return [items, count];
   }
 
   async fetchCategoryProducts(category_uuid: string) {

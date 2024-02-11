@@ -23,6 +23,8 @@ import { DiscountsPanelController } from './controllers/discounts/discounts.pane
 import { DiscountsController } from './controllers/discounts/discounts.controller';
 import { DiscountsModule } from 'src/discounts/discounts.module';
 import { EventController } from './controllers/events/event.controller';
+import { ProductModule } from 'src/product/product.module';
+import { ProductController } from './controllers/products/products.controller';
 
 @Module({
   imports: [
@@ -34,6 +36,7 @@ import { EventController } from './controllers/events/event.controller';
       BusinessCategory,
       PagerRequest,
     ]),
+    ProductModule,
     EventModule,
     CustomersModule,
     AccessControlModule,
@@ -51,6 +54,7 @@ import { EventController } from './controllers/events/event.controller';
     CustomersPanelController,
     DiscountsPanelController,
     DiscountsController,
+    ProductController,
   ],
 })
 export class BusinessModule {}
