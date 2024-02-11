@@ -17,6 +17,7 @@ import { VersionController } from './version/version.controller';
 import { CustomersModule } from './customers/customers.module';
 import { DiscountsModule } from './discounts/discounts.module';
 import { CatalogsModule } from './catalogs/catalogs.module';
+import { RequestsModule } from './requests/requests.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { CatalogsModule } from './catalogs/catalogs.module';
     CustomersModule,
     DiscountsModule,
     CatalogsModule,
+    RequestsModule,
   ],
   controllers: [VersionController],
 })

@@ -28,6 +28,7 @@ import { BusinessHall } from 'src/business/sub_modules/hall/entities/business_ha
 import { Customer } from '../customers/entities/customer.entity';
 import { Discount } from 'src/discounts/entities/discount.entity';
 import { Catalog } from 'src/catalogs/entities/catalog.entity';
+import { Request } from 'src/requests/entities/request.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -67,6 +68,7 @@ const config: SequelizeModuleOptions = {
     Customer,
     Discount,
     Catalog,
+    Request,
   ],
 };
 
