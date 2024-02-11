@@ -35,6 +35,18 @@ export const access_control = {
     action: 'remove-business-roles',
   },
 };
+export const catalogs_permissions = {
+  read: {
+    uuid: '38704fa6-8c80-4327-b07c-345037bc9238',
+    title: 'Read Catalogs',
+    action: 'read-catalogs',
+  },
+  write: {
+    uuid: '49f819d9-6908-422a-b940-2facd2b7d326',
+    title: 'Write Catalogs',
+    action: 'write-catalogs',
+  },
+};
 export const business_permissions = {
   createBusiness: {
     uuid: '3cd1e431-2e4b-4150-aa0c-d01d9e16fbd0',
@@ -189,6 +201,7 @@ export const administratorAccessPermissions = [
   business_permissions.readBusinesses,
   business_permissions.setBusinessManager,
   ...Object.values(users_permissions),
+  ...Object.values(catalogs_permissions),
 ];
 
 export const all_permissions = Object.values(business_permissions).concat(

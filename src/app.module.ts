@@ -16,6 +16,7 @@ import { WebPushModule } from './web_push/web_push.module';
 import { VersionController } from './version/version.controller';
 import { CustomersModule } from './customers/customers.module';
 import { DiscountsModule } from './discounts/discounts.module';
+import { CatalogsModule } from './catalogs/catalogs.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { DiscountsModule } from './discounts/discounts.module';
     PhotographyModule,
     CustomersModule,
     DiscountsModule,
+    CatalogsModule,
   ],
   controllers: [VersionController],
 })
