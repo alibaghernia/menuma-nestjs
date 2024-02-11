@@ -5,7 +5,9 @@ import { ConfigService } from '@nestjs/config';
 import { NotEmptyPipe } from 'src/pipes/not_empty.pipe';
 import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 
-@Controller('q')
+@Controller({
+  host: 'q.menuma.online',
+})
 @IsPublic()
 export class QrCodeController {
   constructor(
