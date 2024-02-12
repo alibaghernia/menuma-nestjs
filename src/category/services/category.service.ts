@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Category } from '../entities/category.entity';
-import { CreateCategoryDTO } from '../dto';
+import { CreateDTO } from '../dto';
 import { FetchCategoriesDTO } from '../dto/filters.dto';
 import { WhereOptions } from 'sequelize';
 import { Business } from 'src/business/entites/business.entity';
@@ -109,7 +109,7 @@ export class CategoryService {
     return result;
   }
 
-  create(category: CreateCategoryDTO) {
+  create(category: CreateDTO) {
     return this.categoryRepository.create({
       title: category.title,
       slug: category.slug,

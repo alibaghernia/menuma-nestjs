@@ -96,4 +96,5 @@ export class Category extends Model<Category> {
   businesses: Business[];
 
   products_count?: number;
+  business?: Business;
 }

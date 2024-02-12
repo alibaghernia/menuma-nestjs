@@ -1,11 +1,9 @@
-import { Controller, Get, Param, Query, UsePipes } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 import { FetchCategoriesDTO } from '../dto/filters.dto';
 import { CategoryService } from '../services/category.service';
-import { SlugCheckerController } from 'src/pipes/slug_checker_controller.pipe';
 
-@Controller('category/:business_slug')
-@UsePipes(SlugCheckerController)
+@Controller('category')
 @IsPublic()
 export class CategoryController {
   constructor(private categoryService: CategoryService) {}

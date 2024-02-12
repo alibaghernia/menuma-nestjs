@@ -71,7 +71,7 @@ export class ProductPanelService {
       where,
     });
     products.map((product: Product) => {
-      product.business.setImages();
+      product.business?.setImages();
       product.setDataValue(
         'categories',
         product.categories.map((category) => category.category) as any[],

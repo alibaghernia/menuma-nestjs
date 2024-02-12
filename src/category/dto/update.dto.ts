@@ -1,7 +1,7 @@
 import { IsOptional } from 'class-validator';
-import { CreateCategoryDTO } from './create.dto';
+import { CreateDTO } from './create.dto';
 
-export class UpdateCategoryDTO extends CreateCategoryDTO {
+export class UpdateCategoryDTO extends CreateDTO {
   @IsOptional()
   title: string;
 

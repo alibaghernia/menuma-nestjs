@@ -26,6 +26,8 @@ import { EventController } from './controllers/events/event.controller';
 import { ProductModule } from 'src/product/product.module';
 import { ProductController } from './controllers/products/products.controller';
 import { ProductPanelController } from './controllers/products/product.panel.controller';
+import { CategoryPanelController } from './controllers/categories/category.panel.controller';
+import { CategoryModule } from 'src/category/category.module';
 
 @Module({
   imports: [
@@ -38,6 +40,7 @@ import { ProductPanelController } from './controllers/products/product.panel.con
       PagerRequest,
     ]),
     ProductModule,
+    CategoryModule,
     EventModule,
     CustomersModule,
     AccessControlModule,
@@ -57,6 +60,7 @@ import { ProductPanelController } from './controllers/products/product.panel.con
     DiscountsController,
     ProductController,
     ProductPanelController,
+    CategoryPanelController,
   ],
 })
 export class BusinessModule {}

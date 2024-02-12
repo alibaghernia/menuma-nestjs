@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateCategoryDTO } from '../dto';
+import { CreateDTO } from '../dto';
 import { Sequelize } from 'sequelize-typescript';
 import { InjectModel } from '@nestjs/sequelize';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
@@ -8,7 +8,9 @@ import { Category } from '../entities/category.entity';
 import { UpdateCategoryDTO } from '../dto/update.dto';
 import { BusinessCategoryProduct } from 'src/product/entities/business-category_product.entity';
 import { FiltersDTO } from '../dto/filters.dto';
-import { Op } from 'sequelize';
+import { FindOptions, WhereOptions } from 'sequelize';
+import { getPagination } from 'src/utils/filter';
+import { Product } from 'src/product/entities/product.entity';
 
 @Injectable()
 export class CategoryPanelService {
@@ -24,56 +26,47 @@ export class CategoryPanelService {
     private businessCategoryProductRep: typeof BusinessCategoryProduct,
   ) {}
 
-  async fetchAll(business_uuid: string, _filters: FiltersDTO) {
-    const { page, limit, ...filters } = _filters;
-    const categoriesFilters = filters
-      ? Object.fromEntries(
-          Object.entries(filters).map(([k, v]) => [k, { [Op.like]: `%${v}%` }]),
-        )
-      : {};
-    const business = await this.businessRep.findOne({
-      where: {
-        uuid: business_uuid,
+  async fetchAll(filters: FiltersDTO) {
+    const { offset, limit } = getPagination(filters);
+
+    const where: WhereOptions<BusinessCategory> = {};
+    const include: FindOptions<BusinessCategory>['include'] = [
+      {
+        model: Category,
       },
-      include: [
-        {
-          model: Category,
-          where: categoriesFilters,
-          through: {
-            // attributes: [],
-          },
-        },
-      ],
-    });
-    if (filters && !business)
-      return {
-        categories: [],
-        total: 0,
-      };
-    if (!business)
-      throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-
-    const categories = business.categories as (Category & {
-      BusinessCategory: any;
-    })[];
-
-    for (const category of categories) {
-      category.setDataValue(
-        'products_count',
-        await this.businessCategoryProductRep.count({
-          where: {
-            business_category_uuid: category.BusinessCategory.uuid,
-          },
-        }),
-      );
-      delete category.BusinessCategory;
+      {
+        model: Product,
+      },
+    ];
+    if (filters.business_uuid) where.business_uuid = filters.business_uuid;
+    else {
+      include.push({
+        model: Business,
+        attributes: ['uuid', 'name', 'slug', 'logo'],
+      });
     }
+
+    const busCategories = await this.businessCategoryRep.findAll({
+      where,
+      offset,
+      limit,
+      include,
+    });
+
+    const count = await this.businessCategoryRep.count({
+      where,
+    });
+
+    const categories = busCategories.map((busCat) => {
+      return {
+        ...(busCat.category?.setImageUrl().toJSON() || {}),
+        products_count: busCat.products.length,
+        business: busCat.business?.setImages(),
+      };
+    });
     return {
-      categories:
-        page && limit
-          ? categories.slice(page * limit - limit, page * limit)
-          : categories,
-      total: categories.length,
+      categories,
+      total: count,
     };
   }
   async findOne(category_uuid: string) {
@@ -81,16 +74,27 @@ export class CategoryPanelService {
       where: {
         uuid: category_uuid,
       },
+      include: [
+        {
+          model: Business,
+          attributes: ['uuid', 'name', 'slug', 'logo'],
+          through: {
+            attributes: [],
+          },
+        },
+      ],
     });
     if (!category)
       throw new HttpException(
         'Category not found!',
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
+    category.setDataValue('business', category.businesses[0]?.setImages());
+    delete category.businesses;
     return category;
   }
   // TODO: add checking duplicate category creation
-  async create(business_uuid: string, payload: CreateCategoryDTO) {
+  async create(business_uuid: string, payload: CreateDTO) {
     const transaction = await this.sequelize.transaction();
     try {
       const business = await this.businessRep.findOne({
@@ -114,33 +118,29 @@ export class CategoryPanelService {
   }
 
   // TODO: add checking duplicate category creation
-  async update(category_uuid: string, payload: UpdateCategoryDTO) {
+  async update(uuid: string, payload: UpdateCategoryDTO) {
     const transaction = await this.sequelize.transaction();
     try {
-      const business = await this.categoryRep.update(payload, {
+      await this.categoryRep.update(payload, {
         where: {
-          uuid: category_uuid,
+          uuid: uuid,
         },
       });
-      if (!business)
-        throw new HttpException('Category not found!', HttpStatus.NOT_FOUND);
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
       throw error;
     }
   }
-  async remove(business_uuid: string, category_uuid: string) {
+  async remove(uuid: string) {
     const transaction = await this.sequelize.transaction();
     try {
-      const business = await this.businessRep.findOne({
+      await this.categoryRep.destroy({
         where: {
-          uuid: business_uuid,
+          uuid,
         },
+        transaction,
       });
-      if (!business)
-        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-      await business.removeCategory(category_uuid);
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();

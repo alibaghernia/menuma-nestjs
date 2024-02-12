@@ -1,6 +1,12 @@
-import { IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import {
+  IsEmpty,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
-export class CreateCategoryDTO {
+export class CreateDTO {
   @IsString()
   @IsNotEmpty()
   title: string;
@@ -16,4 +22,8 @@ export class CreateCategoryDTO {
   @IsOptional()
   @IsUUID()
   parent_uuid: string;
+
+  @IsEmpty()
+  @IsUUID()
+  business_uuid: string;
 }

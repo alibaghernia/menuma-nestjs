@@ -1,5 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class FiltersDTO {
   @IsOptional()
@@ -13,6 +13,10 @@ export class FiltersDTO {
   @IsOptional()
   @IsString()
   limit: number;
+
+  @IsOptional()
+  @IsUUID()
+  business_uuid: number;
 }
 
 export class FetchCategoriesDTO extends FiltersDTO {

@@ -7,25 +7,43 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
+  UsePipes,
 } from '@nestjs/common';
+import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
+import { CreateDTO } from '../../../category/dto';
+import { CategoryPanelService } from '../../../category/services/category.panel.service';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
+import { UpdateCategoryDTO } from '../../../category/dto/update.dto';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
 import { category_permissions } from 'src/access_control/constants';
-import { IsAdmin } from 'src/auth/decorators/is_public.decorator';
-import { CategoryPanelService } from '../services/category.panel.service';
-import { FiltersDTO } from '../dto/filters.dto';
-import { CreateAdminDTO } from '../dto/admin_panel.dto';
+import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
+import { FiltersDTO } from '../../../category/dto/filters.dto';
+import { CheckBusinessExistsGuard } from 'src/business/guards/exists.guard';
+import { CheckBusinessAccessGuard } from 'src/access_control/guards/check_buisness_access.guard';
 
-@Controller('panel/category')
-@IsAdmin()
+@Controller('panel/business/:business_uuid/category')
+@UseGuards(
+  CheckBusinessExistsGuard,
+  CheckBusinessAccessGuard,
+  CheckPermissionsGuard,
+)
+@UsePipes(new UUIDCheckerController('Business UUID', 'business_uuid'))
 export class CategoryPanelController {
   constructor(private categoryPanelService: CategoryPanelService) {}
 
   @Get()
   @CheckPermissions([category_permissions.read.action])
-  async getCategories(@Query() filters: FiltersDTO) {
+  async getCategories(
+    @Param('business_uuid', new UUIDChecker('Business UUID'))
+    business_uuid: string,
+    @Query() filters: FiltersDTO,
+  ) {
     try {
-      const categories = await this.categoryPanelService.fetchAll(filters);
+      const categories = await this.categoryPanelService.fetchAll({
+        business_uuid,
+        ...filters,
+      });
       return {
         ok: true,
         data: categories,
@@ -40,7 +58,7 @@ export class CategoryPanelController {
   async createCategory(
     @Param('business_uuid')
     business_uuid: string,
-    @Body() payload: CreateAdminDTO,
+    @Body() payload: CreateDTO,
   ) {
     try {
       await this.categoryPanelService.create(business_uuid, payload);
@@ -53,14 +71,14 @@ export class CategoryPanelController {
     }
   }
 
-  @Get(':uuid')
+  @Get(':category_uuid')
   @CheckPermissions([category_permissions.read.action])
   async getCategory(
-    @Param('uuid', new UUIDChecker('Category UUID'))
-    uuid: string,
+    @Param('category_uuid', new UUIDChecker('Category UUID'))
+    category_uuid: string,
   ) {
     try {
-      const category = await this.categoryPanelService.findOne(uuid);
+      const category = await this.categoryPanelService.findOne(category_uuid);
       return {
         ok: true,
         data: category,
@@ -70,15 +88,15 @@ export class CategoryPanelController {
     }
   }
 
-  @Put(':uuid')
+  @Put(':category_uuid')
   @CheckPermissions([category_permissions.updateCategory.action])
   async updateCategory(
-    @Param('uuid', new UUIDChecker('Category UUID'))
-    uuid: string,
-    @Body() payload: CreateAdminDTO,
+    @Param('category_uuid', new UUIDChecker('Category UUID'))
+    category_uuid: string,
+    @Body() payload: UpdateCategoryDTO,
   ) {
     try {
-      await this.categoryPanelService.update(uuid, payload);
+      await this.categoryPanelService.update(category_uuid, payload);
       return {
         ok: true,
         message: 'Category updated successfully!',
