@@ -25,6 +25,8 @@ export class BusinessService {
     private pagerRequestRepository: typeof PagerRequest,
     @InjectModel(BusinessCategory)
     private businessCategoryRepository: typeof BusinessCategory,
+    @InjectModel(BusinessTable)
+    private businessTableRepository: typeof BusinessTable,
     private pagerRequestGateway: PagerRequestgGateway,
     private sequelize: Sequelize,
   ) {}
@@ -171,8 +173,13 @@ export class BusinessService {
         attributes: ['uuid'],
       });
 
-      if (!business)
-        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
+      const table = await this.businessTableRepository.count({
+        where: {
+          uuid: payload.table_uuid,
+        },
+      });
+      if (!table)
+        throw new HttpException('Table not found!', HttpStatus.NOT_FOUND);
 
       const request = await this.pagerRequestRepository.create({
         business_uuid: business.uuid,

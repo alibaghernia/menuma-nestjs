@@ -28,6 +28,8 @@ import { ProductController } from './controllers/products/products.controller';
 import { ProductPanelController } from './controllers/products/product.panel.controller';
 import { CategoryPanelController } from './controllers/categories/category.panel.controller';
 import { CategoryModule } from 'src/category/category.module';
+import { BusinessTable } from './sub_modules/table/entitile/business_tables.entity';
+import { Product } from 'src/product/entities/product.entity';
 
 @Module({
   imports: [
@@ -37,7 +39,9 @@ import { CategoryModule } from 'src/category/category.module';
       User,
       BusinessUser,
       BusinessCategory,
+      BusinessTable,
       PagerRequest,
+      Product,
     ]),
     ProductModule,
     CategoryModule,

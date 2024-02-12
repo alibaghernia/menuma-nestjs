@@ -27,6 +27,8 @@ import {
 import { PagerRequest } from '../entites/pager_request.entity';
 import { PagerRequestgGateway } from '../gateways/pager_request.gateway';
 import { getPagination } from 'src/utils/filter';
+import { BusinessCategory } from '../entites/business_category.entity';
+import { Product } from 'src/product/entities/product.entity';
 
 @Injectable()
 export class BusinessPanelService {
@@ -42,6 +44,10 @@ export class BusinessPanelService {
     private businessUserRepository: typeof BusinessUser,
     @InjectModel(PagerRequest)
     private pagerRequestRepository: typeof PagerRequest,
+    @InjectModel(BusinessCategory)
+    private businessCategoryRepository: typeof BusinessCategory,
+    @InjectModel(Product)
+    private productRepository: typeof Product,
     private sequelize: Sequelize,
     @Inject(REQUEST) private request: Request,
     private pagerRequestGateway: PagerRequestgGateway,
@@ -108,6 +114,24 @@ export class BusinessPanelService {
     if (!business)
       throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
     return business;
+  }
+
+  async statistics(uuid: string) {
+    const categories = await this.businessCategoryRepository.count({
+      where: {
+        business_uuid: uuid,
+      },
+    });
+    const items = await this.productRepository.count({
+      where: {
+        business_uuid: uuid,
+      },
+    });
+
+    return {
+      categories,
+      items,
+    };
   }
 
   findOne(where: WhereOptions<Business>) {

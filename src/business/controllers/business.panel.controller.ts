@@ -55,6 +55,17 @@ export class BusinessPanelController {
       data: business,
     };
   }
+  @Get(':uuid/statistics')
+  async statistics(
+    @Param('uuid', new NotEmptyPipe('Business UUID'))
+    uuid: string,
+  ) {
+    const statistics = await this.businessService.statistics(uuid);
+    return {
+      ok: true,
+      data: statistics,
+    };
+  }
 
   @Post()
   @CheckPermissions([business_permissions.createBusiness.action])
