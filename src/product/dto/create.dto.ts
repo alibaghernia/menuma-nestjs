@@ -7,7 +7,6 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  IsUUID,
   ValidateNested,
 } from 'class-validator';
 import { ProductPrice } from '../entities/product.entity';
@@ -40,7 +39,6 @@ export class CreateProductDTO {
   categories: string;
 
   @IsEmpty()
-  @IsUUID()
   business_uuid: string;
 }
 

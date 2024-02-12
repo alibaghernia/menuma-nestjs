@@ -24,6 +24,5 @@ export class CreateDTO {
   parent_uuid: string;
 
   @IsEmpty()
-  @IsUUID()
   business_uuid: string;
 }
