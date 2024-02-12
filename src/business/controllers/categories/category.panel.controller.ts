@@ -61,7 +61,7 @@ export class CategoryPanelController {
     @Body() payload: CreateDTO,
   ) {
     try {
-      await this.categoryPanelService.create(business_uuid, payload);
+      await this.categoryPanelService.create({ business_uuid, ...payload });
       return {
         ok: true,
         message: 'Category created successfully!',

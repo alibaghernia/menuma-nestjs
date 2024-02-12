@@ -37,13 +37,9 @@ export class CategoryPanelController {
 
   @Post()
   @CheckPermissions([category_permissions.createCategory.action])
-  async createCategory(
-    @Param('business_uuid')
-    business_uuid: string,
-    @Body() payload: CreateAdminDTO,
-  ) {
+  async createCategory(@Body() payload: CreateAdminDTO) {
     try {
-      await this.categoryPanelService.create(business_uuid, payload);
+      await this.categoryPanelService.create(payload);
       return {
         ok: true,
         message: 'Category created successfully!',

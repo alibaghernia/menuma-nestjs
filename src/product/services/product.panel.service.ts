@@ -50,14 +50,12 @@ export class ProductPanelService {
       {
         model: File,
       },
-    ];
-    if (filters.business_uuid) where.business_uuid = filters.business_uuid;
-    else {
-      include.push({
+      {
         model: Business,
         attributes: ['uuid', 'name', 'slug', 'status', 'logo'],
-      });
-    }
+      },
+    ];
+    if (filters.business_uuid) where.business_uuid = filters.business_uuid;
     const products = await this.productRepository.findAll({
       where,
       offset,

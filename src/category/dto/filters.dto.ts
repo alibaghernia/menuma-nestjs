@@ -4,7 +4,7 @@ import { IsBoolean, IsOptional, IsString, IsUUID } from 'class-validator';
 export class FiltersDTO {
   @IsOptional()
   @IsString()
-  title: string;
+  title: string = '';
 
   @IsOptional()
   @IsString()

@@ -11,6 +11,7 @@ import { FiltersDTO } from '../dto/filters.dto';
 import { FindOptions, WhereOptions } from 'sequelize';
 import { getPagination } from 'src/utils/filter';
 import { Product } from 'src/product/entities/product.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class CategoryPanelService {
@@ -33,18 +34,21 @@ export class CategoryPanelService {
     const include: FindOptions<BusinessCategory>['include'] = [
       {
         model: Category,
+        where: {
+          title: {
+            [Op.like]: `%${filters.title}%`,
+          },
+        },
       },
       {
         model: Product,
       },
-    ];
-    if (filters.business_uuid) where.business_uuid = filters.business_uuid;
-    else {
-      include.push({
+      {
         model: Business,
         attributes: ['uuid', 'name', 'slug', 'logo'],
-      });
-    }
+      },
+    ];
+    if (filters.business_uuid) where.business_uuid = filters.business_uuid;
 
     const busCategories = await this.businessCategoryRep.findAll({
       where,
@@ -94,12 +98,12 @@ export class CategoryPanelService {
     return category;
   }
   // TODO: add checking duplicate category creation
-  async create(business_uuid: string, payload: CreateDTO) {
+  async create(payload: CreateDTO) {
     const transaction = await this.sequelize.transaction();
     try {
       const business = await this.businessRep.findOne({
         where: {
-          uuid: business_uuid,
+          uuid: payload.business_uuid,
         },
       });
       if (!business)
