@@ -57,6 +57,9 @@ export class DiscountsService {
       where,
     });
 
+    if (!filters.business_uuid)
+      discounts.forEach((dis) => dis.business?.setImages());
+
     return [discounts, count];
   }
   async get(uuid: string, business_uuid_slug: string) {

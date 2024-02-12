@@ -93,6 +93,10 @@ export class UpdateBusinessDTO {
   @IsOptional()
   @IsBoolean()
   readonly pager: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  readonly pin: boolean;
 }
 
 export class UpdateTableDTO {

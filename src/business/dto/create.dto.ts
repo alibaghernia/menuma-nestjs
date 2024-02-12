@@ -87,6 +87,10 @@ export class CreateBusinessDTO {
   readonly pager: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  readonly pin: boolean;
+
+  @IsOptional()
   @IsArray()
   readonly users: {
     user_uuid: string;
