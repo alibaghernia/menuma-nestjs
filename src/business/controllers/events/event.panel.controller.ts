@@ -61,7 +61,7 @@ export class EventPanelController {
 
   @Get(':id')
   async getById(@Param('id', new UUIDChecker('Event UUID')) uuid: string) {
-    const event = await this.eventPanelService.getById(uuid);
+    const event = await this.eventPanelService.get(uuid);
     return {
       ok: true,
       data: event,
@@ -73,10 +73,10 @@ export class EventPanelController {
     @Param('business_uuid') business_uuid: string,
     @Query() queryParams: FiltersDTO,
   ) {
-    const [events, total] = await this.eventPanelService.getAll(
-      business_uuid,
-      queryParams,
-    );
+    const [events, total] = await this.eventPanelService.getAll({
+      organizer_uuid: business_uuid,
+      ...queryParams,
+    });
 
     return {
       ok: true,

@@ -5,10 +5,12 @@ import { CreateEventDTO } from '../dto/create.dto';
 import { FiltersDTO } from '../dto/filters.dto';
 import { Event } from '../entities/event.entity';
 import { Sequelize } from 'sequelize-typescript';
-import { WhereOptions } from 'sequelize';
+import { FindOptions, WhereOptions } from 'sequelize';
 import { Op } from 'sequelize';
 import { doInTransaction } from 'src/utils/transaction';
 import { getPagination } from 'src/utils/filter';
+import { Business } from 'src/business/entites/business.entity';
+import { User } from 'src/users/entites/user.entity';
 
 @Injectable()
 export class EventPanelService {
@@ -21,30 +23,64 @@ export class EventPanelService {
     @Inject(REQUEST) private request: Request,
   ) {}
 
-  async getById(uuid: string) {
-    return this.eventRepository.findOne({ where: { uuid } });
+  async get(uuid: string, include_business: boolean = false) {
+    const include: FindOptions<Event>['include'] = [];
+    if (include_business) {
+      include.push({
+        model: Business,
+        required: false,
+        attributes: ['uuid', 'name', 'slug', 'logo'],
+      });
+      include.push({
+        model: User,
+        required: false,
+        attributes: ['uuid', 'first_name', 'last_name'],
+      });
+    }
+    const item = await this.eventRepository.findOne({
+      where: { uuid },
+      include,
+    });
+    if (include_business) item.business.setImages();
+    return item;
   }
   async getAll(
-    organizer_uuid: string,
-    { title = '', ...filters }: FiltersDTO,
+    filters: FiltersDTO,
+    include_business: boolean = false,
   ): Promise<[Event[], number]> {
     const where: WhereOptions<Event> = {
-      organizer_uuid,
       title: {
-        [Op.like]: `%${title}%`,
+        [Op.like]: `%${filters.title}%`,
       },
     };
+    if (filters.organizer_type) where.organizer_type = filters.organizer_type;
+    if (filters.organizer_uuid) where.organizer_uuid = filters.organizer_uuid;
 
+    const include: FindOptions<Event>['include'] = [];
+    if (include_business) {
+      include.push({
+        model: Business,
+        required: false,
+        attributes: ['uuid', 'name', 'slug', 'logo'],
+      });
+      include.push({
+        model: User,
+        required: false,
+        attributes: ['uuid', 'first_name', 'last_name'],
+      });
+    }
     const { offset, limit } = getPagination(filters);
 
     const events = await this.eventRepository.findAll({
       offset,
       limit,
       where,
+      include,
     });
     const total = await this.eventRepository.count({
       where,
     });
+    if (include_business) events.forEach((eve) => eve.business.setImages());
     return [events, total];
   }
   async create(payload: CreateEventDTO) {
