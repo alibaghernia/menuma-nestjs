@@ -56,26 +56,20 @@ export class ProductService {
         },
       ].filter(Boolean),
     });
-    let result;
-    if (with_categories) {
-      result = products.map((_prod) => {
-        const prod = _prod.get({ plain: true });
-        const product = {
-          ...prod,
-          categories: prod.businessCategories.map((bCat) => bCat.category),
-        };
-        delete product.businessCategories;
+    if (with_categories)
+      products.map((product) => {
+        product.setDataValue(
+          'categories',
+          product.categories.map((cat) => cat.category) as any[],
+        );
         return product;
       });
-    } else {
-      result = products;
-    }
     const count = await this.productRepository.count({
       where,
     });
 
     return {
-      products: result,
+      products,
       total: count,
     };
   }
@@ -110,18 +104,13 @@ export class ProductService {
     ).get({ plain: true });
     if (!product)
       throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
-    let result;
-    if (with_categories) {
-      result = {
-        ...product,
-        categories: product.businessCategories.map((bCat) => bCat.category),
-      };
-      delete result.businessCategories;
-    } else {
-      result = product;
-    }
+    if (with_categories)
+      product.setDataValue(
+        'categories',
+        product.categories.map((cat) => cat.category) as any[],
+      );
 
-    return result || product;
+    return product;
   }
 
   async offers() {

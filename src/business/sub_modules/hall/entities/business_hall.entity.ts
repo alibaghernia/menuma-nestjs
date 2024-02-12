@@ -15,7 +15,7 @@ import { makeImageUrl } from 'src/utils/images';
   hooks: {
     afterFind(model: any) {
       const task = (mo) => {
-        mo.setImageUrl?.();
+        mo?.setImageUrl?.();
       };
       if (model?.length) model.forEach(task);
       else {

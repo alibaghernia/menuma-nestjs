@@ -25,6 +25,7 @@ import { DiscountsModule } from 'src/discounts/discounts.module';
 import { EventController } from './controllers/events/event.controller';
 import { ProductModule } from 'src/product/product.module';
 import { ProductController } from './controllers/products/products.controller';
+import { ProductPanelController } from './controllers/products/product.panel.controller';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { ProductController } from './controllers/products/products.controller';
     DiscountsPanelController,
     DiscountsController,
     ProductController,
+    ProductPanelController,
   ],
 })
 export class BusinessModule {}

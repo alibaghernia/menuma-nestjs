@@ -10,13 +10,12 @@ import { Tag } from 'src/database/entities/tag.entity';
 import { Category } from 'src/category/entities/category.entity';
 import { BusinessCategory } from 'src/business/entites/business_category.entity';
 import { FindProductFiltersDTO } from '../dto/query.dto';
-import { Op, WhereOptions } from 'sequelize';
+import { FindOptions, Op, WhereOptions } from 'sequelize';
 import { Image } from 'src/database/entities/image.entity';
 import { Business } from 'src/business/entites/business.entity';
 import { FiltersDTO } from '../dto/filters.dto';
 import { File } from 'src/files/entities/file.entity';
-import { UpdateProductDTO } from '../dto/update.dto';
-import { makeImageUrl } from 'src/utils/images';
+import { getPagination } from 'src/utils/filter';
 
 @Injectable()
 export class ProductPanelService {
@@ -32,58 +31,56 @@ export class ProductPanelService {
     @Inject(REQUEST) private request: Request,
   ) {}
 
-  async fetchAll(business_uuid: string, _filters: FiltersDTO) {
-    const { page, limit, ...filter } = _filters;
-    // parse filters
-    const parsedFilter = Object.fromEntries(
-      Object.entries(filter)
-        .filter(([, v]) => v)
-        .map(([k, v]) => [k, { [Op.like]: `%${v}%` }]),
-    );
+  async fetchAll(filters: FiltersDTO) {
+    const { offset, limit } = getPagination(filters);
     const where: WhereOptions<Product> = {
-      business_uuid,
-      ...parsedFilter,
+      title: {
+        [Op.like]: `%${filters.title}%`,
+      },
     };
+    const include: FindOptions<Product>['include'] = [
+      {
+        model: BusinessCategory,
+        include: [
+          {
+            model: Category,
+          },
+        ],
+      },
+      {
+        model: File,
+      },
+    ];
+    if (filters.business_uuid) where.business_uuid = filters.business_uuid;
+    else {
+      include.push({
+        model: Business,
+        attributes: ['uuid', 'name', 'slug', 'status', 'logo'],
+      });
+    }
     const products = await this.productRepository.findAll({
       where,
-      offset: page * limit - limit,
-      limit: page * limit,
+      offset,
+      limit,
       attributes: {
         exclude: ['business_uuid'],
       },
-      include: [
-        {
-          model: BusinessCategory,
-          include: [
-            {
-              model: Category,
-            },
-          ],
-        },
-        {
-          model: File,
-        },
-      ],
+      include,
     });
     const count = await this.productRepository.count({
       where,
     });
-
+    products.map((product: Product) => {
+      product.business.setImages();
+      product.setDataValue(
+        'categories',
+        product.categories.map((category) => category.category) as any[],
+      );
+      return product;
+    });
+    console.log('find all');
     return {
-      products: products
-        .map((item) => item.get({ plain: true }))
-        .map(
-          ({
-            businessCategories,
-            ...product
-          }: Product & { categories: Category[] }) => {
-            product.categories =
-              businessCategories?.map((besCat) => {
-                return besCat.category;
-              }) || [];
-            return product;
-          },
-        ),
+      products,
       total: count,
     };
   }
@@ -99,7 +96,7 @@ export class ProductPanelService {
       ...parsedFilter,
     };
 
-    const result = (
+    const product = (
       await this.productRepository.findOne({
         where,
         attributes: {
@@ -124,13 +121,53 @@ export class ProductPanelService {
       })
     )?.get({ plain: true });
 
-    if (!result)
+    if (!product)
       throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
-    const { businessCategories, ...product } = result;
-    (product as Product & { categories?: Category[] }).categories =
-      businessCategories.map((besCat) => besCat.category);
+    product.setDataValue(
+      'categories',
+      product.categories.map((category) => category.category) as any[],
+    );
 
     return product;
+  }
+  async get(uuid: string) {
+    const include: FindOptions<Product>['include'] = [
+      {
+        model: BusinessCategory,
+        include: [
+          {
+            model: Category,
+          },
+        ],
+      },
+      {
+        model: File,
+        through: {
+          attributes: [],
+        },
+      },
+      {
+        model: Business,
+        attributes: ['uuid', 'name', 'slug', 'status', 'logo'],
+      },
+    ];
+
+    const item = await this.productRepository.findOne({
+      where: {
+        uuid,
+      },
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+      include,
+    });
+    if (!item) throw new HttpException('Item not found!', HttpStatus.NOT_FOUND);
+    item.setDataValue(
+      'categories',
+      item.categories.map((cat) => cat.category) as any[],
+    );
+    item.business.setImages();
+    return item;
   }
   async findOneByUuid(business_uuid: string, uuid: string) {
     const where: WhereOptions<Product> = {
@@ -138,90 +175,64 @@ export class ProductPanelService {
       uuid,
     };
 
-    const result: Product & { image_url?: string } = (
-      await this.productRepository.findOne({
-        where,
-        attributes: {
-          exclude: ['business_uuid'],
-        },
-        include: [
-          {
-            model: BusinessCategory,
-            include: [
-              {
-                model: Category,
-              },
-            ],
-          },
-          {
-            model: File,
-            attributes: ['uuid'],
-            through: {
-              attributes: [],
+    const product = await this.productRepository.findOne({
+      where,
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+      include: [
+        {
+          model: BusinessCategory,
+          include: [
+            {
+              model: Category,
             },
+          ],
+        },
+        {
+          model: File,
+          attributes: ['uuid'],
+          through: {
+            attributes: [],
           },
-        ],
-      })
-    )?.get({ plain: true });
+        },
+      ],
+    });
 
-    if (!result)
+    if (!product)
       throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
+    product.setDataValue(
+      'categories',
+      product.categories.map((category) => category.category) as any[],
+    );
 
-    const { businessCategories, ...product } = result;
-
-    (product as Product & { categories?: Category[] }).categories =
-      businessCategories.map((besCat) => besCat.category);
-    if (product.images.length) {
-      product.image_url = makeImageUrl(product.images[0].uuid);
-    }
     return product;
   }
-  async create(business_uuid: string, payload: CreateProductDTO) {
+  async create(payload: CreateProductDTO) {
     const transaction = await this.sequelize.transaction();
     try {
       const business = await this.businessRepository.findOne({
         where: {
-          uuid: business_uuid,
+          uuid: payload.business_uuid,
         },
+        transaction,
       });
-      if (!business)
-        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
       const { categories, image, ...prodPayload } = payload;
-      const product = await this.productRepository.create({
-        ...prodPayload,
-        business_uuid,
+      const product = await this.productRepository.create(prodPayload, {
+        transaction,
       });
-
-      // handle tags
-      // if (tags)
-      //   for (const tag of tags) {
-      //     const [newTag] = await this.tagRepository.findOrCreate({
-      //       defaults: {
-      //         value: tag.value,
-      //         tagable_type: 'product',
-      //         tagable_uuid: product.uuid,
-      //       },
-      //       where: {
-      //         value: tag.value,
-      //         uuid: product.uuid,
-      //       },
-      //     });
-      //     await product.addTag(newTag);
-      //   }
-      // handle image
       if (image) {
-        await product.setImages([image]);
+        await product.setImages([image], { transaction });
       }
-      // if (await business.hasCategories(categories.map((cat) => cat))) {
-      if (await business.hasCategory(categories)) {
+      if (await business.hasCategory(categories, { transaction })) {
         const categoriesIns = await this.businessCategoryRepository.findAll({
           where: {
-            business_uuid,
-            // category_uuid: categories.map((cat) => cat),
+            business_uuid: payload.business_uuid,
             category_uuid: categories,
           },
+          transaction,
         });
-        await product.setBusinessCategories(categoriesIns);
+        await product.setCategories(categoriesIns, { transaction });
       } else
         throw new HttpException(
           'One or more of these categories are not associate with this business!',
@@ -234,84 +245,54 @@ export class ProductPanelService {
       throw error;
     }
   }
-  async update(
-    business_uuid: string,
-    product_uuid: string,
-    payload: UpdateProductDTO,
-  ) {
+  async update(product_uuid: string, payload: CreateProductDTO) {
     const transaction = await this.sequelize.transaction();
     try {
       const business = await this.businessRepository.findOne({
         where: {
-          uuid: business_uuid,
+          uuid: payload.business_uuid,
         },
+        transaction,
       });
-      if (!business)
-        throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
       const { categories, image, ...prodPayload } = payload;
-      await this.productRepository.update(
-        {
-          ...prodPayload,
+      await this.productRepository.update(prodPayload, {
+        where: {
+          uuid: product_uuid,
         },
-        {
-          where: {
-            uuid: product_uuid,
-          },
-        },
-      );
+        transaction,
+      });
       const product = await this.productRepository.findOne({
         where: {
           uuid: product_uuid,
         },
+        transaction,
         include: [Tag],
       });
       if (!product)
         throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
 
-      // if tags field is presented
-      // if (tags) {
-      //   for (const tag of tags) {
-      //     const [newTag] = await this.tagRepository.findOrCreate({
-      //       defaults: {
-      //         value: tag.value,
-      //         tagable_type: 'product',
-      //         tagable_uuid: product_uuid,
-      //       },
-      //       where: {
-      //         value: tag.value,
-      //         uuid: product.uuid,
-      //       },
-      //     });
-      //     await product.addTag(newTag);
-      //   }
-      //   // check deleted tags
-      //   const deletedTags = product.tags.filter(
-      //     (item) => !tags.some((tag) => tag.value == item.value),
-      //   );
-      //   await this.tagRepository.destroy({
-      //     where: {
-      //       uuid: deletedTags.map((item) => item.uuid),
-      //     },
-      //   });
-      // }
-
       // handle image
       if (image) {
-        await product.setImages([image]);
+        await product.setImages([image], {
+          transaction,
+        });
       }
 
-      // if categories field is presented
       if (categories) {
-        // if (await business.hasCategories(categories.map((cat) => cat))) {
-        if (await business.hasCategory(categories)) {
+        if (
+          await business.hasCategory(categories, {
+            transaction,
+          })
+        ) {
           const categoriesIns = await this.businessCategoryRepository.findAll({
             where: {
-              business_uuid,
+              business_uuid: payload.business_uuid,
               // category_uuid: categories.map((cat) => cat),
               category_uuid: categories,
             },
+            transaction,
           });
-          await product.setBusinessCategories(categoriesIns);
+          await product.setCategories(categoriesIns, { transaction });
         } else
           throw new HttpException(
             'One or more of these categories are not associate with this business!',
@@ -324,7 +305,7 @@ export class ProductPanelService {
       throw error;
     }
   }
-  async delete(business_uuid: string, uuid: string) {
+  async delete(uuid: string) {
     const transaction = await this.sequelize.transaction();
     try {
       await this.productRepository.destroy({

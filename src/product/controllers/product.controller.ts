@@ -4,7 +4,7 @@ import { FetchAllProductsDTO } from '../dto/filters.dto';
 import { ProductService } from '../services/product.service';
 import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 
-@Controller('product/:business_slug')
+@Controller('product')
 @UsePipes(SlugCheckerController)
 @IsPublic()
 export class ProductController {

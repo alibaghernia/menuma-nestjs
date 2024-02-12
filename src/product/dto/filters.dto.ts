@@ -1,16 +1,21 @@
 import { Transform } from 'class-transformer';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsUUID } from 'class-validator';
+import { PaginationDto } from 'src/misc/dto/filters.dto';
 
-export class FiltersDTO {
+export class FiltersDTO extends PaginationDto {
   @IsOptional()
   @IsString()
-  readonly title: string;
+  readonly title: string = '';
 
-  @IsString()
+  @IsOptional()
   readonly page: number;
 
-  @IsString()
+  @IsOptional()
   readonly limit: number;
+
+  @IsOptional()
+  @IsUUID()
+  business_uuid: string;
 }
 
 export class FetchAllProductsDTO extends FiltersDTO {

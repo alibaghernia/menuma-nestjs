@@ -12,20 +12,25 @@ import {
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
-import { ProductPanelService } from '../services/product.panel.service';
-import { CreateProductDTO } from '../dto/create.dto';
+import { ProductPanelService } from '../../../product/services/product.panel.service';
+import { CreateProductDTO } from '../../../product/dto/create.dto';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
 import { product_permissions } from 'src/access_control/constants';
-import { FindProductFiltersDTO } from '../dto/query.dto';
+import { FindProductFiltersDTO } from '../../../product/dto/query.dto';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
-import { UpdateProductDTO } from '../dto/update.dto';
-import { FiltersDTO } from '../dto/filters.dto';
+import { FiltersDTO } from '../../../product/dto/filters.dto';
+import { CheckBusinessExistsGuard } from 'src/business/guards/exists.guard';
+import { CheckBusinessAccessGuard } from 'src/access_control/guards/check_buisness_access.guard';
 
 @Controller('panel/business/:business_uuid/product')
 @UsePipes(new UUIDCheckerController('Business UUID', 'business_uuid'))
-@UseGuards(CheckPermissionsGuard)
+@UseGuards(
+  CheckBusinessExistsGuard,
+  CheckBusinessAccessGuard,
+  CheckPermissionsGuard,
+)
 export class ProductPanelController {
   private logger = new Logger('ProductController');
   constructor(private productService: ProductPanelService) {}
@@ -82,10 +87,10 @@ export class ProductPanelController {
   ) {
     this.logger.log('get products');
     try {
-      const products = await this.productService.fetchAll(
+      const products = await this.productService.fetchAll({
         business_uuid,
-        filters,
-      );
+        ...filters,
+      });
 
       return {
         ok: true,
@@ -105,7 +110,7 @@ export class ProductPanelController {
   ) {
     this.logger.log('create new product');
     try {
-      await this.productService.create(business_uuid, payload);
+      await this.productService.create({ business_uuid, ...payload });
 
       return {
         ok: true,
@@ -121,11 +126,14 @@ export class ProductPanelController {
   async update(
     @Param('business_uuid') business_uuid: string,
     @Param('uuid') product_uuid: string,
-    @Body() payload: UpdateProductDTO,
+    @Body() payload: CreateProductDTO,
   ) {
     this.logger.log('update product');
     try {
-      await this.productService.update(business_uuid, product_uuid, payload);
+      await this.productService.update(product_uuid, {
+        business_uuid,
+        ...payload,
+      });
 
       return {
         ok: true,
@@ -138,14 +146,10 @@ export class ProductPanelController {
   }
   @Delete(':uuid')
   @CheckPermissions([product_permissions.deleteProduct.action])
-  async delete(
-    @Param('business_uuid', new UUIDChecker('Business UUID'))
-    business_uuid: string,
-    @Param('uuid', new UUIDChecker('Product UUID')) uuid: string,
-  ) {
+  async delete(@Param('uuid', new UUIDChecker('Product UUID')) uuid: string) {
     this.logger.log('delete product');
     try {
-      await this.productService.delete(business_uuid, uuid);
+      await this.productService.delete(uuid);
 
       return {
         ok: true,

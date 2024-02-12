@@ -43,7 +43,7 @@ export type ProductPrice = {
   hooks: {
     afterFind(model: any) {
       const task = (mo) => {
-        mo.setImagesUrls?.();
+        mo?.setImagesUrls?.();
       };
       if (model?.length) model.forEach(task);
       else {
@@ -109,13 +109,13 @@ export class Product extends Model<Product> {
 
   @BelongsToMany(() => BusinessCategory, {
     through: () => BusinessCategoryProduct,
-    as: 'businessCategories',
+    as: 'categories',
     foreignKey: 'product_uuid',
     sourceKey: 'uuid',
     otherKey: 'business_category_uuid',
     targetKey: 'uuid',
   })
-  businessCategories: BusinessCategory[];
+  categories: BusinessCategory[];
 
   @BelongsToMany(() => File, {
     through: () => FileProduct,
@@ -138,7 +138,7 @@ export class Product extends Model<Product> {
     return this;
   }
   setBusiness: BelongsToSetAssociationMixin<Business, Business['uuid']>;
-  setBusinessCategories: BelongsToManySetAssociationsMixin<
+  setCategories: BelongsToManySetAssociationsMixin<
     BusinessCategory,
     BusinessCategory['uuid']
   >;

@@ -2,18 +2,15 @@ import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
+  IsEmpty,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
-  // IsUUID,
-  // ValidateIf,
+  IsUUID,
   ValidateNested,
 } from 'class-validator';
-import {
-  // ProductMetadata,
-  ProductPrice,
-} from '../entities/product.entity';
+import { ProductPrice } from '../entities/product.entity';
 
 export class CreateProductDTO {
   @IsNotEmpty()
@@ -26,11 +23,8 @@ export class CreateProductDTO {
 
   @IsOptional()
   @IsArray()
-  // @ValidateNested({ each: true })
-  // @Type(() => Metadata)
   @IsString({ each: true })
   metadata: string[];
-  // metadata: ProductMetadata[];
 
   @IsOptional()
   @IsString()
@@ -42,26 +36,13 @@ export class CreateProductDTO {
   @Type(() => Price)
   prices: ProductPrice[];
 
-  // @IsArray()
-  // @IsString({ each: true })
   @IsString()
   categories: string;
 
-  // @IsOptional()
-  // @IsArray()
-  // @ValidateNested({ each: true })
-  // @Type(() => Tag)
-  // tags: Tag[];
+  @IsEmpty()
+  @IsUUID()
+  business_uuid: string;
 }
-
-// export class Metadata {
-//   @IsNotEmpty()
-//   @IsString()
-//   title: string;
-
-//   @IsNotEmpty()
-//   value: string | number;
-// }
 
 export class Price {
   @IsOptional()
@@ -77,9 +58,3 @@ export class Tag {
   @IsString()
   value: string;
 }
-
-// class Category {
-//   @ValidateIf((e) => !e.title)
-//   @IsUUID()
-//   readonly uuid: string;
-// }
