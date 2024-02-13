@@ -11,12 +11,21 @@ import { discountTypes } from './create.dto';
 
 export class FiltersDTO extends PaginationDto {
   @IsOptional()
+  page: number;
+  @IsOptional()
+  limit: number;
+
+  @IsOptional()
   @IsString()
-  search?: string;
+  search?: string = '';
 
   @IsNotEmpty()
   @IsEnum(discountTypes)
   type: string;
+
+  @IsOptional()
+  @IsUUID()
+  business_uuid: string;
 }
 
 export class PublicFiltersDTO extends PaginationDto {

@@ -4,6 +4,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUUID,
   Max,
   Min,
 } from 'class-validator';
@@ -32,4 +33,13 @@ export class CreateDTO {
   @IsNotEmpty()
   @IsEnum(discountTypes)
   type: string;
+
+  @IsOptional()
+  @IsUUID()
+  business_uuid: string;
+}
+
+export class CreateAdminDTO extends CreateDTO {
+  @IsNotEmpty()
+  business_uuid: string;
 }

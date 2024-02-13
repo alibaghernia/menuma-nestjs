@@ -14,14 +14,14 @@ export class DiscountsPanelService {
     private sequelize: Sequelize,
   ) {}
 
-  async getAll(business_uuid: string, { search = '', ...filters }: FiltersDTO) {
+  async getAll(filters: FiltersDTO) {
     const { limit, offset } = getPagination(filters);
     const where: WhereOptions<Discount> = {
-      business_uuid,
       title: {
-        [Op.like]: `%${search}%`,
+        [Op.like]: `%${filters.search}%`,
       },
     };
+    if (filters.business_uuid) where.business_uuid = filters.business_uuid;
     if (filters.type != 'ALL') {
       where.type = filters.type;
     }
@@ -34,14 +34,9 @@ export class DiscountsPanelService {
       offset,
     });
     const count = await this.discountRepository.count({
-      where: {
-        business_uuid,
-      },
+      where,
     });
-    return {
-      items: items,
-      total: count,
-    };
+    return [items, count];
   }
   async get(uuid: string) {
     const item = await this.discountRepository.findOne({
@@ -54,15 +49,12 @@ export class DiscountsPanelService {
     });
     return item;
   }
-  async create(business_uuid: string, payload: CreateDTO) {
+  async create(payload: CreateDTO) {
     const transaction = await this.sequelize.transaction();
     try {
-      await this.discountRepository.create(
-        { business_uuid, ...payload },
-        {
-          transaction,
-        },
-      );
+      await this.discountRepository.create(payload, {
+        transaction,
+      });
 
       await transaction.commit();
     } catch (error) {

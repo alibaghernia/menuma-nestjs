@@ -55,23 +55,23 @@ export class DiscountsPanelController {
     business_uuid: string,
     @Query() filters: FiltersDTO,
   ) {
-    const items = await this.discountsPanelService.getAll(
+    const [items, total] = await this.discountsPanelService.getAll({
       business_uuid,
-      filters,
-    );
+      ...filters,
+    });
     return {
       ok: true,
-      data: items,
+      data: { items, total },
     };
   }
 
   @Post()
   @CheckPermissions([permissions.action, permissions.create.action])
   async create(@Req() request: Request, @Body() payload: CreateDTO) {
-    await this.discountsPanelService.create(
-      request.business_guard.uuid,
-      payload,
-    );
+    await this.discountsPanelService.create({
+      business_uuid: request.business_guard.uuid,
+      ...payload,
+    });
     return {
       ok: true,
       message: 'item added successfully!',
