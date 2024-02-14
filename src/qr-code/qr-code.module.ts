@@ -11,5 +11,6 @@ import { QrCodePanelController } from './controllers/qr-code.panel.controller';
   imports: [SequelizeModule.forFeature([QrCode]), AccessControlModule],
   controllers: [QrCodeController, QrCodePanelController],
   providers: [QrCodeService, QrCodePanelService],
+  exports: [QrCodePanelService],
 })
 export class QrCodeModule {}

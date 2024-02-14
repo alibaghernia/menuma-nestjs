@@ -1,42 +1,59 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { QrCode } from '../enitites/qr-code.entity';
-import { CreateQrCodeDTO } from '../dto/create.dto';
-import { QueryError } from 'sequelize';
+import { CreateDTO } from '../dto/create.dto';
+import { QueryError, WhereOptions } from 'sequelize';
+import { GetAllDTO } from '../dto/retrieve.dto';
+import { getPagination } from 'src/utils/filter';
 
 @Injectable()
 export class QrCodePanelService {
   constructor(@InjectModel(QrCode) private qrCodeRepo: typeof QrCode) {}
 
-  async fetchAll(
-    business_uuid: string,
-    pagination: { page: number; limit: number },
-  ) {
+  async getAll(filters: GetAllDTO) {
+    const { limit, offset } = getPagination(filters);
+    const where: WhereOptions<QrCode> = {};
+    if (filters.business_uuid) where.business_uuid = filters.business_uuid;
     const items = await this.qrCodeRepo.findAll({
-      where: {
-        business_uuid,
-      },
-      offset: pagination.page * pagination.limit - pagination.limit,
-      limit: pagination.page * pagination.limit,
+      where,
+      offset,
+      limit,
       attributes: {
         exclude: ['business_uuid'],
       },
     });
     const count = await this.qrCodeRepo.count({
-      where: {
-        business_uuid,
+      where,
+    });
+
+    return [items, count];
+  }
+  async get(uuid: string) {
+    const where: WhereOptions<QrCode> = { uuid };
+    const item = await this.qrCodeRepo.findOne({
+      where,
+      attributes: {
+        exclude: ['business_uuid'],
       },
     });
 
-    return {
-      qrCodes: items,
-      total: count,
-    };
+    return item;
   }
-  async create(business_uuid: string, payload: CreateQrCodeDTO) {
+  async getData(uuid: string) {
+    const where: WhereOptions<QrCode> = { uuid };
+    const item = await this.qrCodeRepo.findOne({
+      where,
+      attributes: {
+        exclude: ['business_uuid'],
+      },
+    });
+
+    return `https://q.menuma.online/${item.slug}`;
+  }
+  async create(payload: CreateDTO) {
     try {
       const qrCode = await this.qrCodeRepo.create({
-        business_uuid,
+        business_uuid: payload.business_uuid,
         ...payload,
       });
       return qrCode;
@@ -55,7 +72,7 @@ export class QrCodePanelService {
       throw error;
     }
   }
-  async update(qr_code_uuid: string, payload: CreateQrCodeDTO) {
+  async update(qr_code_uuid: string, payload: CreateDTO) {
     try {
       await this.qrCodeRepo.update(payload, {
         where: {
@@ -63,13 +80,6 @@ export class QrCodePanelService {
         },
       });
     } catch (error) {
-      if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {
-        // duplicate entry
-        throw new HttpException(
-          'Qr code slug or uuid is duplicate',
-          HttpStatus.BAD_REQUEST,
-        );
-      }
       throw error;
     }
   }

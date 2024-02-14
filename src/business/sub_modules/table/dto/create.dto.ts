@@ -23,10 +23,10 @@ export class CreateTableDTO {
   max_capacity: number;
 
   @IsOptional()
-  @IsUUID()
-  hall_uuid: string;
-
-  @IsOptional()
   @IsString()
   image: string;
+
+  @IsOptional()
+  @IsUUID()
+  hall_uuid: string;
 }

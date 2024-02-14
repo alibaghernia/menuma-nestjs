@@ -15,7 +15,6 @@ import { TablesFiltersDTO } from 'src/business/dto/filters.dto';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
 import { TablePanelService } from '../services/table.panel.service';
 import { CreateTableDTO } from '../dto';
-import { UpdateTableDTO } from '../dto/update.dto';
 import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
 
 @Controller('panel/business/:business_uuid/tables')
@@ -111,7 +110,7 @@ export class TablePanelController {
     business_uuid: string,
     @Param('table_uuid', new UUIDChecker('Table UUID'))
     table_uuid: string,
-    @Body() payload: UpdateTableDTO,
+    @Body() payload: CreateTableDTO,
   ) {
     await this.tablePanelService.updateTable(
       business_uuid,

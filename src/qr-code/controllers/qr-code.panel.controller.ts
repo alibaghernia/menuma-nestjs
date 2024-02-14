@@ -8,34 +8,27 @@ import {
   Put,
   Query,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { QrCodePanelService } from '../services/qr-code.panel.service';
-import { CreateQrCodeDTO } from '../dto/create.dto';
+import { CreateDTO } from '../dto/create.dto';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
-import { UpdateQrCodeDTO } from '../dto/update.dto';
+import { GetAllDTO } from '../dto/retrieve.dto';
+import { IsAdmin } from 'src/auth/decorators/is_public.decorator';
 
-@Controller('/panel/business/:business_uuid/qr-code')
+@Controller('/panel/qr-code')
+@IsAdmin()
 export class QrCodePanelController {
-  constructor(
-    private qrCodePanelService: QrCodePanelService,
-    private configService: ConfigService,
-  ) {}
+  constructor(private qrCodePanelService: QrCodePanelService) {}
 
   @Get()
-  async fetchAll(
-    @Param('business_uuid', new UUIDChecker('Business uuid'))
-    business_uuid: string,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ) {
+  async fetchAll(@Query() filters: GetAllDTO) {
     try {
-      const qrCodes = await this.qrCodePanelService.fetchAll(business_uuid, {
-        page,
-        limit,
-      });
+      const [items, total] = await this.qrCodePanelService.getAll(filters);
       return {
         ok: true,
-        data: qrCodes,
+        data: {
+          items,
+          total,
+        },
       };
     } catch (error) {
       throw error;
@@ -43,16 +36,9 @@ export class QrCodePanelController {
   }
 
   @Post()
-  async create(
-    @Param('business_uuid', new UUIDChecker('Business uuid'))
-    business_uuid: string,
-    @Body() payload: CreateQrCodeDTO,
-  ) {
+  async create(@Body() payload: CreateDTO) {
     try {
-      const qrCode = await this.qrCodePanelService.create(
-        business_uuid,
-        payload,
-      );
+      const qrCode = await this.qrCodePanelService.create(payload);
       return {
         ok: true,
         message: 'Qr Code created successfully!',
@@ -64,14 +50,14 @@ export class QrCodePanelController {
       throw error;
     }
   }
-  @Put(':qr_code_uuid')
+  @Put(':uuid')
   async update(
-    @Param('qr_code_uuid', new UUIDChecker('Qr Code uuid'))
-    qr_code_uuid: string,
-    @Body() payload: UpdateQrCodeDTO,
+    @Param('uuid', new UUIDChecker('Qr Code uuid'))
+    uuid: string,
+    @Body() payload: CreateDTO,
   ) {
     try {
-      await this.qrCodePanelService.update(qr_code_uuid, payload);
+      await this.qrCodePanelService.update(uuid, payload);
       return {
         ok: true,
         message: 'Qr Code updated successfully!',
@@ -80,13 +66,13 @@ export class QrCodePanelController {
       throw error;
     }
   }
-  @Delete(':qr_code_uuid')
+  @Delete(':uuid')
   async delete(
-    @Param('qr_code_uuid', new UUIDChecker('Qr Code uuid'))
-    qr_code_uuid: string,
+    @Param('uuid', new UUIDChecker('Qr Code uuid'))
+    uuid: string,
   ) {
     try {
-      await this.qrCodePanelService.delete(qr_code_uuid);
+      await this.qrCodePanelService.delete(uuid);
       return {
         ok: true,
         message: 'Qr Code deleted successfully!',

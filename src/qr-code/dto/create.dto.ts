@@ -1,6 +1,13 @@
-import { IsEnum, IsNotEmpty, IsObject, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+} from 'class-validator';
 
-export class CreateQrCodeDTO {
+export class CreateDTO {
   @IsString()
   @IsNotEmpty()
   slug: string;
@@ -12,4 +19,17 @@ export class CreateQrCodeDTO {
   @IsNotEmpty()
   @IsObject()
   metadata: object;
+
+  business_uuid: string;
+}
+export class UpdateDTO extends CreateDTO {
+  @IsOptional()
+  type: string;
+  @IsOptional()
+  metadata: object;
+}
+export class CreateQrCodeAdminDTO extends CreateDTO {
+  @IsOptional()
+  @IsUUID()
+  business_uuid: string;
 }

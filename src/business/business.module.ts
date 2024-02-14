@@ -30,6 +30,8 @@ import { CategoryPanelController } from './controllers/categories/category.panel
 import { CategoryModule } from 'src/category/category.module';
 import { BusinessTable } from './sub_modules/table/entitile/business_tables.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { QrCodePanelController } from './controllers/qr-code/qr-code.panel.controller';
+import { QrCodeModule } from 'src/qr-code/qr-code.module';
 
 @Module({
   imports: [
@@ -51,6 +53,7 @@ import { Product } from 'src/product/entities/product.entity';
     TableModule,
     HallModule,
     DiscountsModule,
+    QrCodeModule,
   ],
   providers: [BusinessPanelService, BusinessService, PagerRequestgGateway],
   controllers: [
@@ -65,6 +68,7 @@ import { Product } from 'src/product/entities/product.entity';
     ProductController,
     ProductPanelController,
     CategoryPanelController,
+    QrCodePanelController,
   ],
 })
 export class BusinessModule {}
