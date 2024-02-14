@@ -31,6 +31,8 @@ export class UsersService {
       ],
     });
 
+    user.businesses?.forEach((bus) => bus.setImages());
+
     return user;
   }
 }
