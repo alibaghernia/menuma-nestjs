@@ -61,11 +61,14 @@ export class CatalogsPanelController {
   @Post()
   @CheckPermissions([catalogs_permissions.write.action])
   async create(@Body() payload: CreateDTO) {
-    await this.catalogsPanelService.create(payload);
+    const catalog = await this.catalogsPanelService.create(payload);
 
     return {
       ok: true,
       message: 'Catalog created successfully!',
+      data: {
+        uuid: catalog.uuid,
+      },
     };
   }
   @Delete(':uuid')

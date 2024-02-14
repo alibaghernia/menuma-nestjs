@@ -39,10 +39,13 @@ export class CategoryPanelController {
   @CheckPermissions([category_permissions.createCategory.action])
   async createCategory(@Body() payload: CreateAdminDTO) {
     try {
-      await this.categoryPanelService.create(payload);
+      const category = await this.categoryPanelService.create(payload);
       return {
         ok: true,
         message: 'Category created successfully!',
+        data: {
+          uuid: category.uuid,
+        },
       };
     } catch (error) {
       throw error;

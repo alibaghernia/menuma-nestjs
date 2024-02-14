@@ -35,10 +35,11 @@ export class QrCodePanelService {
   }
   async create(business_uuid: string, payload: CreateQrCodeDTO) {
     try {
-      await this.qrCodeRepo.create({
+      const qrCode = await this.qrCodeRepo.create({
         business_uuid,
         ...payload,
       });
+      return qrCode;
     } catch (error) {
       if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {
         // duplicate entry

@@ -46,7 +46,7 @@ export class CatalogsPanelService {
   }
 
   async create(payload: CreateDTO) {
-    await this.catalogRepository.create(payload);
+    return await this.catalogRepository.create(payload);
   }
 
   async update(uuid: string, payload: CreateDTO) {

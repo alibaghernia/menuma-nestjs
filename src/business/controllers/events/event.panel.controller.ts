@@ -31,10 +31,13 @@ export class EventPanelController {
 
   @Post()
   async create(@Body() body: CreateEventDTO) {
-    await this.eventPanelService.create(body);
+    const event = await this.eventPanelService.create(body);
     return {
       ok: true,
       message: 'Event created successfully!',
+      data: {
+        uuid: event.uuid,
+      },
     };
   }
 

@@ -65,10 +65,16 @@ export class CustomersPanelController {
     @Body() body: CustomerClubCreateDTO,
   ) {
     try {
-      await this.customersService.create({ business_uuid, ...body });
+      const customer = await this.customersService.create({
+        business_uuid,
+        ...body,
+      });
       return {
         ok: true,
         message: 'Customer created successfully!',
+        data: {
+          uuid: customer.uuid,
+        },
       };
     } catch (error) {
       if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {

@@ -110,11 +110,17 @@ export class ProductPanelController {
   ) {
     this.logger.log('create new product');
     try {
-      await this.productService.create({ business_uuid, ...payload });
+      const product = await this.productService.create({
+        business_uuid,
+        ...payload,
+      });
 
       return {
         ok: true,
         message: 'Product created successfully!',
+        data: {
+          uuid: product.uuid,
+        },
       };
     } catch (error) {
       this.logger.log('Error during create new product');

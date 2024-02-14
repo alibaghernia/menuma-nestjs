@@ -49,10 +49,16 @@ export class QrCodePanelController {
     @Body() payload: CreateQrCodeDTO,
   ) {
     try {
-      await this.qrCodePanelService.create(business_uuid, payload);
+      const qrCode = await this.qrCodePanelService.create(
+        business_uuid,
+        payload,
+      );
       return {
         ok: true,
         message: 'Qr Code created successfully!',
+        data: {
+          uuid: qrCode.uuid,
+        },
       };
     } catch (error) {
       throw error;

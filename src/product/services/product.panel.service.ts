@@ -238,6 +238,7 @@ export class ProductPanelService {
         );
 
       await transaction.commit();
+      return product;
     } catch (error) {
       await transaction.rollback();
       throw error;

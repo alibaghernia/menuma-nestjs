@@ -1,9 +1,6 @@
 import { Sequelize } from 'sequelize';
 
-export const doInTransaction = async (
-  seq: Sequelize,
-  func: (transaction) => Promise<unknown>,
-) => {
+export const doInTransaction = async (seq: Sequelize, func) => {
   const transaction = await seq.transaction();
   try {
     const res = await func(transaction);

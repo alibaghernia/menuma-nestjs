@@ -35,10 +35,13 @@ export class DiscountsPanelController {
   }
   @Post()
   async create(@Body() payload: CreateAdminDTO) {
-    await this.discountsPanelService.create(payload);
+    const discount = await this.discountsPanelService.create(payload);
     return {
       ok: true,
       message: 'Discount created successfully!',
+      data: {
+        uuid: discount.uuid,
+      },
     };
   }
   @Put(':uuid')

@@ -12,13 +12,16 @@ export class CustomersController {
 
   @Post()
   async create(@Req() req: Request, @Body() body: CustomerClubCreateDTO) {
-    await this.customersService.create({
+    const customer = await this.customersService.create({
       business_uuid: req.business_guard?.uuid,
       ...body,
     });
     return {
       ok: true,
       message: 'Customer created successfully!',
+      data: {
+        uuid: customer.uuid,
+      },
     };
   }
 }

@@ -77,6 +77,9 @@ export class BusinessPanelController {
     return {
       ok: true,
       message: `${business.name} crearted successfully!`,
+      data: {
+        uuid: business.uuid,
+      },
     };
   }
 

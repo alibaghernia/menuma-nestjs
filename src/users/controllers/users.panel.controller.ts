@@ -64,10 +64,13 @@ export class UsersPanelController {
   async createUser(@Body() payload: CreateUserDTO) {
     this.logger.log('Create new user');
     try {
-      await this.usersService.createUser(payload);
+      const user = await this.usersService.createUser(payload);
       return {
         ok: true,
         message: 'User has created successfully!',
+        data: {
+          uuid: user.uuid,
+        },
       };
     } catch (error) {
       console.log({

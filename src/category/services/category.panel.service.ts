@@ -108,13 +108,14 @@ export class CategoryPanelService {
       });
       if (!business)
         throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-      await business.createCategory({
+      const category = await business.createCategory({
         title: payload.title,
         parent_uuid: payload.parent_uuid,
         slug: payload.slug,
         image: payload.image,
       });
       await transaction.commit();
+      return category;
     } catch (error) {
       await transaction.rollback();
       throw error;

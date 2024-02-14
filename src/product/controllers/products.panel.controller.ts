@@ -49,11 +49,14 @@ export class ProductsPanelController {
     console.log({
       payload,
     });
-    await this.productPanelService.create(payload);
+    const product = await this.productPanelService.create(payload);
 
     return {
       ok: true,
       message: 'Product created successfully!',
+      data: {
+        uuid: product.uuid,
+      },
     };
   }
   @Put(':uuid')

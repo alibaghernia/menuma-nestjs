@@ -143,7 +143,7 @@ export class UsersPanelService {
   async createUser(payload: CreateUserDTO) {
     try {
       const { password, businesses, ...userPayload } = payload;
-      await doInTransaction(this.sequelize, async (transaction) => {
+      return await doInTransaction(this.sequelize, async (transaction) => {
         const user = await this.userRepository.create(
           {
             password: bcrypt.hashSync(password, bcrypt.genSaltSync()),
@@ -181,6 +181,7 @@ export class UsersPanelService {
             }
           }
         }
+        return user;
       });
     } catch (error) {
       if ((error as QueryError)?.name == 'SequelizeUniqueConstraintError') {

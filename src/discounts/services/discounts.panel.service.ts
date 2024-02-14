@@ -52,11 +52,12 @@ export class DiscountsPanelService {
   async create(payload: CreateDTO) {
     const transaction = await this.sequelize.transaction();
     try {
-      await this.discountRepository.create(payload, {
+      const discount = await this.discountRepository.create(payload, {
         transaction,
       });
 
       await transaction.commit();
+      return discount;
     } catch (error) {
       await transaction.rollback();
       throw error;
