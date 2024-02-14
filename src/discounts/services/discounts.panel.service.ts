@@ -3,9 +3,10 @@ import { CreateDTO, FiltersDTO, UpdateDTO } from '../dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { Discount } from '../entities/discount.entity';
 import { Sequelize } from 'sequelize-typescript';
-import { WhereOptions } from 'sequelize';
+import { FindOptions, WhereOptions } from 'sequelize';
 import { Op } from 'sequelize';
 import { getPagination } from 'src/utils/filter';
+import { Business } from 'src/business/entites/business.entity';
 
 @Injectable()
 export class DiscountsPanelService {
@@ -21,17 +22,22 @@ export class DiscountsPanelService {
         [Op.like]: `%${filters.search}%`,
       },
     };
+    const include: FindOptions<Discount>['include'] = [];
     if (filters.business_uuid) where.business_uuid = filters.business_uuid;
+    else {
+      include.push({
+        model: Business,
+        attributes: ['uuid', 'name', 'slug', 'logo'],
+      });
+    }
     if (filters.type != 'ALL') {
       where.type = filters.type;
     }
     const items = await this.discountRepository.findAll({
       where,
-      attributes: {
-        exclude: ['business_uuid'],
-      },
       limit,
       offset,
+      include,
     });
     const count = await this.discountRepository.count({
       where,
@@ -42,9 +48,6 @@ export class DiscountsPanelService {
     const item = await this.discountRepository.findOne({
       where: {
         uuid: uuid,
-      },
-      attributes: {
-        exclude: ['business_uuid'],
       },
     });
     return item;

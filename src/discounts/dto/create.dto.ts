@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsEnum,
   IsNotEmpty,
   IsNumber,
@@ -42,4 +43,7 @@ export class CreateDTO {
 export class CreateAdminDTO extends CreateDTO {
   @IsNotEmpty()
   business_uuid: string;
+  @IsOptional()
+  @IsBoolean()
+  pin: boolean;
 }
