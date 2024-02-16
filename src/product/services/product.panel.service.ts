@@ -275,6 +275,8 @@ export class ProductPanelService {
         await product.setImages([image], {
           transaction,
         });
+      } else {
+        await product.setImages([], { transaction });
       }
 
       if (categories) {

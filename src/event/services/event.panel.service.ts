@@ -90,10 +90,10 @@ export class EventPanelService {
   }
   async update(uuid: string, payload: CreateEventDTO) {
     return doInTransaction(this.sequelize, (transaction) => {
-      return this.eventRepository.update(
-        { ...payload },
-        { transaction, where: { uuid } },
-      );
+      return this.eventRepository.update(payload, {
+        transaction,
+        where: { uuid },
+      });
     });
   }
   async delete(uuid: string) {
