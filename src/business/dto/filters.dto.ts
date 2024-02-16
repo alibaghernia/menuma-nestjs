@@ -60,6 +60,11 @@ export class TablesFiltersDTO {
   @IsString()
   limit: number;
 }
+export class MenuFiltersDTO {
+  @IsOptional()
+  @IsString()
+  search: string = '';
+}
 
 export class PagerRequestsFiltersDTO {
   @IsOptional()

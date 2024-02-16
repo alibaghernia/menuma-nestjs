@@ -7,7 +7,7 @@ import { PagerRequest } from '../entites/pager_request.entity';
 import { STATUS } from '../constants/pager_request.cons';
 import { PagerRequestgGateway } from '../gateways/pager_request.gateway';
 import { BusinessTable } from '../sub_modules/table/entitile/business_tables.entity';
-import { BusinessesFiltersDTO } from '../dto/filters.dto';
+import { BusinessesFiltersDTO, MenuFiltersDTO } from '../dto/filters.dto';
 import { FindAttributeOptions, FindOptions, WhereOptions } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { Op } from 'sequelize';
@@ -120,7 +120,7 @@ export class BusinessService {
 
     return business;
   }
-  async getMenu(slug: string) {
+  async getMenu(slug: string, filters: MenuFiltersDTO) {
     const business = await this.businessRepository.findOne({
       where: {
         slug: slug,
@@ -129,7 +129,11 @@ export class BusinessService {
 
     if (!business)
       throw new HttpException('Business not found!', HttpStatus.NOT_FOUND);
-
+    const productWhere: WhereOptions<Product> = {
+      title: {
+        [Op.like]: `%${filters.search}%`,
+      },
+    };
     const businessCategories = await this.businessCategoryRepository.findAll({
       where: {
         business_uuid: business.uuid,
@@ -143,6 +147,7 @@ export class BusinessService {
           through: {
             attributes: [],
           },
+          where: productWhere,
           include: [
             {
               model: File,

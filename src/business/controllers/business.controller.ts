@@ -13,7 +13,7 @@ import { UUIDCheckerController } from 'src/pipes/uuid_checker_controller.pipe';
 import { NewPagerRequestDTO } from '../dto';
 import { BusinessService } from '../services/business.service';
 import { IsPublic } from 'src/auth/decorators/is_public.decorator';
-import { BusinessesFiltersDTO } from '../dto/filters.dto';
+import { BusinessesFiltersDTO, MenuFiltersDTO } from '../dto/filters.dto';
 import { CheckBusinessExistsGuard } from '../guards/exists.guard';
 
 @Controller('business')
@@ -44,8 +44,11 @@ export class BusinessController {
     };
   }
   @Get(':business_slug/menu')
-  async getMenu(@Param('business_slug') business_slug: string) {
-    const business = await this.businessService.getMenu(business_slug);
+  async getMenu(
+    @Param('business_slug') business_slug: string,
+    @Query() filters: MenuFiltersDTO,
+  ) {
+    const business = await this.businessService.getMenu(business_slug, filters);
     return {
       ok: true,
       data: business,
