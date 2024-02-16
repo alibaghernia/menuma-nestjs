@@ -5,6 +5,7 @@ import {
   IsUUID,
   IsNumber,
   IsEnum,
+  IsBoolean,
 } from 'class-validator';
 
 export enum organizerEnum {
@@ -67,4 +68,8 @@ export class CreateEventDTO {
   @IsOptional()
   @IsUUID()
   readonly image: string;
+
+  @IsOptional()
+  @IsBoolean()
+  readonly pin: boolean;
 }
