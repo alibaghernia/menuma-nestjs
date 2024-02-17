@@ -34,6 +34,9 @@ export class Customer extends Model<Customer> {
   @Column({ type: DataType.STRING(100), allowNull: false })
   birth_date: string;
 
+  @Column({ type: DataType.STRING, allowNull: false })
+  description: string;
+
   @ForeignKey(() => Business)
   @Column({
     type: DataType.UUID,

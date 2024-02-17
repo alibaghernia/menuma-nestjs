@@ -21,6 +21,10 @@ export class CreateCustomerDto {
   @IsString()
   mobile: string;
 
+  @IsOptional()
+  @IsString()
+  description: string;
+
   @IsNotEmpty()
   @IsUUID()
   business_uuid: string;
