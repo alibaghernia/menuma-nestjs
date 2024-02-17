@@ -32,6 +32,7 @@ import { BusinessTable } from './sub_modules/table/entitile/business_tables.enti
 import { Product } from 'src/product/entities/product.entity';
 import { QrCodePanelController } from './controllers/qr-code/qr-code.panel.controller';
 import { QrCodeModule } from 'src/qr-code/qr-code.module';
+import { Customer } from 'src/customers/entities/customer.entity';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { QrCodeModule } from 'src/qr-code/qr-code.module';
       BusinessTable,
       PagerRequest,
       Product,
+      Customer,
     ]),
     ProductModule,
     CategoryModule,

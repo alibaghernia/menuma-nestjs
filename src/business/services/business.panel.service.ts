@@ -27,8 +27,8 @@ import {
 import { PagerRequest } from '../entites/pager_request.entity';
 import { PagerRequestgGateway } from '../gateways/pager_request.gateway';
 import { getPagination } from 'src/utils/filter';
-import { BusinessCategory } from '../entites/business_category.entity';
 import { Product } from 'src/product/entities/product.entity';
+import { Customer } from 'src/customers/entities/customer.entity';
 
 @Injectable()
 export class BusinessPanelService {
@@ -44,8 +44,8 @@ export class BusinessPanelService {
     private businessUserRepository: typeof BusinessUser,
     @InjectModel(PagerRequest)
     private pagerRequestRepository: typeof PagerRequest,
-    @InjectModel(BusinessCategory)
-    private businessCategoryRepository: typeof BusinessCategory,
+    @InjectModel(Customer)
+    private customerRepository: typeof Customer,
     @InjectModel(Product)
     private productRepository: typeof Product,
     private sequelize: Sequelize,
@@ -117,20 +117,30 @@ export class BusinessPanelService {
   }
 
   async statistics(uuid: string) {
-    const categories = await this.businessCategoryRepository.count({
+    const customers = await this.customerRepository.count({
       where: {
         business_uuid: uuid,
       },
     });
+    const productWhere: WhereOptions<Product> = {
+      [Op.and]: [
+        this.sequelize.fn(
+          'JSON_CONTAINS',
+          this.sequelize.col('metadata'),
+          '"sold_out"',
+        ),
+        {
+          business_uuid: uuid,
+        },
+      ],
+    };
     const items = await this.productRepository.count({
-      where: {
-        business_uuid: uuid,
-      },
+      where: productWhere,
     });
 
     return {
-      categories,
-      items,
+      customers,
+      sold_out: items,
     };
   }
 
