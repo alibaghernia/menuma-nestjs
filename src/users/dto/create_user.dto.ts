@@ -11,6 +11,7 @@ export class CreateUserDTO {
   @IsNotEmpty()
   first_name: string;
 
+  @IsOptional()
   @IsString()
   last_name: string;
 

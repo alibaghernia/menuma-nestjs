@@ -373,6 +373,7 @@ export class BusinessPanelService {
               },
             },
           ],
+          transaction,
         });
         if (!user)
           throw new HttpException(
@@ -387,6 +388,7 @@ export class BusinessPanelService {
           where: {
             uuid: business_uuid,
           },
+          transaction,
         });
       }
       if (!business)
@@ -394,12 +396,21 @@ export class BusinessPanelService {
           "Business not found or you dont' have enough permission!",
           HttpStatus.NOT_FOUND,
         );
-      if (await business.hasUser(user_uuid))
+      if (await business.hasUser(user_uuid, { transaction }))
         throw new HttpException(
           'this user is already registered in this business!',
           HttpStatus.BAD_REQUEST,
         );
-      await business.addUser(user_uuid);
+      await business.addUser(user_uuid, { transaction });
+      const user = await this.businessUserRepository.findOne({
+        where: {
+          business_uuid: business.uuid,
+          user_uuid,
+        },
+        transaction,
+      });
+      await transaction.commit();
+      return user;
     } catch (error) {
       console.log({
         error,

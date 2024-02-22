@@ -115,10 +115,13 @@ export class BusinessPanelController {
     @Param('business_uuid', new UUIDChecker('Business UUID')) id: string,
     @Param('user_uuid', new UUIDChecker('User UUID')) user_uuid: string,
   ) {
-    await this.businessService.addUser(id, user_uuid);
+    const bUser = await this.businessService.addUser(id, user_uuid);
     return {
       ok: true,
       message: 'User added to business successfully!',
+      data: {
+        uuid: bUser.uuid,
+      },
     };
   }
 

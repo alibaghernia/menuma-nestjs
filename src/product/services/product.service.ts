@@ -117,7 +117,7 @@ export class ProductService {
     const where = this.sequelize.fn(
       'JSON_CONTAINS',
       this.sequelize.col('metadata'),
-      '"offer"',
+      '"day_offer"',
     );
     const items = await this.productRepository.findAll({
       where,

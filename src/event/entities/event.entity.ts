@@ -54,10 +54,10 @@ export class Event extends Model<Event> {
   @Column({ type: DataType.UUID })
   banner_uuid: string;
 
-  @Column({ type: DataType.STRING(100) })
+  @Column({ type: DataType.TEXT })
   short_description: string;
 
-  @Column({ type: DataType.STRING(100) })
+  @Column({ type: DataType.TEXT })
   long_description: string;
 
   @Column({ type: DataType.STRING(100), allowNull: false })

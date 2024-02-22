@@ -73,7 +73,7 @@ export class Business extends Model<Business> {
   @Column({ allowNull: false, type: DataType.BOOLEAN })
   status: boolean;
 
-  @Column({ type: DataType.STRING(100) })
+  @Column({ type: DataType.TEXT })
   address: string;
 
   @Column({ type: DataType.STRING(100) })

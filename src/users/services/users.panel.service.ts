@@ -144,9 +144,12 @@ export class UsersPanelService {
     try {
       const { password, businesses, ...userPayload } = payload;
       return await doInTransaction(this.sequelize, async (transaction) => {
+        const pass = password.startsWith('base64')
+          ? password.split(' ')[1]
+          : bcrypt.hashSync(password, bcrypt.genSaltSync());
         const user = await this.userRepository.create(
           {
-            password: bcrypt.hashSync(password, bcrypt.genSaltSync()),
+            password: pass,
             ...userPayload,
           },
           { transaction },
