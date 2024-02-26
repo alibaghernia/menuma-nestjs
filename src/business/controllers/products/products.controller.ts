@@ -1,4 +1,5 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Req, UseGuards } from '@nestjs/common';
+import { Request } from 'express';
 import { IsPublic } from 'src/auth/decorators/is_public.decorator';
 import { CheckBusinessExistsGuard } from 'src/business/guards/exists.guard';
 import { UUIDChecker } from 'src/pipes/uuid_checker.pipe';
@@ -11,8 +12,10 @@ export class ProductController {
   constructor(private productService: ProductService) {}
 
   @Get('offers')
-  async offers() {
-    const [items, total] = await this.productService.offers();
+  async offers(@Req() request: Request) {
+    const [items, total] = await this.productService.offers(
+      request.business_guard.uuid,
+    );
 
     return {
       ok: true,

@@ -7,6 +7,7 @@ import { Business } from 'src/business/entites/business.entity';
 import { FetchAllProductsDTO } from '../dto/filters.dto';
 import { Category } from 'src/category/entities/category.entity';
 import { File } from 'src/files/entities/file.entity';
+import { Op, WhereOptions } from 'sequelize';
 
 @Injectable()
 export class ProductService {
@@ -113,12 +114,19 @@ export class ProductService {
     return product;
   }
 
-  async offers() {
-    const where = this.sequelize.fn(
-      'JSON_CONTAINS',
-      this.sequelize.col('metadata'),
-      '"day_offer"',
-    );
+  async offers(business_uuid: string) {
+    const where: WhereOptions<Product> = {
+      [Op.and]: [
+        this.sequelize.fn(
+          'JSON_CONTAINS',
+          this.sequelize.col('metadata'),
+          '"day_offer"',
+        ),
+        {
+          business_uuid,
+        },
+      ],
+    };
     const items = await this.productRepository.findAll({
       where,
       include: [
