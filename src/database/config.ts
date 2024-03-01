@@ -29,6 +29,7 @@ import { Customer } from '../customers/entities/customer.entity';
 import { Discount } from 'src/discounts/entities/discount.entity';
 import { Catalog } from 'src/catalogs/entities/catalog.entity';
 import { Request } from 'src/requests/entities/request.entity';
+import { BusinessMetadata } from 'src/business/entites/business-metadata.entity';
 
 dotenvConfig({ path: '.env' });
 
@@ -69,6 +70,7 @@ const config: SequelizeModuleOptions = {
     Discount,
     Catalog,
     Request,
+    BusinessMetadata,
   ],
 };
 
