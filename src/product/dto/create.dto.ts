@@ -29,6 +29,10 @@ export class CreateProductDTO {
   @IsString()
   image: string;
 
+  @IsOptional()
+  @IsNumber()
+  order: number;
+
   @IsArray()
   @ArrayMinSize(1)
   @ValidateNested({ each: true })

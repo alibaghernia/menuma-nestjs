@@ -57,6 +57,13 @@ export class Category extends Model<Category> {
     type: DataType.STRING,
   })
   image: string;
+
+  @Column({
+    type: DataType.NUMBER,
+    allowNull: false,
+    defaultValue: 0,
+  })
+  order: number;
   setImageUrl() {
     const image = this.getDataValue('image');
     if (image) this.setDataValue('image_url', makeImageUrl(image));

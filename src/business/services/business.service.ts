@@ -138,6 +138,10 @@ export class BusinessService {
       where: {
         business_uuid: business.uuid,
       },
+      order: [
+        [this.sequelize.col('category.order'), 'ASC'],
+        [this.sequelize.col('products.order'), 'ASC'],
+      ],
       include: [
         {
           model: Category,

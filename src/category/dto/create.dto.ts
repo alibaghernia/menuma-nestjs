@@ -1,6 +1,7 @@
 import {
   IsEmpty,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   IsUUID,
@@ -22,6 +23,10 @@ export class CreateDTO {
   @IsOptional()
   @IsUUID()
   parent_uuid: string;
+
+  @IsOptional()
+  @IsNumber()
+  order: number;
 
   @IsEmpty()
   business_uuid: string;

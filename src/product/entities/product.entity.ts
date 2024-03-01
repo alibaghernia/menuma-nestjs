@@ -90,6 +90,13 @@ export class Product extends Model<Product> {
   })
   business_uuid: string;
 
+  @Column({
+    type: DataType.NUMBER,
+    allowNull: false,
+    defaultValue: 0,
+  })
+  order: number;
+
   @HasMany(() => Tag, {
     as: 'tags',
     foreignKey: 'tagable_uuid',
