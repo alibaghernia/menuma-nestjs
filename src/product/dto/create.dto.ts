@@ -46,6 +46,15 @@ export class CreateProductDTO {
   business_uuid: string;
 }
 
+export class UpdateProductDTO extends CreateProductDTO {
+  @IsOptional()
+  title: string;
+  @IsOptional()
+  prices: ProductPrice[];
+  @IsOptional()
+  categories: string;
+}
+
 export class Price {
   @IsOptional()
   @IsString()

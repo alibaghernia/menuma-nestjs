@@ -13,7 +13,10 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { ProductPanelService } from '../../../product/services/product.panel.service';
-import { CreateProductDTO } from '../../../product/dto/create.dto';
+import {
+  CreateProductDTO,
+  UpdateProductDTO,
+} from '../../../product/dto/create.dto';
 import { CheckPermissions } from 'src/access_control/decorators/check_permissions.decorator';
 import { CheckPermissionsGuard } from 'src/access_control/guards/check_permissions.guard';
 import { product_permissions } from 'src/access_control/constants';
@@ -132,7 +135,7 @@ export class ProductPanelController {
   async update(
     @Param('business_uuid') business_uuid: string,
     @Param('uuid') product_uuid: string,
-    @Body() payload: CreateProductDTO,
+    @Body() payload: UpdateProductDTO,
   ) {
     this.logger.log('update product');
     try {

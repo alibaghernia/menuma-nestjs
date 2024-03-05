@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Product } from '../entities/product.entity';
-import { CreateProductDTO } from '../dto/create.dto';
+import { CreateProductDTO, UpdateProductDTO } from '../dto/create.dto';
 import { REQUEST } from '@nestjs/core';
 import { User } from 'src/users/entites/user.entity';
 import { Request } from 'express';
@@ -33,11 +33,21 @@ export class ProductPanelService {
 
   async fetchAll(filters: FiltersDTO) {
     const { offset, limit } = getPagination(filters);
-    const where: WhereOptions<Product> = {
+    const where: any = {
       title: {
         [Op.like]: `%${filters.title}%`,
       },
+      [Op.and]: [],
     };
+    if (filters.sold_out) {
+      where[Op.and].push(
+        this.sequelize.fn(
+          'JSON_CONTAINS',
+          this.sequelize.col('metadata'),
+          '"sold_out"',
+        ),
+      );
+    }
     const include: FindOptions<Product>['include'] = [
       {
         model: BusinessCategory,
@@ -55,7 +65,9 @@ export class ProductPanelService {
         attributes: ['uuid', 'name', 'slug', 'status', 'logo'],
       },
     ];
-    if (filters.business_uuid) where.business_uuid = filters.business_uuid;
+    if (filters.business_uuid) {
+      where.business_uuid = filters.business_uuid;
+    }
     const products = await this.productRepository.findAll({
       where,
       offset,
@@ -64,6 +76,10 @@ export class ProductPanelService {
         exclude: ['business_uuid'],
       },
       include,
+      order: [
+        ['order', 'asc'],
+        ['createdAt', 'asc'],
+      ],
     });
     const count = await this.productRepository.count({
       where,
@@ -76,7 +92,6 @@ export class ProductPanelService {
       );
       return product;
     });
-    console.log('find all');
     return {
       products,
       total: count,
@@ -244,7 +259,7 @@ export class ProductPanelService {
       throw error;
     }
   }
-  async update(product_uuid: string, payload: CreateProductDTO) {
+  async update(product_uuid: string, payload: UpdateProductDTO) {
     const transaction = await this.sequelize.transaction();
     try {
       const business = await this.businessRepository.findOne({
@@ -270,15 +285,16 @@ export class ProductPanelService {
       if (!product)
         throw new HttpException('Product not found!', HttpStatus.NOT_FOUND);
 
-      // handle image
-      if (image) {
-        await product.setImages([image], {
-          transaction,
-        });
-      } else {
-        await product.setImages([], { transaction });
+      if (typeof image != 'undefined') {
+        // handle image
+        if (image) {
+          await product.setImages([image], {
+            transaction,
+          });
+        } else {
+          await product.setImages([], { transaction });
+        }
       }
-
       if (categories) {
         if (
           await business.hasCategory(categories, {

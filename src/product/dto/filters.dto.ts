@@ -16,6 +16,11 @@ export class FiltersDTO extends PaginationDto {
   @IsOptional()
   @IsUUID()
   business_uuid: string;
+
+  @IsOptional()
+  @Transform((v: any) => v?.value == 'true')
+  @IsBoolean()
+  readonly sold_out: boolean;
 }
 
 export class FetchAllProductsDTO extends FiltersDTO {
@@ -24,6 +29,7 @@ export class FetchAllProductsDTO extends FiltersDTO {
 
   @IsOptional()
   readonly limit: number;
+
   @IsOptional()
   @IsBoolean()
   @Transform(({ value }) => value == '1' || value == 'true')

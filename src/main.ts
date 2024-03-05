@@ -25,6 +25,7 @@ async function bootstrap() {
 
   app.useGlobalPipes(
     new ValidationPipe({
+      always: true,
       whitelist: true,
       forbidNonWhitelisted: true,
       forbidUnknownValues: true,
